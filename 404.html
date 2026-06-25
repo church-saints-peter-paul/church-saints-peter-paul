@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - الصفحة غير موجودة</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d0a0a 50%, #1a1a1a 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* خلفية متحركة مع نجوم */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .star {
+            position: absolute;
+            background: #d4a017;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0; transform: scale(0); }
+            50% { opacity: 1; transform: scale(1); }
+        }
+
+        /* الحاوية الرئيسية */
+        .error-container {
+            text-align: center;
+            padding: 40px;
+            position: relative;
+            z-index: 10;
+            max-width: 800px;
+            width: 90%;
+        }
+
+        /* رقم 404 المتحرك */
+        .error-number {
+            font-size: 15rem;
+            font-weight: 900;
+            background: linear-gradient(45deg, #800000, #d4a017, #800000);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientMove 3s ease infinite;
+            text-shadow: 0 0 80px rgba(212, 160, 23, 0.5);
+            letter-spacing: 10px;
+            position: relative;
+            line-height: 1;
+            margin-bottom: 30px;
+        }
+
+        @keyframes gradientMove {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        /* تأثير الضوء خلف الرقم */
+        .glow-effect {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(212, 160, 23, 0.3) 0%, transparent 70%);
+            animation: pulse 2s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
+            50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.8; }
+        }
+
+        /* العنوان */
+        .error-title {
+            font-size: 3rem;
+            color: #d4a017;
+            margin-bottom: 20px;
+            font-weight: 700;
+            text-shadow: 0 0 20px rgba(212, 160, 23, 0.5);
+            animation: fadeInUp 1s ease;
+        }
+
+        /* الوصف */
+        .error-description {
+            font-size: 1.3rem;
+            color: #efdfbf;
+            margin-bottom: 40px;
+            line-height: 1.8;
+            animation: fadeInUp 1.2s ease;
+            opacity: 0.9;
+        }
+
+        /* الأزرار */
+        .error-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: fadeInUp 1.4s ease;
+        }
+
+        .btn {
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            text-decoration: none;
+            display: inline-block;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #800000, #d4a017);
+            color: white;
+            box-shadow: 0 10px 30px rgba(128, 0, 0, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #d4a017, #f0c14b);
+            color: #1a1a1a;
+            box-shadow: 0 10px 30px rgba(212, 160, 23, 0.4);
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 40px rgba(128, 0, 0, 0.6);
+        }
+
+        .btn:active {
+            transform: translateY(-2px) scale(1.02);
+        }
+
+        /* أيقونة الكنيسة المتحركة */
+        .church-icon {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 30px;
+            position: relative;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .church-icon::before {
+            content: '✝';
+            font-size: 80px;
+            color: #d4a017;
+            display: block;
+            text-shadow: 0 0 30px rgba(212, 160, 23, 0.8);
+            animation: rotate 10s linear infinite;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* خطوط متحركة في الخلفية */
+        .bg-lines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .line {
+            position: absolute;
+            width: 2px;
+            height: 100%;
+            background: linear-gradient(180deg, transparent, rgba(212, 160, 23, 0.2), transparent);
+            animation: lineMove 4s linear infinite;
+        }
+
+        .line:nth-child(1) { left: 10%; animation-delay: 0s; }
+        .line:nth-child(2) { left: 30%; animation-delay: 1s; }
+        .line:nth-child(3) { left: 50%; animation-delay: 2s; }
+        .line:nth-child(4) { left: 70%; animation-delay: 3s; }
+        .line:nth-child(5) { left: 90%; animation-delay: 1.5s; }
+
+        @keyframes lineMove {
+            0% { transform: translateY(-100%); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateY(100%); opacity: 0; }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* دوائر متحركة */
+        .floating-circles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .circle {
+            position: absolute;
+            border-radius: 50%;
+            border: 2px solid rgba(212, 160, 23, 0.2);
+            animation: floatCircle 20s linear infinite;
+        }
+
+        .circle:nth-child(1) {
+            width: 80px;
+            height: 80px;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .circle:nth-child(2) {
+            width: 120px;
+            height: 120px;
+            left: 80%;
+            animation-delay: 5s;
+        }
+
+        .circle:nth-child(3) {
+            width: 60px;
+            height: 60px;
+            left: 50%;
+            animation-delay: 10s;
+        }
+
+        @keyframes floatCircle {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* تأثير الجسيمات */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #d4a017;
+            border-radius: 50%;
+            animation: particleFloat 15s linear infinite;
+            opacity: 0;
+        }
+
+        @keyframes particleFloat {
+            0% {
+                transform: translateY(100vh) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) translateX(100px);
+                opacity: 0;
+            }
+        }
+
+        /* استجابة الموبايل */
+        @media (max-width: 768px) {
+            .error-number {
+                font-size: 8rem;
+                letter-spacing: 5px;
+            }
+
+            .error-title {
+                font-size: 2rem;
+            }
+
+            .error-description {
+                font-size: 1.1rem;
+            }
+
+            .btn {
+                padding: 12px 30px;
+                font-size: 1rem;
+                width: 100%;
+                max-width: 300px;
+            }
+
+            .error-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .church-icon {
+                width: 80px;
+                height: 80px;
+            }
+
+            .church-icon::before {
+                font-size: 60px;
+            }
+
+            .glow-effect {
+                width: 250px;
+                height: 250px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .error-number {
+                font-size: 6rem;
+            }
+
+            .error-title {
+                font-size: 1.5rem;
+            }
+
+            .error-description {
+                font-size: 1rem;
+                padding: 0 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- خلفية النجوم -->
+    <div class="stars" id="stars"></div>
+
+    <!-- خطوط متحركة -->
+    <div class="bg-lines">
+        <div class="line"></div>
+        <div class="line"></div>
+        <div class="line"></div>
+        <div class="line"></div>
+        <div class="line"></div>
+    </div>
+
+    <!-- دوائر متحركة -->
+    <div class="floating-circles">
+        <div class="circle"></div>
+        <div class="circle"></div>
+        <div class="circle"></div>
+    </div>
+
+    <!-- جسيمات متحركة -->
+    <div class="particles" id="particles"></div>
+
+    <!-- المحتوى الرئيسي -->
+    <div class="error-container">
+        <div class="glow-effect"></div>
+        
+        <div class="church-icon"></div>
+        
+        <div class="error-number">404</div>
+        
+        <h1 class="error-title">عذراً، الصفحة غير موجودة</h1>
+        
+        <p class="error-description">
+            يبدو أن الصفحة التي تبحث عنها قد تم نقلها أو حذفها أو ربما لم تكن موجودة من الأساس.
+            <br>
+            لا تقلق، يمكنك العودة إلى الصفحة الرئيسية أو البحث عما تريد.
+        </p>
+        
+        <div class="error-buttons">
+            <a href="index.html" class="btn btn-primary">العودة للصفحة الرئيسية</a>
+            <a href="javascript:history.back()" class="btn btn-secondary">العودة للصفحة السابقة</a>
+        </div>
+    </div>
+
+    <script>
+        // إنشاء النجوم المتحركة
+        const starsContainer = document.getElementById('stars');
+        for (let i = 0; i < 100; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            star.style.width = Math.random() * 3 + 'px';
+            star.style.height = star.style.width;
+            star.style.left = Math.random() * 100 + '%';
+            star.style.top = Math.random() * 100 + '%';
+            star.style.animationDelay = Math.random() * 3 + 's';
+            star.style.animationDuration = (Math.random() * 2 + 2) + 's';
+            starsContainer.appendChild(star);
+        }
+
+        // إنشاء الجسيمات المتحركة
+        const particlesContainer = document.getElementById('particles');
+        for (let i = 0; i < 30; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 15 + 's';
+            particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+            particlesContainer.appendChild(particle);
+        }
+
+        // تأثير حركة الماوس على الرقم 404
+        const errorNumber = document.querySelector('.error-number');
+        document.addEventListener('mousemove', (e) => {
+            const x = (e.clientX / window.innerWidth - 0.5) * 20;
+            const y = (e.clientY / window.innerHeight - 0.5) * 20;
+            errorNumber.style.transform = `translate(${x}px, ${y}px)`;
+        });
+
+        // تأثير النقر على الأزرار
+        const buttons = document.querySelectorAll('.btn');
+        buttons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                const ripple = document.createElement('span');
+                const rect = this.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size / 2;
+                const y = e.clientY - rect.top - size / 2;
+                
+                ripple.style.width = ripple.style.height = size + 'px';
+                ripple.style.left = x + 'px';
+                ripple.style.top = y + 'px';
+                ripple.style.position = 'absolute';
+                ripple.style.borderRadius = '50%';
+                ripple.style.background = 'rgba(255, 255, 255, 0.5)';
+                ripple.style.transform = 'scale(0)';
+                ripple.style.animation = 'ripple-effect 0.6s ease-out';
+                
+                this.appendChild(ripple);
+                
+                setTimeout(() => ripple.remove(), 600);
+            });
+        });
+
+        // إضافة تأثير الأنيميشن للريبل
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes ripple-effect {
+                to {
+                    transform: scale(4);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

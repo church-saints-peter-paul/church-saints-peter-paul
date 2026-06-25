@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>التكوين</title>
+</head>
+<style>
+
+@import url('https://fonts.googleapis.com/css2?family=Amiri&display=swap');
+
+body {
+    font-family: 'Amiri', serif;
+    direction: rtl;
+    font-size: 16px; /* حجم الخط الأساسي */
+    text-align: center; /* لضبط النص في المنتصف */
+    margin: 0;
+    padding: 0;
+}
+
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: #800000;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+.top-bar a {
+    color: white;
+    text-decoration: none;
+    font-size: 1.2em;
+}
+
+.theme-toggle {
+    background-color: #800000;
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    font-size: 1em;
+    border-radius: 5px;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.theme-toggle:hover {
+    background-color: #0056b3;
+    transform: scale(1.05);
+}
+
+.navbar {
+    background-color: #800000;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+}
+
+.navbar .site-name {
+    font-size: 1.5em;
+    margin: 0;
+}
+
+.about-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 50px;
+    opacity: 0;
+    transform: translateY(50px);
+    transition: opacity 1s, transform 1s;
+}
+
+.about-section.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.about-section ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.about-section ul li {
+    margin: 10px 0;
+}
+
+.about-section ul li a {
+    text-decoration: none;
+    color: #800000;
+    font-size: 1.2em;
+}
+
+.about-section ul li a:hover {
+    text-decoration: underline;
+}
+
+.text-content {
+    margin: 20px;
+    text-align: justify;
+    line-height: 1.6;
+}
+
+footer {
+    background: #1f1f1f;
+    color: #ffffff;
+    text-align: center;
+    padding: 1rem 0;
+    width: 100%;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+    font-size: 0.875rem;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+footer a {
+    color: #3ad1ff;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+footer a:hover {
+    color: #1e90ff;
+}
+
+.font-size-controls {
+    display: flex;
+    justify-content: center;
+    margin: 20px;
+}
+
+.font-size-controls button {
+    margin: 0 10px;
+    padding: 10px;
+    font-size: 1em;
+    cursor: pointer;
+}
+
+/* تصميم المؤشر بشكل جذاب */
+.font-size-indicator {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #ffffff;
+    border: 2px solid #800000;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 1.2em;
+    color: #800000;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.font-size-indicator:hover {
+    background-color: #800000;
+    color: #ffffff;
+    transform: scale(1.2);
+}
+
+
+</style>
+
+<body>
+<body class="light-mode">
+    <div class="top-bar">
+        <a href="enjeel.html">الرجوع</a>
+        <div class="font-size-indicator" onclick="toggleFontSizeMenu()">أ</div>
+    </div>
+    <header class="navbar">
+        <span class="site-name">اَلْمَزْمور الثَّانِي وَالأَرْبَعونَ</span>
+        <div class="font-size-controls" id="fontSizeControls">
+            <button onclick="changeFontSize(-1)">تصغير النص</button>
+            <button onclick="changeFontSize(1)">تكبير النص</button>
+    </header>
+    <main>
+        <section class="about-section show">
+            <div class="text-content">
+                <ul>
+                    
+                    1كَمَا يَشْتَاق الإِيَّل إِلَى جَدَاوِلِ الْمِيَاهِ، هكَذَا تَشْتَاق نَفْسِي إِلَيْكَ يَا الله. 2عَطِشَتْ نَفْسِي إِلَى اللهِ، إِلَى الإِلهِ الْحَيِّ. مَتَى أَجِيء وَأَتَرَاءَى قدَّامَ اللهِ ؟ 3صَارَتْ لِي دموعِي خبْزًا نَهَارًا وَلَيْلاً إِذْ قِيلَ لِي كلَّ يَوْمٍ: «أَيْنَ إِلهكَ؟ ». 4هذِهِ أَذْكرهَا فَأَسْكب نَفْسِي عَلَيَّ: لأَنِّي كنْت أَمرّ مَعَ الْجمَّاعِ، أَتَدَرَّج مَعَهمْ إِلَى بَيْتِ اللهِ بِصَوْتِ تَرَنّمٍ وَحَمْدٍ، جمْهورٌ معَيِّدٌ. 5لِمَاذَا أَنْتِ منْحَنِيَةٌ يَا نَفْسِي؟ وَلِمَاذَا تَئِنِّينَ فِيَّ؟ ارْتَجِي اللهَ، لأَنِّي بَعْد أَحْمَده، لأَجْلِ خَلاَصِ وَجْهِهِ.
+
+6يَا إِلهِي، نَفْسِي منْحَنِيَةٌ فِيَّ، لِذلِكَ أَذْكركَ مِنْ أَرْضِ الأرْدنِّ وَجِبَالِ حَرْمونَ، مِنْ جَبَلِ مِصْعَرَ. 7غَمْرٌ ينَادِي غَمْرًا عِنْدَ صَوْتِ مَيَازِيبِكَ. كلّ تَيَّارَاتِكَ وَلجَجِكَ طَمَتْ عَلَيَّ. 8بِالنَّهَارِ يوصِي الرَّبّ رَحْمَتَه، وَبِاللَّيْلِ تَسْبِيحه عِنْدِي صَلاَةٌ لإِلهِ حَيَاتِي. 9أَقول ِللهِ صَخْرَتِي: «لِمَاذَا نَسِيتَنِي؟ لِمَاذَا أَذْهَب حَزِينًا مِنْ مضَايَقَةِ الْعَدوِّ؟ ». 10بِسَحْق فِي عِظَامِي عَيَّرَنِي مضَايِقِيَّ، بِقَوْلِهِمْ لِي كلَّ يَوْمٍ: «أَيْنَ إِلهكَ؟ ». 11لِمَاذَا أَنْتِ منْحَنِيَةٌ يَا نَفْسِي؟ وَلِمَاذَا تَئِنِّينَ فِيَّ؟ تَرَجَّيِاللهَ، لأَنِّي بَعْد أَحْمَده، خَلاَصَ وَجْهِي وَإِلهِي.
+
+                </ul>
+            </div>
+            
+            </div>
+        </section>
+    </main>
+    <footer>
+        © 2024 الإنجيل. جميع الحقوق محفوظة.
+    </footer>
+    <script>
+        function changeFontSize(delta) {
+            const content = document.querySelector('.text-content');
+            const currentSize = parseFloat(window.getComputedStyle(content, null).getPropertyValue('font-size'));
+            content.style.fontSize = (currentSize + delta) + 'px';
+        }
+
+        function toggleFontSizeMenu() {
+            const fontSizeControls = document.getElementById('fontSizeControls');
+            fontSizeControls.style.display = fontSizeControls.style.display === 'none' || fontSizeControls.style.display === '' ? 'flex' : 'none';
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('fontSizeControls').style.display = 'none';
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1899 @@
+<!DOCTYPE html>
+<html lang="ar">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>كنيسة القديسين بطرس وبولس</title>
+
+    <link rel="icon" href="123.icon">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Media queries to resolve double login button issue */
+@media (max-width:768px){
+
+    #loginButton{
+        display:none !important;
+    }
+
+    #loginButtonMobile.hidden{
+        display:none !important;
+    }
+
+}
+
+        /* Preloader smooth fade */
+        #preloader {
+            transition: opacity 0.4s ease;
+        }
+
+        /* Custom Glassmorphic Modal & Toast */
+        .custom-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .custom-modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .custom-modal-box {
+            background: linear-gradient(135deg, rgba(1, 51, 70, 0.95), rgba(2, 34, 46, 0.95));
+            border: 1px solid rgba(212, 160, 23, 0.4);
+            border-radius: 15px;
+            padding: 25px 30px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            transform: scale(0.8);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .custom-modal-overlay.show .custom-modal-box {
+            transform: scale(1);
+        }
+
+        .custom-modal-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #d4a017;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .custom-modal-message {
+            font-size: 15px;
+            color: #edf5f7;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        .custom-modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .custom-modal-btn {
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+        }
+
+        .custom-modal-btn-cancel {
+            background: rgba(255, 255, 255, 0.1);
+            color: #edf5f7;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .custom-modal-btn-cancel:hover {
+            background: rgba(255, 255, 255, 0.18);
+        }
+
+        .custom-modal-btn-confirm {
+            background: #d4a017;
+            color: #013346;
+        }
+
+        .custom-modal-btn-confirm:hover {
+            background: #f7c339;
+            box-shadow: 0 0 10px rgba(212, 160, 23, 0.5);
+        }
+
+        /* Toast Notification Styles */
+        .custom-toast-container {
+            position: fixed;
+            top: 25px;
+            left: 25px;
+            z-index: 1000000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .custom-toast {
+            background: rgba(1, 51, 70, 0.95);
+            border: 1px solid rgba(212, 160, 23, 0.4);
+            border-radius: 8px;
+            padding: 14px 20px;
+            min-width: 280px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #edf5f7;
+            animation: toastSlideIn 0.3s ease forwards;
+            direction: rtl;
+        }
+
+        .custom-toast.toast-warning {
+            border-right: 4px solid #ffd166;
+        }
+
+        .custom-toast.toast-success {
+            border-right: 4px solid #51cf66;
+        }
+
+        .custom-toast.toast-error {
+            border-right: 4px solid #ff6b6b;
+        }
+
+        @keyframes toastSlideIn {
+            from {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes toastSlideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+
+            to {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css"
+        integrity="sha512-1cK78a1o+ht2JcaW6g8OXYwqpev9+6GqOkz9xmBN9iUUhIndKtxwILGWYOSibOKjLsEdjyjZvYDq/cZwNeak0w=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+
+
+
+
+<body class="light-mode">
+    <div id="preloader">
+        <div class="spinner"></div>
+    </div>
+
+    <div class="custom-cursor"></div>
+
+    <header class="top-bar" id="topBar">
+        <div class="container">
+            <!-- Desktop Header Content -->
+            <div class="top-bar-content desktop-only-header">
+                <div class="site-branding">
+                    <div class="site-name">كنيسة القديسين بطرس وبولس</div>
+
+                    <div class="welcome-section">
+                        <div id="welcomeMessage" class="welcome-message" style="display: none;">
+                            ازيك يا <span id="userName"></span>
+                        </div>
+                        <button id="loginButton" class="register-button">تسجيل الدخول</button>
+                        <button id="logoutButton" class="register-button"
+                            style="display: none; background: #800000; margin-right: 5px;">تسجيل الخروج</button>
+                        <button id="adminDashboardBtn" class="register-button"
+                            style="display: none; background: #d4a017; color: #013346; margin-right: 5px;">لوحة التحكم</button>
+                        <button id="serviceControlBtn" class="register-button"
+                            style="display: none; background: #2e7d32; color: #ffffff; margin-right: 5px;">التحكم في الخدمة</button>
+                    </div>
+                </div>
+                
+                <div class="theme-switch-wrapper">
+                    <input type="checkbox" id="theme-switch" class="theme-switch">
+                    <label for="theme-switch" class="theme-switch-label">
+                        <span class="icon icon-sun">☀</span>
+                        <span class="icon icon-moon">☾</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Mobile Header Content -->
+            <div class="top-bar-content mobile-only-header">
+                <div class="mobile-site-title">كنيسة القديسين بطرس وبولس</div>
+                <div class="mobile-action-row">
+                    <!-- Left: Theme Switcher -->
+                    <div class="mobile-theme-switch">
+                        <div class="theme-switch-wrapper">
+                            <input type="checkbox" id="mobile-theme-switch-checkbox" class="theme-switch">
+                            <label for="mobile-theme-switch-checkbox" class="theme-switch-label">
+                                <span class="icon icon-sun">☀</span>
+                                <span class="icon icon-moon">☾</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Center: Login Button OR Welcome Message -->
+                    <div class="mobile-center-action">
+                        <div id="welcomeMessageMobile" class="welcome-message" style="display: none;">
+                            ازيك يا <span id="userNameMobile"></span>
+                        </div>
+                        <button id="loginButtonMobile" class="register-button mobile-login-btn">تسجيل الدخول</button>
+                    </div>
+                    
+                    <!-- Right: Menu Drawer toggle -->
+                    <button class="toggle-btn">☰</button>
+                </div>
+            </div>
+
+            <nav class="desktop-nav">
+                <a href="enjeel.html">الإنجيل المقدس</a>
+                <a href="404.html">الأجبية</a>
+                <a href="404.html">الخلاجي</a>
+                <a href="404.html">القطمارس</a>
+                <a href="el5dma/elkhedma.html">الخدمة</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="sidebar-overlay"></div>
+    <nav class="sidebar" id="sidebar">
+        <!-- زر الإغلاق المحسّن -->
+        <button class="sidebar-close-btn">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+
+        <!-- صورة واسم الكنيسة -->
+        <div class="sidebar-header">
+            <div class="sidebar-avatar">
+                <img src="123.icon" alt="كنيسة القديسين بطرس وبولس" loading="lazy">
+            </div>
+            <div class="sidebar-title">
+                <h3>كنيسة القديسين بطرس وبولس</h3>
+                <p class="sidebar-subtitle">منوفية - مصر</p>
+            </div>
+        </div>
+
+        <!-- روابط القائمة -->
+        <div class="sidebar-menu">
+            <a href="enjeel.html" class="sidebar-link">
+                <span class="sidebar-icon">📖</span>
+                <span>الإنجيل المقدس</span>
+            </a>
+            <a href="404.html" class="sidebar-link">
+                <span class="sidebar-icon">⛪</span>
+                <span>الأجبية</span>
+            </a>
+            <a href="404.html" class="sidebar-link">
+                <span class="sidebar-icon">📜</span>
+                <span>الخلاجي</span>
+            </a>
+            <a href="404.html" class="sidebar-link">
+                <span class="sidebar-icon">📅</span>
+                <span>القطمارس</span>
+            </a>
+            <a href="el5dma/elkhedma.html" class="sidebar-link">
+                <span class="sidebar-icon">⛪</span>
+                <span>الخدمة</span>
+            </a>
+            <a href="login-system/admin.html" class="sidebar-link sidebar-admin-btn" id="sidebarAdminBtn">
+                <span class="sidebar-icon">🛠️</span>
+                <span>لوحة التحكم</span>
+            </a>
+            <a href="el5dma/control.html" class="sidebar-link sidebar-admin-btn" id="sidebarServiceBtn" style="display: none; background: #2e7d32; border-color: rgba(46, 196, 182, 0.3);">
+                <span class="sidebar-icon">⚙️</span>
+                <span>التحكم في الخدمة</span>
+            </a>
+            <a href="#" class="sidebar-link sidebar-logout-btn" id="sidebarLogoutBtn">
+                <span class="sidebar-icon">🚪</span>
+                <span>تسجيل الخروج</span>
+            </a>
+        </div>
+
+        <!-- قسم إضافي للخيارات -->
+        <div class="sidebar-extra">
+            <div class="sidebar-divider"></div>
+
+            <!-- تبديل الوضع المظلم داخل الشريط -->
+            <div class="sidebar-theme-toggle">
+                <span class="sidebar-icon">🌙</span>
+                <span>الوضع الليلي</span>
+                <label class="sidebar-switch">
+                    <input type="checkbox" id="sidebar-theme-switch">
+                    <span class="sidebar-slider"></span>
+                </label>
+            </div>
+
+            <!-- معلومات الاتصال -->
+            <div class="sidebar-contact">
+                <h4>روابط التواصل</h4>
+                <div class="sidebar-social-icons">
+                    <a href="#" class="sidebar-social-icon" aria-label="فيسبوك" target="_blank" rel="noopener">
+                        <i class="fab fa-facebook-f" aria-hidden="true"></i>
+                    </a>
+                    <a href="#" class="sidebar-social-icon" aria-label="يوتيوب" target="_blank" rel="noopener">
+                        <i class="fab fa-youtube" aria-hidden="true"></i>
+                    </a>
+                    <a href="#" class="sidebar-social-icon" aria-label="واتساب" target="_blank" rel="noopener">
+                        <i class="fab fa-whatsapp" aria-hidden="true"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- معلومات إضافية -->
+        <div class="sidebar-footer">
+            <p class="sidebar-copyright">© 2023 كنيسة القديسين</p>
+        </div>
+    </nav>
+
+    <!-- طبقة التعتيم -->
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+
+
+    <!-- في قسم الصورة الرئيسية -->
+    <div class="main-image">
+        <div class="image-stack" id="imageStack">
+            <!-- ستتم إضافة الصور ديناميكياً هنا -->
+        </div>
+        <div class="overlay"></div>
+
+        <!-- أضف هذا النص هنا -->
+        <div class="main-image-text">
+            <h1 class="main-title">كنيسة القديسين بطرس وبولس</h1>
+            <p class="main-subtitle">شبين الكوم - المنوفيه</p>
+        </div>
+    </div>>
+
+
+
+    <section class="about-section section-transiti" id="aboutSection" data-aos="fade-up">
+        <div class="container">
+            <h2 class="section-title">عن الكنيسة</h2>
+            <div class="about-content" data-tilt data-tilt-max="8" data-tilt-speed="300" data-tilt-perspective="800">
+                <img src="16.jpg" alt="صورة الكنيسة" class="church-image" loading="lazy">
+                <div class="text">
+                    <p>تعد كنيسة القديسين بطرس وبولس هي الكنيسة الثالثة بعد كنستي الشهيد مار جرجس والأخرى السيدة العذراء
+                        مريم التابعين لايبارشية كرسي المنوفية و كانت تتبع طائفة الأقباط الكاثوليك و في عام 2005 تم شراء
+                        الكنيسة و تدشينها بيد صاحب النيافة الحبر الجليل الأنبا بنيامين وتعرضت الكنيسة بحريق هائل يوم
+                        الأربعاء الموافق تسعة من شهر سبتمبر عام ألفين و تسعه 2009/09/9 الساعة الثالثة ظهرا كان هناك فى
+                        هذا اليوم قداس انتهى الساعة الحادية عشر صباحا قد زعم البعض انه ماس كهربى او شمعة هى التى سببت
+                        هذا الحريق الهائل الذى سبب خسائر فادحة و قدرت هذه الخسائر بمائة ألف جنيه قد أثبت أنه ليس ماس
+                        كهربى ولا يوجد ايضا اى شمعة يوم الاربعاء يوجد الشمع فقط يومي الأحد والجمعة فالحريق لم يتم بشمعة
+                        أو ماس كهربى و تم تجديد الكنيسة بالكامل والان يتم بناء كنيسة أخرى تابعة لهذه الكنيسة </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="mass-schedule" class="section-transiti" data-aos="fade-up" data-aos-delay="100">
+        <div class="container">
+            <h2 class="section-title">مواعيد القداسات</h2>
+
+            <!-- Desktop Table -->
+            <div class="mass-table-wrapper">
+                <table class="mass-table">
+                    <thead>
+                        <tr>
+                            <th>الأحد</th>
+                            <th>الإثنين</th>
+                            <th>الثلاثاء</th>
+                            <th>الأربعاء</th>
+                            <th>الخميس</th>
+                            <th>الجمعة</th>
+                            <th>السبت</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>7:00 ص<br>إلى<br>9:30 ص</td>
+                            <td>----</td>
+                            <td>----</td>
+                            <td>12:00 م<br>إلى<br>3:00 م</td>
+                            <td>----</td>
+                            <td>7:30 ص<br>إلى<br>10:00 ص</td>
+                            <td>7:30 ص<br>إلى<br>10:00 ص</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Mobile Cards -->
+            <div class="mass-mobile-cards">
+                <div class="mass-card">
+                    <h4>الجمعة</h4>
+                    <div class="mass-time">
+                        <span>07:30 ص</span>
+                        <span>10:00 ص</span>
+                    </div>
+                </div>
+                <div class="mass-card">
+                    <h4>السبت</h4>
+                    <div class="mass-time">
+                        <span>07:30 ص</span>
+                        <span>10:00 ص</span>
+                    </div>
+                </div>
+                <div class="mass-card">
+                    <h4>الأحد</h4>
+                    <div class="mass-time">
+                        <span>07:00 ص</span>
+                        <span>09:30 ص</span>
+                    </div>
+                </div>
+                <div class="mass-card">
+                    <h4>الأربعاء</h4>
+                    <div class="mass-time">
+                        <span>12:00 م</span>
+                        <span>03:00 م</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- قسم الأخبار الجديد -->
+
+    <section id="church-news" class="church-news-section" data-aos="fade-up">
+        <div class="container">
+            <h2 class="section-title">أخبار الكنيسة</h2>
+
+            <!-- حاوية السلايدر الجديدة -->
+            <div class="news-3d-container">
+                <div class="news-3d-wrapper">
+
+                    <!-- البطاقة 1 -->
+                    <div class="news-card-3d active">
+                        <div class="card-visual">
+                            <img src="16.jpg" alt="ترقية الشمامسة الي اغنسطس " loading="lazy">
+                            <div class="date-badge">
+                                <span class="day">06</span>
+                                <span class="month">SAT</span>
+                            </div>
+                            <div class="category-tag">رسامة</div>ئئئ
+                        </div>
+                        <div class="card-details">
+                            <h3>ترقية الشمامسة الي اغنسطس </h3>
+                            <p>سيامه مجموعه من ابناء الكنيسه برتبه أغنسطس بيد صاحب الن....</p>
+                            <button class="action-btn"
+                                onclick="showModal('سيامه مجموعه من ابناء الكنيسه برتبه أغنسطس بيد صاحب النيافه مطرننا الجليل أنبا بنيامين')">
+                                اقرأ التفاصيل
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- البطاقة 2 -->
+                    <div class="news-card-3d next">
+                        <div class="card-visual">
+                            <img src="17.jpg" alt="فريق الحان ثانوي" loading="lazy">
+                            <div class="date-badge">
+                                <span class="day">24</span>
+                                <span class="month">AUG</span>
+                            </div>
+                            <div class="category-tag">كرازه</div>
+                        </div>
+                        <div class="card-details">
+                            <h3>فريق الحان ثانوي</h3>
+                            <p> مشاركة الكنيسه بفرع الالحان للمرحله الثانويه تحت إش.... </p>
+                            <button class="action-btn"
+                                onclick="showModal(' مشاركة الكنيسه بفرع الالحان للمرحله الثانويه تحت إشراف (بيتر ميخائيل) و (مريم هاني) و (إبرام إيهاب) و فاز الفريق بدرع التميز ')">
+                                اقرأ التفاصيل
+                            </button>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+
+        </div>
+
+        <!-- أزرار التحكم -->
+        <div class="slider-3d-controls">
+            <button class="nav-btn prev" aria-label="السابق">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 18l6-6-6-6" />
+                </svg>
+            </button>
+            <div class="dots-indicator">
+                <!-- سيتم إنشاؤها بالجافاسكريبت -->
+            </div>
+            <button class="nav-btn next" aria-label="التالي">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M15 18l-6-6 6-6" />
+                </svg>
+            </button>
+        </div>
+        </div>
+        </div>
+
+
+    </section>
+
+    <section class="fathers-section section-transiti" id="fathersSection" data-aos="fade-up" data-aos-delay="300">
+        <div class="container">
+            <h2 class="section-title">آباء الكنيسة</h2>
+            <div class="fathers-grid">
+                <div class="father">
+                    <a href="ابونا بولس.html">
+                        <div class="father-image">
+                            <img src="2.jpg" alt="القمص بولس حنا" loading="lazy">
+                        </div>
+                    </a>
+                    <div class="name">القمص بولس حنا</div>
+                </div>
+                <div class="father">
+                    <a href="ابونا بيتروس.html">
+                        <div class="father-image">
+                            <img src="4.jpg" alt="القس بيتروس داود" loading="lazy">
+                        </div>
+                    </a>
+                    <div class="name">القس بيتروس داود</div>
+                </div>
+                <div class="father">
+                    <a href="ابونا برناباس.html">
+                        <div class="father-image">
+                            <img src="5.jpg" alt="القس برناباس نادي" loading="lazy">
+                        </div>
+                    </a>
+                    <div class="name">القس برناباس نادي</div>
+                </div>
+                <div class="father">
+                    <a href="ابونا ياكوبوس.html">
+                        <div class="father-image">
+                            <img src="6.png" alt="القس ياكوبوس صبري" loading="lazy">
+                        </div>
+                    </a>
+                    <div class="name">القس ياكوبوس صبري</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="donation-section section-transiti" id="donationSection" data-aos="fade-up" data-aos-delay="400">
+        <div class="container">
+            <h2 class="section-title">التبرع</h2>
+            <p>الكنيسة تقبل تبرعاتكم وعطاياكم على الأرقام التالية: "وَالْمُعْطِي الْمَسْرُورَ يُحِبُّهُ اللهُ" (2 كو 9:
+                7)</p>
+
+            <div class="contact-buttons">
+                <button class="contact-button" onclick="location.href='رقم ابونا بولس.html'">القمص بولس حنا</button>
+                <button class="contact-button" onclick="location.href='رقم ابونا بطرس.html'">القس بطرس داود</button>
+                <button class="contact-button" onclick="location.href='رقم ابونا برناباس.html'">القس برناباس
+                    نادي</button>
+                <button class="contact-button" onclick="location.href='رقم ابونا ياكوبوس.html'">القس ياكوبوس
+                    صبري</button>
+            </div>
+        </div>
+    </section>
+
+    <div id="newsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">×</span>
+            <h3 id="modalTitle"></h3>
+            <p id="modalContent"></p>
+        </div>
+    </div>
+
+
+
+
+
+    <footer>
+        © جميع الحقوق محفوظة لكنيسة القديسين بطرس وبولس
+        <br>
+        <a href="https://menasamuel2010.github.io/MISA-Technolgy./" target="_blank">Designed by Mina Samuel</a>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"
+        integrity="sha512-A7AYk1fGKX6S2SsHywmPkrnzTZHrgiVT7GcQkLGDe2ev0aWb8zejytzS8wjo7PGEXKqJOrjQ4oORtnimIRZBtw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanilla-tilt@1.7.2/dist/vanilla-tilt.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/supabase-service.js"></script>
+    <script type="module" src="chatbot.js"></script>
+
+    <script>
+        // ===== نظام موحد لإدارة الوضع المظلم / المضيء (Theme Management) =====
+        window.syncThemeState = function (isDark) {
+            if (isDark) {
+                document.body.classList.add('dark-mode');
+                document.body.classList.remove('light-mode');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                document.body.classList.add('light-mode');
+                document.body.classList.remove('dark-mode');
+                localStorage.setItem('theme', 'light');
+            }
+            // تحديث كافة أزرار التحكم في الصفحة
+            document.querySelectorAll('#theme-switch, #mobile-theme-switch-checkbox, #sidebar-theme-switch').forEach(sw => {
+                sw.checked = isDark;
+            });
+        };
+
+        // استرجاع المود فوراً لتجنب الوميض الأبيض
+        (function() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.body.classList.add(savedTheme + '-mode');
+        })();
+
+        // مستمع أحداث موحد لتغيير الوضع
+        document.addEventListener('change', function (e) {
+            if (e.target.matches('#theme-switch, #mobile-theme-switch-checkbox, #sidebar-theme-switch')) {
+                window.syncThemeState(e.target.checked);
+            }
+        });
+
+        // ===== ضمان إخفاء الـ preloader دائماً =====
+        // يعمل كـ failsafe حتى لو فشل أي كود آخر
+        (function () {
+            function hidePreloader() {
+                var pre = document.getElementById('preloader');
+                if (pre) { pre.style.opacity = '0'; setTimeout(function () { pre.style.display = 'none'; }, 400); }
+            }
+            if (document.readyState === 'complete') {
+                setTimeout(hidePreloader, 500);
+            } else {
+                window.addEventListener('load', function () { setTimeout(hidePreloader, 500); });
+                // Failsafe absolute maximum: 4 seconds no matter what
+                setTimeout(hidePreloader, 4000);
+            }
+        })();
+
+        // ===== تحسينات الشريط الجانبي الاحترافية =====
+
+        // تهيئة الشريط الجانبي
+        function initEnhancedSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+            const toggleBtns = document.querySelectorAll('.toggle-btn');
+            const sidebarCloseBtn = document.querySelector('.sidebar-close-btn');
+            const sidebarLoginBtn = document.getElementById('sidebarLoginButton');
+            const sidebarThemeSwitch = document.getElementById('sidebar-theme-switch');
+
+            // فتح الشريط
+            function openSidebar() {
+                sidebar.classList.add('show');
+                sidebarBackdrop.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+
+            // إغلاق الشريط
+            function closeSidebar() {
+                sidebar.classList.remove('show');
+                sidebarBackdrop.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+
+            // أحداث الفتح/الإغلاق
+            if (toggleBtns) {
+                toggleBtns.forEach(btn => btn.addEventListener('click', openSidebar));
+            }
+
+            if (sidebarCloseBtn) {
+                sidebarCloseBtn.addEventListener('click', closeSidebar);
+            }
+
+            if (sidebarBackdrop) {
+                sidebarBackdrop.addEventListener('click', closeSidebar);
+            }
+
+            // زر تسجيل الدخول داخل الشريط
+            if (sidebarLoginBtn) {
+                sidebarLoginBtn.addEventListener('click', function () {
+                    closeSidebar();
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 300);
+                });
+            }
+
+            // تعيين الحالة الأولية لتبديل الوضع المظلم داخل الشريط الجانبي
+            if (sidebarThemeSwitch) {
+                sidebarThemeSwitch.checked = localStorage.getItem('theme') === 'dark';
+            }
+
+            // ===== دعم السحب باللمس =====
+            let startX = 0;
+            let currentX = 0;
+            let isDragging = false;
+
+            function handleTouchStart(e) {
+                if (!sidebar.classList.contains('show')) return;
+                startX = e.touches[0].clientX;
+                currentX = startX;
+                isDragging = true;
+                sidebar.style.transition = 'none';
+            }
+
+            function handleTouchMove(e) {
+                if (!isDragging || !sidebar.classList.contains('show')) return;
+
+                currentX = e.touches[0].clientX;
+                const diff = currentX - startX;
+
+                // السماح بالسحب لليمين فقط (للإغلاق)
+                if (diff > 0) {
+                    const translateX = Math.min(diff, 100);
+                    sidebar.style.transform = `translateX(${translateX}px)`;
+                    sidebarBackdrop.style.opacity = 1 - (translateX / 100);
+                }
+            }
+
+            function handleTouchEnd() {
+                if (!isDragging) return;
+
+                isDragging = false;
+                sidebar.style.transition = 'right 0.3s ease';
+                sidebarBackdrop.style.transition = 'all 0.3s ease';
+
+                const diff = currentX - startX;
+
+                // إذا كانت المسافة كافية (50px)، أغلق الشريط
+                if (diff > 50) {
+                    closeSidebar();
+                } else {
+                    // إعادة الشريط إلى مكانه
+                    sidebar.style.transform = 'translateX(0)';
+                    sidebarBackdrop.style.opacity = 1;
+                }
+
+                // إعادة ضبط التحولات بعد 300ms
+                setTimeout(() => {
+                    sidebar.style.transform = '';
+                }, 300);
+            }
+
+            // إضافة مستمعي الأحداث للسحب
+            sidebar.addEventListener('touchstart', handleTouchStart, { passive: true });
+            sidebar.addEventListener('touchmove', handleTouchMove, { passive: true });
+            sidebar.addEventListener('touchend', handleTouchEnd);
+
+            // ===== دعم الإغلاق بالضغط على مفتاح ESC =====
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape' && sidebar.classList.contains('show')) {
+                    closeSidebar();
+                }
+            });
+
+            // ===== تحسينات إضافية =====
+
+            // إغلاق الشريط عند النقر على رابط
+            document.querySelectorAll('.sidebar-link').forEach(link => {
+                link.addEventListener('click', function (e) {
+                    closeSidebar();
+                });
+            });
+        }
+          
+
+        // تهيئة الشريط الجانبي بعد تحميل الصفحة
+        document.addEventListener('DOMContentLoaded', function () {
+            setTimeout(initEnhancedSidebar, 100);
+        });
+
+        // تحديث عند تغيير حجم النافذة
+        window.addEventListener('resize', function () {
+            const sidebar = document.getElementById('sidebar');
+            const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+
+            // إغلاق الشريط عند التبديل إلى وضع الكمبيوتر
+            if (window.innerWidth > 768 && sidebar && sidebar.classList.contains('show')) {
+                sidebar.classList.remove('show');
+                if (sidebarBackdrop) sidebarBackdrop.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+
+
+        // دالة المودال يجب أن تكون في النطاق العام (Global Scope)
+        function showModal(title, content) {
+            const modal = document.getElementById("newsModal");
+            const modalTitle = document.getElementById("modalTitle");
+            const modalContent = document.getElementById("modalContent");
+
+            if (modal && modalTitle && modalContent) {
+                modalTitle.textContent = title;
+                modalContent.textContent = content;
+                modal.style.display = "block";
+                document.body.style.overflow = 'hidden'; // منع التمرير في الخلفية
+            } else {
+                console.error("عناصر المودال غير موجودة!");
+            }
+        }
+        // إغلاق المودال
+        function closeModal() {
+            const modal = document.getElementById("newsModal");
+            if (modal) {
+                modal.style.display = "none";
+                document.body.style.overflow = ''; // إعادة تفعيل التمرير
+            }
+        }
+        document.addEventListener("DOMContentLoaded", function () {
+            // تطبيق البيانات المخزنة فوراً لتجنب وميض التخطيط
+            if (localStorage.getItem('isLoggedIn') === 'true') {
+                const welcomeMsg = document.getElementById('welcomeMessage');
+                const welcomeMsgMobile = document.getElementById('welcomeMessageMobile');
+                const logoutBtn = document.getElementById('logoutButton');
+                const sidebarLogoutBtn = document.getElementById('sidebarLogoutBtn');
+                const dashBtn = document.getElementById('adminDashboardBtn');
+                const sidebarDashBtn = document.getElementById('sidebarAdminBtn');
+                const loginBtn = document.getElementById('loginButton');
+                const mobileLoginBtn = document.getElementById('loginButtonMobile');
+
+                const firstName = localStorage.getItem('userFirstName') || '';
+                const userRole = localStorage.getItem('userRole') || 'مخدوم';
+
+                let greetingText = '';
+                if (userRole === 'اب كاهن') {
+                    greetingText = `سلام ونعمة يا ابونا ${firstName}`;
+                } else if (userRole === 'امين خدمه' || userRole === 'خادم') {
+                    greetingText = `سلام ونعمة يا أخ ${firstName}`;
+                } else {
+                    greetingText = `ازيك يا ${firstName}`;
+                }
+
+                if (welcomeMsg) {
+                    welcomeMsg.innerHTML = greetingText;
+                    welcomeMsg.style.display = 'inline-block';
+                }
+                if (welcomeMsgMobile) {
+                    welcomeMsgMobile.innerHTML = greetingText;
+                    welcomeMsgMobile.style.display = 'inline-block';
+                }
+                if (loginBtn) loginBtn.style.display = 'none';
+                if (mobileLoginBtn) mobileLoginBtn.classList.add('hidden');
+                if (logoutBtn) logoutBtn.style.display = 'inline-block';
+                if (sidebarLogoutBtn) sidebarLogoutBtn.style.display = 'flex';
+
+                const adminRoles = ['اب كاهن', 'امين خدمه', 'خادم'];
+                if (adminRoles.includes(userRole)) {
+                    if (dashBtn) dashBtn.style.display = 'inline-block';
+                    if (sidebarDashBtn) sidebarDashBtn.style.display = 'flex';
+                } else {
+                    if (dashBtn) dashBtn.style.display = 'none';
+                    if (sidebarDashBtn) sidebarDashBtn.style.display = 'none';
+                }
+
+                const serviceRoles = ['امين خدمه', 'خادم'];
+                const serviceBtn = document.getElementById('serviceControlBtn');
+                const sidebarServiceBtn = document.getElementById('sidebarServiceBtn');
+                if (serviceRoles.includes(userRole)) {
+                    if (serviceBtn) serviceBtn.style.display = 'inline-block';
+                    if (sidebarServiceBtn) sidebarServiceBtn.style.display = 'flex';
+                } else {
+                    if (serviceBtn) serviceBtn.style.display = 'none';
+                    if (sidebarServiceBtn) sidebarServiceBtn.style.display = 'none';
+                }
+            }
+
+            // Initialize AOS (wrapped in try/catch to prevent crashes if CDN fails)
+            try { AOS.init({ duration: 1000, once: true }); } catch (e) { console.warn('AOS not loaded:', e); }
+
+            // Initialize Vanilla Tilt for Desktop only (wrapped in try/catch)
+            try {
+                if (window.innerWidth >= 768) {
+                    VanillaTilt.init(document.querySelector('.about-content'), {
+                        max: 800,
+                        speed: 300000,
+                        perspective: 80000
+                    });
+
+                    VanillaTilt.init(document.querySelectorAll('.father'), {
+                        max: 8,
+                        speed: 30,
+                        perspective: 80
+                    });
+
+                    VanillaTilt.init(document.querySelectorAll('.church-news'), {
+                        max: 8,
+                        speed: 3000,
+                        perspective: 80
+                    });
+
+                    VanillaTilt.init(document.querySelector('.mass-table'), {
+                        max: 9,
+                        speed: 8000,
+                    });
+                }
+            } catch (e) { console.warn('VanillaTilt not loaded:', e); }
+
+            // منع النقر بزر الماوس الأيمن
+            document.addEventListener('contextmenu', function (e) {
+                e.preventDefault();
+            });
+
+            // منع نسخ النصوص
+            document.addEventListener('copy', function (e) {
+                e.preventDefault();
+                if (typeof showToast === 'function') {
+                    showToast('⚠️ نسخ النصوص غير مسموح به في هذا الموقع', 'warning');
+                }
+            });
+
+            // منع اختيار النصوص (لكن هذا قد يؤثر على تجربة المستخدم)
+            document.addEventListener('selectstart', function (e) {
+                e.preventDefault();
+            });
+
+            // لمنع سحب الصور (اختياري)
+            document.addEventListener('dragstart', function (e) {
+                if (e.target.tagName === 'IMG') {
+                    e.preventDefault();
+                }
+            });
+            
+
+            // Custom Cursor (Desktop Only)
+            if (window.innerWidth >= 768) {
+                const cursor = document.querySelector('.custom-cursor');
+                document.addEventListener('mousemove', (e) => {
+                    cursor.style.left = `${e.clientX}px`;
+                    cursor.style.top = `${e.clientY}px`;
+                });
+
+                document.querySelectorAll('a, button, .father, .read-more-btn, .contact-button, .toggle-btn, .theme-switch-label, .sidebar-link, .social-media img').forEach(el => {
+                    el.addEventListener('mouseenter', () => cursor.classList.add('hovered'));
+                    el.addEventListener('mouseleave', () => cursor.classList.remove('hovered'));
+                });
+
+                // Scroll Interaction for Cursor
+                let lastScrollTop = 0;
+                window.addEventListener('scroll', () => {
+                    let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                    if (scrollTop > lastScrollTop) {
+                        cursor.classList.add('scrolling-down');
+                        cursor.classList.remove('scrolling-up');
+                    } else {
+                        cursor.classList.add('scrolling-up');
+                        cursor.classList.remove('scrolling-down');
+                    }
+                    lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+                    setTimeout(() => {
+                        cursor.classList.remove('scrolling-up', 'scrolling-down');
+                    }, 300);
+                });
+            }
+
+
+
+            // Preloader - hide immediately on DOMContentLoaded
+            try {
+                var pre = document.getElementById('preloader');
+                if (pre) {
+                    pre.style.opacity = '0';
+                    setTimeout(function () { pre.style.display = 'none'; }, 400);
+                }
+            } catch (e) { console.warn('Preloader hide error:', e); }
+
+            // Theme Toggle initial setup
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            if (typeof window.syncThemeState === 'function') {
+                window.syncThemeState(savedTheme === 'dark');
+            }
+
+            // Login Buttons redirects
+            const loginBtn = document.getElementById('loginButton');
+            if (loginBtn) {
+                loginBtn.addEventListener('click', function () {
+                    window.location.href = 'login.html';
+                });
+            }
+            const loginBtnMobile = document.getElementById('loginButtonMobile');
+            if (loginBtnMobile) {
+                loginBtnMobile.addEventListener('click', function () {
+                    window.location.href = 'login.html';
+                });
+            }
+
+            // Logout Button handlers (both top bar and sidebar)
+            const logoutBtn = document.getElementById('logoutButton');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function () {
+                    openCustomLogoutModal();
+                });
+            }
+            const sidebarLogout = document.getElementById('sidebarLogoutBtn');
+            if (sidebarLogout) {
+                sidebarLogout.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    openCustomLogoutModal();
+                });
+            }
+
+            // Admin Dashboard Button redirect
+            const adminDashBtn = document.getElementById('adminDashboardBtn');
+            if (adminDashBtn) {
+                adminDashBtn.addEventListener('click', function () {
+                    window.location.href = 'login-system/admin.html';
+                });
+            }
+
+            // Service Dashboard Button redirect
+            const serviceCtrlBtn = document.getElementById('serviceControlBtn');
+            if (serviceCtrlBtn) {
+                serviceCtrlBtn.addEventListener('click', function () {
+                    window.location.href = 'el5dma/control.html';
+                });
+            }
+
+            // Dynamic header update based on active Supabase Auth
+            async function checkSessionAndDisplayHeader() {
+                try {
+                    const result = await authService.checkAuth();
+                    const welcomeMsg = document.getElementById('welcomeMessage');
+                    const welcomeMsgMobile = document.getElementById('welcomeMessageMobile');
+                    const uName = document.getElementById('userName');
+                    const uNameMobile = document.getElementById('userNameMobile');
+                    const mainLoginBtn = document.getElementById('loginButton');
+                    const mainLoginBtnMobile = document.getElementById('loginButtonMobile');
+                    const mainLogoutBtn = document.getElementById('logoutButton');
+                    const sidebarLogoutBtn = document.getElementById('sidebarLogoutBtn');
+                    const mainDashBtn = document.getElementById('adminDashboardBtn');
+                    const sidebarDashBtn = document.getElementById('sidebarAdminBtn');
+                    const mainServiceBtn = document.getElementById('serviceControlBtn');
+                    const sidebarServiceBtn = document.getElementById('sidebarServiceBtn');
+
+                    if (result && result.session) {
+                        const profile = result.profile;
+
+                        if (profile.status === 'Suspended') {
+                            await authService.logout();
+                            window.location.reload();
+                            return;
+                        }
+
+                        
+
+                        // Determine greeting text
+                        const firstName = profile.full_name.split(' ')[0] || profile.full_name;
+                        let greetingText = '';
+                        if (profile.role === 'اب كاهن') {
+                            greetingText = `سلام ونعمة يا ابونا ${firstName}`;
+                        } else if (profile.role === 'امين خدمه' || profile.role === 'خادم') {
+                            greetingText = `سلام ونعمة يا  ${firstName}`;
+                        } else {
+                            greetingText = `ازيك يا ${firstName}`;
+                        }
+
+                        // Update desktop welcome msg
+                        if (uName) uName.textContent = profile.full_name;
+                        if (welcomeMsg) {
+                            welcomeMsg.innerHTML = greetingText;
+                            welcomeMsg.style.display = 'inline-block';
+                        }
+                        if (mainLoginBtn) mainLoginBtn.style.display = 'none';
+
+                        // Update mobile welcome msg
+                        if (uNameMobile) uNameMobile.textContent = profile.full_name;
+                        if (welcomeMsgMobile) {
+                            welcomeMsgMobile.innerHTML = greetingText;
+                            welcomeMsgMobile.style.display = 'inline-block';
+                        }
+                        if (mainLoginBtnMobile) mainLoginBtnMobile.classList.add('hidden');
+
+                        // Show Logout
+                        if (mainLogoutBtn) mainLogoutBtn.style.display = 'inline-block';
+                        if (sidebarLogoutBtn) sidebarLogoutBtn.style.display = 'flex';
+
+                        // Show Dashboard if applicable
+                        const isAuthorized = (profile.role === 'اب كاهن' || profile.role === 'امين خدمه' || profile.role === 'خادم');
+                        if (isAuthorized) {
+                            if (mainDashBtn) mainDashBtn.style.display = 'inline-block';
+                            if (sidebarDashBtn) sidebarDashBtn.style.display = 'flex';
+                        } else {
+                            if (mainDashBtn) mainDashBtn.style.display = 'none';
+                            if (sidebarDashBtn) sidebarDashBtn.style.display = 'none';
+                        }
+
+                        // Show Service Control if Servant or Coordinator
+                        const isServant = (profile.role === 'امين خدمه' || profile.role === 'خادم');
+                        if (isServant) {
+                            if (mainServiceBtn) mainServiceBtn.style.display = 'inline-block';
+                            if (sidebarServiceBtn) sidebarServiceBtn.style.display = 'flex';
+                        } else {
+                            if (mainServiceBtn) mainServiceBtn.style.display = 'none';
+                            if (sidebarServiceBtn) sidebarServiceBtn.style.display = 'none';
+                        }
+                    } else {
+                        // Supabase session could not be verified (network issue, token refresh delay, etc.)
+                        // Only hide UI if localStorage also confirms the user is NOT logged in.
+                        // If localStorage still says logged in, keep the fast-path UI visible.
+                        const isLocallyLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+                        
+                        if (!isLocallyLoggedIn) {
+                            // Confirmed: not logged in at all
+                            if (welcomeMsg) welcomeMsg.style.display = 'none';
+                            if (welcomeMsgMobile) welcomeMsgMobile.style.display = 'none';
+                            
+                            if (mainLoginBtn) mainLoginBtn.style.display = 'inline-block';
+                            if (mainLoginBtnMobile) mainLoginBtnMobile.classList.remove('hidden');
+
+                            if (mainLogoutBtn) mainLogoutBtn.style.display = 'none';
+                            if (sidebarLogoutBtn) sidebarLogoutBtn.style.display = 'none';
+
+                            if (mainDashBtn) mainDashBtn.style.display = 'none';
+                            if (sidebarDashBtn) sidebarDashBtn.style.display = 'none';
+                            if (mainServiceBtn) mainServiceBtn.style.display = 'none';
+                            if (sidebarServiceBtn) sidebarServiceBtn.style.display = 'none';
+                        }
+                        // else: localStorage says logged in → keep fast-path UI shown
+                        // The Supabase session may be refreshing. The UI will update on next load.
+                    }
+                } catch (error) {
+                    console.error("Session verification failed:", error);
+                }
+            }
+
+            // Load and render schedules
+            async function loadDynamicSchedules() {
+                try {
+                    const schedules = await authService.fetchSchedules();
+                    const desktopTbody = document.querySelector('.mass-table tbody');
+                    const mobileContainer = document.querySelector('.mass-mobile-cards');
+
+                    if (schedules && schedules.length > 0) {
+                        const dayMap = {
+                            'الأحد': 0, 'الاحد': 0,
+                            'الإثنين': 1, 'الاثنين': 1,
+                            'الثلاثاء': 2,
+                            'الأربعاء': 3, 'الاربعاء': 3,
+                            'الخميس': 4,
+                            'الجمعة': 5, 'الجمعه': 5,
+                            'السبت': 6
+                        };
+                        schedules.sort((a, b) => {
+                            const orderA = dayMap[a.day_name] !== undefined ? dayMap[a.day_name] : 99;
+                            const orderB = dayMap[b.day_name] !== undefined ? dayMap[b.day_name] : 99;
+                            return orderA - orderB;
+                        });
+
+                        if (desktopTbody) {
+                            desktopTbody.innerHTML = '';
+                            const cells = ['----', '----', '----', '----', '----', '----', '----'];
+                            schedules.forEach(s => {
+                                const index = dayMap[s.day_name];
+                                if (index !== undefined) {
+                                    cells[index] = `${s.time_from}<br>إلى<br>${s.time_to}`;
+                                }
+                            });
+
+                            const tr = document.createElement('tr');
+                            cells.forEach(cellText => {
+                                const td = document.createElement('td');
+                                td.innerHTML = cellText;
+                                tr.appendChild(td);
+                            });
+                            desktopTbody.appendChild(tr);
+                        }
+
+                        if (mobileContainer) {
+                            mobileContainer.innerHTML = '';
+                            schedules.forEach(s => {
+                                const card = document.createElement('div');
+                                card.className = 'mass-card';
+                                card.innerHTML = `
+                                    <h4>${s.day_name}</h4>
+                                    <div class="mass-time">
+                                        <span>${s.time_from}</span> 
+                                        <span>${s.time_to}</span>
+                                    </div>
+                                `;
+                                mobileContainer.appendChild(card);
+                            });
+                        }
+                    }
+                } catch (e) {
+                    console.error("Error loading dynamic schedules:", e);
+                }
+            }
+
+            // Load and render news slider
+            async function loadDynamicNews() {
+                try {
+                    const news = await authService.fetchNews();
+                    const wrapper = document.querySelector('.news-3d-wrapper');
+                    if (wrapper && news && news.length > 0) {
+                        wrapper.innerHTML = '';
+                        news.forEach((n, index) => {
+                            const card = document.createElement('div');
+                            let statusClass = '';
+                            if (index === 0) statusClass = 'active';
+                            else if (index === 1) statusClass = 'next';
+
+                            card.className = `news-card-3d ${statusClass}`;
+                            card.innerHTML = `
+                                <div class="card-visual">
+                                    <img src="${n.image_url}" alt="${n.title}" loading="lazy" onerror="this.src='1000_F_316125188_FYs3RbaUQ6gGwom3sfqSvgt2QGw3fKol.png'">
+                                    <div class="date-badge">
+                                        <span class="day">${n.date_day}</span>
+                                        <span class="month">${n.date_month}</span>
+                                    </div>
+                                    <div class="category-tag">${n.category}</div>
+                                </div>
+                                <div class="card-details">
+                                    <h3>${n.title}</h3>
+                                    <p>${n.content.substring(0, 50)}...</p>
+                                    <button class="action-btn" onclick="showModal('${n.title.replace(/'/g, "\\'")}', '${n.content.replace(/'/g, "\\'")}')">
+                                        اقرأ التفاصيل
+                                    </button>
+                                </div>
+                            `;
+                            wrapper.appendChild(card);
+                        });
+
+                        initNewsSlider();
+                    }
+                } catch (e) {
+                    console.error("Error loading news slider:", e);
+                }
+            }
+
+            // Load and render background slideshow
+            async function loadDynamicSlideshow() {
+                try {
+                    const slidesData = await authService.fetchSlides();
+                    if (slidesData && slidesData.length > 0) {
+                        images = slidesData.map(s => s.image_url);
+                    }
+                } catch (e) {
+                    console.error("Error loading slideshow images:", e);
+                }
+                initSlideshow();
+            }
+
+            // Trigger session and data loading
+            checkSessionAndDisplayHeader();
+            loadDynamicSchedules();
+            loadDynamicNews();
+            loadDynamicSlideshow();
+
+
+
+            // ===== تهيئة سلايدر أخبار الكنيسة ثلاثي الأبعاد =====
+            function initNewsSlider() {
+                const cards = Array.from(document.querySelectorAll('.news-card-3d'));
+                const nextBtnEl = document.querySelector('.nav-btn.next');
+                const prevBtnEl = document.querySelector('.nav-btn.prev');
+                const dotsContainer = document.querySelector('.dots-indicator');
+                if (!cards.length) return;
+
+                let current = 0;
+                let autoTimer = null;
+
+                // إنشاء النقاط الدالة على الشرائح
+                if (dotsContainer) {
+                    dotsContainer.innerHTML = '';
+                    cards.forEach((_, i) => {
+                        const dot = document.createElement('button');
+                        dot.className = 'dot' + (i === 0 ? ' active' : '');
+                        dot.setAttribute('aria-label', 'الشريحة ' + (i + 1));
+                        dot.addEventListener('click', () => { stopAuto(); goTo(i); startAuto(); });
+                        dotsContainer.appendChild(dot);
+                    });
+                }
+
+                function updateDots() {
+                    if (!dotsContainer) return;
+                    dotsContainer.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === current));
+                }
+
+                function applyClasses() {
+                    cards.forEach((c, i) => {
+                        c.className = 'news-card-3d';
+                        if (i === current) c.classList.add('active');
+                        else if (i === (current + 1) % cards.length) c.classList.add('next');
+                        else c.classList.add('prev');
+                    });
+                    updateDots();
+                }
+
+                function goTo(i) { current = ((i % cards.length) + cards.length) % cards.length; applyClasses(); }
+                function goNext() { goTo(current + 1); }
+                function goPrev() { goTo(current - 1); }
+
+                function startAuto() { stopAuto(); autoTimer = setInterval(goNext, 4500); }
+                function stopAuto() { if (autoTimer) { clearInterval(autoTimer); autoTimer = null; } }
+
+                if (nextBtnEl) nextBtnEl.addEventListener('click', () => { stopAuto(); goNext(); startAuto(); });
+                if (prevBtnEl) prevBtnEl.addEventListener('click', () => { stopAuto(); goPrev(); startAuto(); });
+
+                // سحب باللمس للجوال
+                const wrapperEl = document.querySelector('.news-3d-container');
+                if (wrapperEl) {
+                    let tsX = 0;
+                    wrapperEl.addEventListener('touchstart', e => { tsX = e.changedTouches[0].screenX; }, { passive: true });
+                    wrapperEl.addEventListener('touchend', e => {
+                        const diff = e.changedTouches[0].screenX - tsX;
+                        if (diff < -50) { stopAuto(); goNext(); startAuto(); }
+                        if (diff > 50) { stopAuto(); goPrev(); startAuto(); }
+                    }, { passive: true });
+                }
+
+                // إيقاف التشغيل التلقائي عند الخروج من الصفحة وإعادته عند العودة
+                document.addEventListener('visibilitychange', () => {
+                    if (document.hidden) stopAuto(); else startAuto();
+                });
+
+                applyClasses();
+                startAuto();
+            }
+
+            // Background Image Slideshow - Stacking Technique (No Gap!)
+            let images = ['3.jpg', '1.png', '9.jpg', '10.jpg', '11.jpg', '12.jpg', '13.jpg', '14.jpg', '15.jpg', '16.jpg', '17.jpg'];
+            let currentImageIndex = 0;
+            let imageStack = null;
+            let slides = [];
+            let slideInterval = null;
+
+            // دالة لإنشاء الصور مكدسة
+            function createImageStack() {
+                const mainImageDiv = document.querySelector('.main-image');
+                imageStack = document.getElementById('imageStack');
+
+                if (!imageStack) {
+                    imageStack = document.createElement('div');
+                    imageStack.className = 'image-stack';
+                    imageStack.id = 'imageStack';
+                    mainImageDiv.insertBefore(imageStack, mainImageDiv.querySelector('.overlay'));
+                }
+
+                // إضافة جميع الصور
+                images.forEach((src, index) => {
+                    const slide = document.createElement('div');
+                    slide.className = 'slide';
+                    slide.style.backgroundImage = `url('${src}')`;
+                    slide.dataset.index = index;
+
+                    if (index === 0) {
+                        slide.classList.add('active');
+                    }
+
+                    imageStack.appendChild(slide);
+                    slides.push(slide);
+                });
+            }
+
+            // دالة للتبديل بين الصور
+            function nextSlide() {
+                if (slides.length === 0) return;
+
+                const currentSlide = slides[currentImageIndex];
+                const nextIndex = (currentImageIndex + 1) % slides.length;
+                const nextSlide = slides[nextIndex];
+
+                // تهيئة الصورة التالية
+                nextSlide.style.backgroundImage = `url('${images[nextIndex]}')`;
+
+                // تبديل بسلاسة
+                currentSlide.classList.remove('active');
+                nextSlide.classList.add('active');
+
+                currentImageIndex = nextIndex;
+            }
+
+            // تهيئة السلايدر
+            function initSlideshow() {
+                createImageStack();
+
+                // بدء التبديل التلقائي بعد 5 ثواني
+                setTimeout(() => {
+                    slideInterval = setInterval(nextSlide, 3000);
+                }, 3000);
+
+                // التأكد من تحميل الصور الأولى
+                const firstImage = new Image();
+                firstImage.src = images[0];
+                firstImage.onload = function () {
+                    console.log('✅ الصورة الأولى محملة');
+                };
+            }
+
+            // بدء السلايدر (تم نقله إلى دالة جلب البيانات الديناميكية)
+
+            // إيقاف التقليب عند ترك الصفحة
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) {
+                    if (slideInterval) clearInterval(slideInterval);
+                } else {
+                    if (slideInterval) {
+                        slideInterval = setInterval(nextSlide, 3000);
+                    }
+                }
+            });
+
+            // Scroll Behavior for All Devices
+            // Scroll Behavior for All Devices
+            let lastScrollTop = 0;
+            const topBar = document.getElementById('topBar');
+            const mainImage = document.querySelector('.main-image');
+            const mainImageHeight = mainImage.offsetHeight;
+
+            function handleScrollEvent() {
+                let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+
+                // Check if we're on mobile
+                if (window.innerWidth <= 768) {
+                    // Mobile behavior
+                    if (scrollTop <= mainImageHeight) {
+                        // When in main image area
+                        topBar.classList.add('transparent');
+                        topBar.classList.remove('scrolled', 'hidden');
+                    } else {
+                        // After main image
+                        topBar.classList.remove('transparent');
+                        topBar.classList.add('scrolled');
+
+                        if (scrollTop > lastScrollTop) {
+                            // Scrolling down
+                            topBar.classList.add('hidden');
+                        } else {
+                            // Scrolling up
+                            topBar.classList.remove('hidden');
+                        }
+                    }
+                } else {
+                    // Desktop behavior
+                    if (scrollTop > mainImageHeight) {
+                        topBar.classList.add('scrolled');
+
+                        if (scrollTop > lastScrollTop && scrollTop > mainImageHeight + 100) {
+                            // Scrolling down after main image
+                            topBar.classList.add('hidden');
+                        } else {
+                            // Scrolling up
+                            topBar.classList.remove('hidden');
+                        }
+                    } else {
+                        // At top of page
+                        topBar.classList.remove('scrolled', 'hidden');
+                    }
+                }
+
+                lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+            }
+
+            // Use throttling for better performance
+            let scrollTimeout;
+            window.addEventListener('scroll', function () {
+                if (!scrollTimeout) {
+                    scrollTimeout = setTimeout(function () {
+                        handleScrollEvent();
+                        scrollTimeout = null;
+                    }, 20);
+                }
+            });
+
+
+
+
+
+
+
+            // تم نقل إدارة سلايدر الأخبار إلى دالة initNewsSlider() العامة
+
+
+
+            document.querySelector(".close-btn").onclick = function () {
+                document.getElementById("newsModal").style.display = "none";
+                // Re-enable scroll
+                document.body.style.overflow = '';
+            };
+
+            window.onclick = function (event) {
+                const modal = document.getElementById("newsModal");
+                if (event.target === modal) {
+                    modal.style.display = "none";
+                    // Re-enable scroll
+                    document.body.style.overflow = '';
+                }
+            };
+
+            // السحب باللمس لسلايدر الأخبار مُدمج في initNewsSlider()
+
+            document.addEventListener('click', function (event) {
+                const sidebar = document.querySelector('.sidebar');
+                const toggleBtn = document.querySelector('.toggle-btn');
+                const sidebarOverlay = document.querySelector('.sidebar-overlay');
+
+                if (sidebar.classList.contains('show') &&
+                    !sidebar.contains(event.target) &&
+                    !toggleBtn.contains(event.target)) {
+
+                    // إضافة تأثير انتقالي قبل الإغلاق
+                    sidebar.style.transition = 'transform 0.4s cubic-bezier(0.77, 0, 0.175, 1)';
+                    sidebarOverlay.style.transition = 'opacity 0.4s ease';
+
+                    // إغلاق الشريط
+                    sidebar.classList.remove('show');
+                    sidebarOverlay.classList.remove('active');
+
+                    // إعادة ضبط التمرير بعد انتهاء الانتقال
+                    setTimeout(() => {
+                        document.body.style.overflow = '';
+                    }, 400);
+                }
+            });
+
+            // Add smooth scroll for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    if (targetId === '#') return;
+
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        targetElement.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+
+                        // Close sidebar if open on mobile
+                        if (window.innerWidth <= 768 && sidebar.classList.contains('show')) {
+                            toggleSidebar();
+                        }
+                    }
+                });
+            });
+
+
+
+            // Enhance images with lazy loading and progressive enhancement
+            const lazyImages = document.querySelectorAll('img[loading="lazy"]');
+            if ('loading' in HTMLImageElement.prototype) {
+                // Browser supports native lazy loading
+                lazyImages.forEach(img => {
+                    img.src = img.getAttribute('src');
+                });
+            } else {
+                // Fallback for browsers that don't support lazy loading
+                const lazyLoadObserver = new IntersectionObserver((entries, observer) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            const img = entry.target;
+                            img.src = img.getAttribute('src');
+                            observer.unobserve(img);
+                        }
+                    });
+                });
+
+                lazyImages.forEach(img => {
+                    lazyLoadObserver.observe(img);
+                });
+            }
+        });
+
+
+        // إضافة تأثير المغناطيس للأقسام
+        function initMagnetSections() {
+            const sections = document.querySelectorAll('.section-transiti');
+            const observerOptions = {
+                root: null,
+                rootMargin: '-20% 0px -20% 0px',
+                threshold: 0.1
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    const section = entry.target;
+                    const rect = section.getBoundingClientRect();
+                    const windowHeight = window.innerHeight;
+
+                    if (entry.isIntersecting) {
+                        // حساب المسافة من الأعلى والأسفل
+                        const distanceFromTop = rect.top;
+                        const distanceFromBottom = windowHeight - rect.bottom;
+
+                        // إضافة تأثير المغناطيس بناءً على الاتجاه
+                        if (distanceFromTop < distanceFromBottom) {
+                            // القسم قادم من الأعلى
+                            section.classList.add('magnet-top');
+                            section.classList.remove('magnet-bottom');
+                        } else {
+                            // القسم قادم من الأسفل
+                            section.classList.add('magnet-bottom');
+                            section.classList.remove('magnet-top');
+                        }
+
+                        // إزالة التأثير بعد فترة
+                        setTimeout(() => {
+                            section.classList.remove('magnet-top', 'magnet-bottom');
+                        }, 300);
+                    }
+                });
+            }, observerOptions);
+
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+
+            // إضافة تأثير المغناطيس عند التمرير بالماوس
+            let isScrolling = false;
+            window.addEventListener('scroll', () => {
+                if (!isScrolling) {
+                    isScrolling = true;
+                    requestAnimationFrame(() => {
+                        sections.forEach(section => {
+                            if (section.getBoundingClientRect().top < window.innerHeight * 0.8 &&
+                                section.getBoundingClientRect().bottom > window.innerHeight * 0.2) {
+
+                                const scrollDirection = window.scrollY > (window.lastScrollY || 0) ? 'down' : 'up';
+
+                                if (scrollDirection === 'down') {
+                                    section.classList.add('magnet-bottom');
+                                    section.classList.remove('magnet-top');
+                                } else {
+                                    section.classList.add('magnet-top');
+                                    section.classList.remove('magnet-bottom');
+                                }
+
+                                setTimeout(() => {
+                                    section.classList.remove('magnet-top', 'magnet-bottom');
+                                }, 200);
+                            }
+                        });
+
+                        window.lastScrollY = window.scrollY;
+                        isScrolling = false;
+                    });
+                }
+            });
+
+            // إصلاح مشكلة الجيرسكوب في الموبايل
+            if (window.innerWidth <= 768) {
+                // إزالة بيانات الجيرسكوب في الموبايل
+                document.querySelectorAll('[data-tilt]').forEach(el => {
+                    el.removeAttribute('data-tilt');
+                    el.removeAttribute('data-tilt-max');
+                    el.removeAttribute('data-tilt-speed');
+                    el.removeAttribute('data-tilt-perspective');
+                });
+
+                // تعطيل VanillaTilt في الموبايل
+                if (typeof VanillaTilt !== 'undefined') {
+                    VanillaTilt.init = function () { };
+                }
+            }
+        }
+
+        // استدعاء الدالة بعد تحميل الصفحة
+        document.addEventListener('DOMContentLoaded', function () {
+            // ... الكود الحالي ...
+
+            // إضافة تأثير المغناطيس بعد تحميل الصفحة
+            setTimeout(initMagnetSections, 1000);
+
+            // تحديث عند تغيير حجم النافذة
+            let resizeTimer;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(() => {
+                    initMagnetSections();
+                }, 250);
+            });
+        });
+
+        // تحسين الأداء للجيرسكوب (محمي من الأخطاء)
+        if (window.innerWidth > 768) {
+            try {
+                const aboutEl = document.querySelector('.about-content');
+                if (aboutEl && typeof VanillaTilt !== 'undefined') {
+                    VanillaTilt.init(aboutEl, {
+                        max: 5,
+                        speed: 300,
+                        perspective: 1000,
+                        glare: true,
+                        'max-glare': 0.2,
+                        scale: 1.02,
+                        gyroscope: false
+                    });
+                }
+            } catch (e) { console.warn('VanillaTilt init error:', e); }
+        }
+
+
+
+
+
+
+
+
+
+
+        // Preloader (secondary failsafe on window.load)
+        window.addEventListener('load', function () {
+            const preloader = document.getElementById('preloader');
+            if (preloader) {
+                preloader.style.opacity = '0';
+                setTimeout(function () { preloader.style.display = 'none'; }, 400);
+            }
+        });
+
+
+        /// ==========================================
+        // كود المودال المصحح - يجب أن يكون قبل أي تعريفات أخرى
+        // ==========================================
+
+        // دالة فتح المودال (الإصدار المصحح)
+        window.showModal = function (title, content) {
+            const modal = document.getElementById("newsModal");
+            const modalTitle = document.getElementById("modalTitle");
+            const modalContent = document.getElementById("modalContent");
+
+            if (modal && modalTitle && modalContent) {
+                // تعيين المحتوى
+                modalTitle.textContent = title;
+                modalContent.textContent = content;
+
+                // إظهار المودال
+                modal.style.display = "block";
+                document.body.style.overflow = 'hidden';
+                document.documentElement.style.overflow = 'hidden'; // إضافة هذا السطر
+
+                console.log("تم فتح المودال:", title); // للتتبع
+            } else {
+                console.error("عناصر المودال غير موجودة!");
+            }
+        };
+
+        // دالة إغلاق المودال (الإصدار المصحح)
+        window.closeModal = function () {
+            const modal = document.getElementById("newsModal");
+            if (modal) {
+                modal.style.display = "none";
+                document.body.style.overflow = '';
+                document.documentElement.style.overflow = ''; // إضافة هذا السطر
+                console.log("تم إغلاق المودال"); // للتتبع
+            }
+        };
+
+        // إعداد مستمعي الأحداث بعد تحميل الصفحة
+        document.addEventListener('DOMContentLoaded', function () {
+            const modal = document.getElementById('newsModal');
+
+            if (modal) {
+                // إغلاق عند النقر على زر X
+                const closeBtn = modal.querySelector('.close-btn');
+                if (closeBtn) {
+                    // إزالة أي مستمعين سابقين أولاً
+                    closeBtn.replaceWith(closeBtn.cloneNode(true));
+                    const newCloseBtn = modal.querySelector('.close-btn');
+
+                    newCloseBtn.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        closeModal();
+                    });
+                }
+
+                // إغلاق عند النقر خارج الصندوق
+                modal.addEventListener('click', function (event) {
+                    if (event.target === modal) {
+                        closeModal();
+                    }
+                });
+
+                // إغلاق عند الضغط على زر ESC
+                document.addEventListener('keydown', function (event) {
+                    if (event.key === 'Escape' && modal.style.display === 'block') {
+                        closeModal();
+                    }
+                });
+
+                console.log("تم إعداد مستمعي الأحداث للمودال");
+            }
+        });
+
+        // Toast Notification System
+        window.showToast = function (message, type = 'warning') {
+            const container = document.getElementById('customToastContainer');
+            if (!container) return;
+
+            const toast = document.createElement('div');
+            toast.className = `custom-toast toast-${type}`;
+
+            let iconClass = 'fa-exclamation-triangle';
+            if (type === 'success') iconClass = 'fa-check-circle';
+            else if (type === 'error') iconClass = 'fa-times-circle';
+
+            toast.innerHTML = `
+        <i class="fas ${iconClass}"></i>
+        <span>${message}</span>
+    `;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.animation = 'toastSlideOut 0.3s ease forwards';
+                setTimeout(() => {
+                    toast.remove();
+                }, 300);
+            }, 4000);
+        };
+
+        // Custom Logout Modal Functions
+        window.openCustomLogoutModal = function () {
+            document.getElementById('customLogoutModal').classList.add('show');
+        };
+
+        window.closeCustomLogoutModal = function () {
+            document.getElementById('customLogoutModal').classList.remove('show');
+        };
+
+        window.confirmCustomLogout = async function () {
+            closeCustomLogoutModal();
+            await authService.logout();
+            window.location.reload();
+        };
+ 
+        
+    </script>
+
+    <!-- Custom Logout Confirm Modal -->
+    <div class="custom-modal-overlay" id="customLogoutModal">
+        <div class="custom-modal-box">
+            <div class="custom-modal-title">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>تسجيل الخروج</span>
+            </div>
+            <div class="custom-modal-message">هل ترغب بالفعل في تسجيل الخروج من الموقع؟</div>
+            <div class="custom-modal-buttons">
+                <button class="custom-modal-btn custom-modal-btn-cancel"
+                    onclick="closeCustomLogoutModal()">إلغاء</button>
+                <button class="custom-modal-btn custom-modal-btn-confirm" onclick="confirmCustomLogout()">خروج</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Toast Container -->
+    <div class="custom-toast-container" id="customToastContainer"></div>
+
+
+
+    <script>(function () { function c() { var b = a.contentDocument || a.contentWindow.document; if (b) { var d = b.createElement('script'); d.innerHTML = "window.__CF$cv$params={r:'93a9db35bf691379',t:'MTc0NjM4MTE5Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);"; b.getElementsByTagName('head')[0].appendChild(d) } } if (document.body) { var a = document.createElement('iframe'); a.height = 1; a.width = 1; a.style.position = 'absolute'; a.style.top = 0; a.style.left = 0; a.style.border = 'none'; a.style.visibility = 'hidden'; document.body.appendChild(a); if ('loading' !== document.readyState) c(); else if (window.addEventListener) document.addEventListener('DOMContentLoaded', c); else { var e = document.onreadystatechange || function () { }; document.onreadystatechange = function (b) { e(b); 'loading' !== document.readyState && (document.onreadystatechange = e, c()) } } } })();</script>
+    <script>(function () { function c() { var b = a.contentDocument || a.contentWindow.document; if (b) { var d = b.createElement('script'); d.innerHTML = "window.__CF$cv$params={r:'93b703ad1a7353cf',t:'MTc0NjUxOTE2NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);"; b.getElementsByTagName('head')[0].appendChild(d) } } if (document.body) { var a = document.createElement('iframe'); a.height = 1; a.width = 1; a.style.position = 'absolute'; a.style.top = 0; a.style.left = 0; a.style.border = 'none'; a.style.visibility = 'hidden'; document.body.appendChild(a); if ('loading' !== document.readyState) c(); else if (window.addEventListener) document.addEventListener('DOMContentLoaded', c); else { var e = document.onreadystatechange || function () { }; document.onreadystatechange = function (b) { e(b); 'loading' !== document.readyState && (document.onreadystatechange = e, c()) } } } })();</script>
+
+
+
+
+</body>
+
+</html>

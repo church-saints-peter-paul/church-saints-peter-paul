@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- استيراد خط Cairo -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <!-- مكتبة أيقونات -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* ===== المتغيرات والتأسيسات (نفس الهوية البصرية) ===== */
+        :root {
+            --primary-red: #800000;
+            --primary-gold: #d4a017;
+            --dark-navy: #013346;
+            --light-cream: #efdfbf;
+            --white: #ffffff;
+            --success-green: #2ecc71;
+            --transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            outline: none;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: var(--light-cream);
+            color: var(--dark-navy);
+            line-height: 1.6;
+            overflow-x: hidden;
+            transition: var(--transition);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ===== الخلفية المتحركة ===== */
+        .bg-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.1;
+            background-image: radial-gradient(var(--primary-red) 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+
+        body.dark-mode {
+            background: #0f172a;
+            color: var(--light-cream);
+        }
+
+        body.dark-mode .bg-pattern {
+            opacity: 0.05;
+            background-image: radial-gradient(var(--primary-gold) 1px, transparent 1px);
+        }
+
+        /* ===== الشريط العلوي ===== */
+        .top-bar {
+            padding: 15px 20px;
+            background: linear-gradient(90deg, #002334, #820303);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .back-btn {
+            color: var(--white);
+            text-decoration: none;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 20px;
+            border-radius: 50px;
+            background: rgba(255,255,255,0.1);
+            transition: var(--transition);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .back-btn:hover {
+            background: var(--primary-gold);
+            color: var(--dark-navy);
+            transform: translateX(5px);
+        }
+
+        /* زر الوضع المظلم */
+        .theme-switch-wrapper { display: flex; align-items: center; }
+        .theme-switch { display: none; }
+        .theme-switch-label {
+            background: rgba(0,0,0,0.3);
+            border: 2px solid var(--primary-gold);
+            border-radius: 50px;
+            cursor: pointer;
+            height: 36px;
+            width: 70px;
+            position: relative;
+            transition: var(--transition);
+        }
+        .theme-switch-label:before {
+            content: '\f185';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            background: var(--primary-gold);
+            border-radius: 50%;
+            height: 28px;
+            width: 28px;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 14px;
+            transition: var(--transition);
+        }
+        .theme-switch:checked + .theme-switch-label:before {
+            transform: translateX(34px);
+            content: '\f186';
+            background: var(--white);
+            color: var(--dark-navy);
+        }
+
+        /* ===== الحاوية والبطاقة ===== */
+        .main-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        .contact-card {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            padding: 40px;
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.4);
+            position: relative;
+            overflow: hidden;
+            animation: floatUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        body.dark-mode .contact-card {
+            background: rgba(30, 41, 59, 0.7);
+            border-color: rgba(255,255,255,0.05);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .contact-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(90deg, var(--primary-gold), var(--primary-red));
+        }
+
+        /* صورة الكاهن */
+        .priest-avatar {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            border: 4px solid var(--primary-gold);
+            padding: 4px;
+            margin: 0 auto 20px;
+            position: relative;
+            z-index: 1;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            transition: transform 0.4s ease;
+        }
+        
+        .priest-avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        /* النصوص */
+        .card-title {
+            font-size: 1.1rem;
+            color: #666;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        body.dark-mode .card-title { color: #aaa; }
+
+        .card-name {
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: var(--primary-red);
+            margin-bottom: 30px;
+            text-shadow: 0 2px 10px rgba(128, 0, 0, 0.1);
+        }
+        
+        body.dark-mode .card-name { color: var(--primary-gold); }
+
+        /* حقل الرقم */
+        .number-display-wrapper {
+            position: relative;
+            margin-bottom: 25px;
+        }
+
+        .number-display {
+            width: 100%;
+            background: rgba(128, 0, 0, 0.05);
+            border: 2px dashed var(--primary-red);
+            border-radius: 15px;
+            padding: 15px;
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--dark-navy);
+            text-align: center;
+            font-family: 'Segoe UI', sans-serif;
+            transition: var(--transition);
+            cursor: pointer;
+            user-select: all;
+        }
+
+        body.dark-mode .number-display {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--primary-gold);
+            color: var(--white);
+        }
+
+        /* زر النسخ */
+        .copy-btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 50px;
+            background: linear-gradient(135deg, var(--primary-red), #560000);
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 8px 20px rgba(128, 0, 0, 0.3);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .copy-btn.copied {
+            background: linear-gradient(135deg, var(--success-green), #27ae60);
+        }
+
+        /* رسالة منبثقة */
+        .toast-msg {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--dark-navy);
+            color: var(--primary-gold);
+            padding: 12px 30px;
+            border-radius: 50px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            font-weight: 700;
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid var(--primary-gold);
+        }
+
+        .toast-msg.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        @keyframes floatUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        @media (max-width: 576px) {
+            .contact-card { padding: 30px 20px; max-width: 90%; }
+            .card-name { font-size: 1.8rem; }
+            .number-display { font-size: 1.6rem; }
+            .back-btn span { display: none; }
+        }
+    </style>
+</head>
+<body class="light-mode">
+
+    <div class="bg-pattern"></div>
+
+    <div class="top-bar">
+        <div class="theme-switch-wrapper">
+            <input type="checkbox" class="theme-switch" id="checkbox">
+            <label class="theme-switch-label" for="checkbox"></label>
+        </div>
+        
+        <a href="index.html" class="back-btn">
+            <i class="fas fa-arrow-left"></i>
+            <span>العودة للرئيسية</span>
+        </a>
+    </div>
+
+    <div class="main-container">
+        <div class="contact-card">
+            
+            <div class="priest-avatar">
+                <img src="4.jpg" alt="الْقَسّ بَيْتِروس دَاوُدُ" onerror="this.src='https://via.placeholder.com/180x180/800000/d4a017?text=أبونا'">
+            </div>
+
+
+            <h1 class="card-name">الْقَسّ بَيْتِروس دَاوُدُ</h1>
+
+            <div class="number-display-wrapper">
+                <input type="text" class="number-display" id="phoneInput" value="01280761899" readonly onclick="copyNumber()">
+            </div>
+
+            <button class="copy-btn" id="copyBtn" onclick="copyNumber()">
+                <i class="fas fa-copy"></i>
+                <span>نسخ الرقم</span>
+            </button>
+
+        </div>
+    </div>
+
+    <div class="footer">
+        &copy; كنيسة القديسين - جميع الحقوق محفوظة
+    </div>
+
+    <div class="toast-msg" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <span>تم نسخ الرقم بنجاح!</span>
+    </div>
+
+    <script>
+        // --- إصلاح كود النسخ ليعمل داخل الإطارات (iFrames) ---
+        function copyNumber() {
+            const inputElement = document.getElementById("phoneInput");
+            const btn = document.getElementById("copyBtn");
+            const toast = document.getElementById("toast");
+            const icon = btn.querySelector("i");
+            const text = btn.querySelector("span");
+
+            // تحديد النص يدوياً لضمان النجاح
+            inputElement.focus();
+            inputElement.select();
+            inputElement.setSelectionRange(0, 99999);
+
+            try {
+                // استخدام execCommand كبديل أكثر توافقاً في بيئات iFrame المقيدة
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    onCopySuccess();
+                }
+            } catch (err) {
+                // محاولة أخيرة باستخدام Clipboard API إذا فشل execCommand
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(inputElement.value).then(onCopySuccess).catch(() => {
+                        console.error("فشل النسخ نهائياً.");
+                    });
+                }
+            }
+
+            function onCopySuccess() {
+                btn.classList.add("copied");
+                icon.className = "fas fa-check";
+                text.textContent = "تم النسخ";
+                toast.classList.add("show");
+
+                setTimeout(() => {
+                    btn.classList.remove("copied");
+                    icon.className = "fas fa-copy";
+                    text.textContent = "نسخ الرقم";
+                    toast.classList.remove("show");
+                }, 2000);
+            }
+        }
+
+        // --- كود الوضع الليلي ---
+        const toggleSwitch = document.querySelector('.theme-switch');
+        const currentTheme = localStorage.getItem('theme');
+
+        if (currentTheme) {
+            document.body.classList.remove('light-mode', 'dark-mode');
+            document.body.classList.add(currentTheme);
+            if (currentTheme === 'dark-mode' && toggleSwitch) {
+                toggleSwitch.checked = true;
+            }
+        }
+
+        function switchTheme(e) {
+            if (e.target.checked) {
+                document.body.classList.remove('light-mode');
+                document.body.classList.add('dark-mode');
+                localStorage.setItem('theme', 'dark-mode');
+            } else {
+                document.body.classList.remove('dark-mode');
+                document.body.classList.add('light-mode');
+                localStorage.setItem('theme', 'light-mode');
+            }
+        }
+
+        if (toggleSwitch) {
+            toggleSwitch.addEventListener('change', switchTheme);
+        }
+    </script>
+</body>
+</html>

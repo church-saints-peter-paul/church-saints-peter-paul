@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>صفحة الكورسات</title>
+    <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
+    <style>
+        body {
+            font-family: 'Amiri', serif;
+            background-color: #f8f9fa;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar {
+            background-color: #800000;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            font-size: 22px;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .navbar .title {
+            flex-grow: 1;
+            text-align: center;
+        }
+
+        .navbar .home-button {
+            background-color: #007bff;
+            color: white;
+            border: 2px solid white;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 18px;
+            transition: 0.3s;
+        }
+
+        .navbar .home-button:hover {
+            background-color: white;
+            color: #007bff;
+            border: 2px solid #007bff;
+        }
+
+        .container {
+            margin-top: 50px;
+            padding: 30px;
+            background: white;
+            width: 50%;
+            margin-left: auto;
+            margin-right: auto;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        h2 {
+            color: #800000;
+            font-size: 24px;
+        }
+
+        label {
+            display: block;
+            font-size: 18px;
+            margin: 10px 0 5px;
+            color: #333;
+        }
+
+        input {
+            width: 90%;
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            text-align: center;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: 0.3s;
+            margin-top: 15px;
+            border: 2px solid white;
+        }
+
+        button:hover {
+            background-color: white;
+            color: #007bff;
+            border: 2px solid #007bff;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <button onclick="window.location.href='index.html'" class="home-button">الرئيسية</button>
+        <div class="title">كنيسة القديسين بطرس وبولس</div>
+        <div>الكورسات</div>
+    </div>
+
+    <div class="container">
+        <h2>مرحبًا بك في صفحة الكورسات</h2>
+        <p>يرجى إدخال اسمك وكود الطالب للوصول إلى الكورسات الخاصة بك.</p>
+
+        <form id="studentForm">
+            <label> الاسم:</label>
+            <input type="text" id="studentName" placeholder="أدخل اسمك" required>
+
+            <label> كود:</label>
+            <input type="text" id="studentCode" placeholder="أدخل الكود" required>
+
+            <button type="button" onclick="checkStudent()"> دخول</button>
+        </form>
+
+        <p id="errorMessage" class="error-message"></p>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            let firstName = localStorage.getItem("userFirstName") || "";
+            let lastName = localStorage.getItem("userLastName") || "";
+            let fullName = firstName && lastName ? firstName + " " + lastName : "";
+
+            let storedCode = localStorage.getItem("studentCode") || "";
+
+            document.getElementById("studentName").value = fullName;
+            document.getElementById("studentCode").value = storedCode;
+        });
+
+        function checkStudent() {
+            let name = document.getElementById("studentName").value.trim();
+            let code = document.getElementById("studentCode").value.trim();
+            let year = localStorage.getItem("studentYear");
+
+            if (!name || !code) {
+                document.getElementById("errorMessage").textContent = "⚠️ يجب إدخال الاسم والكود!";
+                return;
+            }
+
+            localStorage.setItem("studentName", name);
+            localStorage.setItem("studentCode", code);
+
+            let redirectPage = "";
+            switch(year) {
+                case "أولى إعدادي": redirectPage = "first_prep.html"; break;
+                case "ثانية إعدادي": redirectPage = "second_prep.html"; break;
+                case "ثالثة إعدادي": redirectPage = "third_prep.html"; break;
+                default: redirectPage = "index.html";
+            }
+
+            window.location.href = redirectPage;
+        }
+    </script>
+</body>
+</html>

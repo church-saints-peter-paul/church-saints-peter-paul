@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>التكوين</title>
+</head>
+<style>
+
+@import url('https://fonts.googleapis.com/css2?family=Amiri&display=swap');
+
+body {
+    font-family: 'Amiri', serif;
+    direction: rtl;
+    font-size: 16px; /* حجم الخط الأساسي */
+    text-align: center; /* لضبط النص في المنتصف */
+    margin: 0;
+    padding: 0;
+}
+
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: #800000;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+.top-bar a {
+    color: white;
+    text-decoration: none;
+    font-size: 1.2em;
+}
+
+.theme-toggle {
+    background-color: #800000;
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    font-size: 1em;
+    border-radius: 5px;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.theme-toggle:hover {
+    background-color: #0056b3;
+    transform: scale(1.05);
+}
+
+.navbar {
+    background-color: #800000;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+}
+
+.navbar .site-name {
+    font-size: 1.5em;
+    margin: 0;
+}
+
+.about-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 50px;
+    opacity: 0;
+    transform: translateY(50px);
+    transition: opacity 1s, transform 1s;
+}
+
+.about-section.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.about-section ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.about-section ul li {
+    margin: 10px 0;
+}
+
+.about-section ul li a {
+    text-decoration: none;
+    color: #800000;
+    font-size: 1.2em;
+}
+
+.about-section ul li a:hover {
+    text-decoration: underline;
+}
+
+.text-content {
+    margin: 20px;
+    text-align: justify;
+    line-height: 1.6;
+}
+
+footer {
+    background: #1f1f1f;
+    color: #ffffff;
+    text-align: center;
+    padding: 1rem 0;
+    width: 100%;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+    font-size: 0.875rem;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+footer a {
+    color: #3ad1ff;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+footer a:hover {
+    color: #1e90ff;
+}
+
+.font-size-controls {
+    display: flex;
+    justify-content: center;
+    margin: 20px;
+}
+
+.font-size-controls button {
+    margin: 0 10px;
+    padding: 10px;
+    font-size: 1em;
+    cursor: pointer;
+}
+
+/* تصميم المؤشر بشكل جذاب */
+.font-size-indicator {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #ffffff;
+    border: 2px solid #800000;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 1.2em;
+    color: #800000;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.font-size-indicator:hover {
+    background-color: #800000;
+    color: #ffffff;
+    transform: scale(1.2);
+}
+
+
+</style>
+
+<body>
+<body class="light-mode">
+    <div class="top-bar">
+        <a href="enjeel.html">الرجوع</a>
+        <div class="font-size-indicator" onclick="toggleFontSizeMenu()">أ</div>
+    </div>
+    <header class="navbar">
+        <span class="site-name">اَلْمَزْمور الثَّانِي وَالْعِشْرونَ</span>
+        <div class="font-size-controls" id="fontSizeControls">
+            <button onclick="changeFontSize(-1)">تصغير النص</button>
+            <button onclick="changeFontSize(1)">تكبير النص</button>
+    </header>
+    <main>
+        <section class="about-section show">
+            <div class="text-content">
+                <ul>
+                    
+                    1إِلهِي، إِلهِي، لِمَاذَا تَرَكْتَنِي، بَعِيدًا عَنْ خَلاَصِي، عَنْ كَلاَمِ زَفِيرِي؟ 2إِلهِي، فِي النَّهَارِ أَدْعو فَلاَ تَسْتَجِيب، فِي اللَّيْلِ أَدْعو فَلاَ هدوَّ لِي. 3وَأَنْتَ الْقدّوس الْجَالِس بَيْنَ تَسْبِيحَاتِ إِسْرَائِيلَ. 4عَلَيْكَ اتَّكَلَ آبَاؤنَا. اتَّكَلوا فَنَجَّيْتَهمْ. 5إِلَيْكَ صَرَخوا فَنَجَوْا. عَلَيْكَ اتَّكَلوا فَلَمْ يَخْزَوْا. 6أَمَّا أَنَا فَدودَةٌ لاَ إِنْسَانٌ. عَارٌ عِنْدَ الْبَشَرِ وَمحْتَقَر الشَّعْبِ. 7كلّ الَّذِينَ يَرَوْنَنِي يَسْتَهْزِئونَ بِي. يَفْغَرونَ الشِّفَاهَ، وَينْغِضونَ الرَّأْسَ قَائِلِينَ: 8«اتَّكَلَ عَلَى الرَّبِّ فَلْينَجِّهِ، لِينْقِذْه لأَنَّه سرَّ بِهِ». 9لأَنَّكَ أَنْتَ جَذَبْتَنِي مِنَ الْبَطْنِ. جَعَلْتَنِي مطْمَئِنًّا عَلَى ثَدْيَيْ أمِّي. 10عَلَيْكَ ألْقِيت مِنَ الرَّحِمِ. مِنْ بَطْنِ أمِّي أَنْتَ إِلهِي. 11لاَ تَتَبَاعَدْ عَنِّي، لأَنَّ الضِّيقَ قَرِيبٌ، لأَنَّه لاَ معِينَ.
+
+12أَحَاطَتْ بِي ثِيرَانٌ كَثِيرَةٌ. أَقْوِيَاء بَاشَانَ اكْتَنَفَتْنِي. 13فَغَروا عَلَيَّ أَفْوَاهَهمْ كَأَسَدٍ مفْتَرِسٍ مزَمْجِرٍ. 14كَالْمَاءِ انْسَكَبْت. انْفَصَلَتْ كلّ عِظَامِي. صَارَ قَلْبِي كَالشَّمْعِ. قَدْ ذَابَ فِي وَسَطِ أَمْعَائِي. 15يَبِسَتْ مِثْلَ شَقْفَةٍ قوَّتِي، وَلَصِقَ لِسَانِي بِحَنَكِي، وَإِلَى ترَابِالْمَوْتِ تَضَعنِي. 16لأَنَّه قَدْ أَحَاطَتْ بِي كِلاَبٌ. جَمَاعَةٌ مِنَ الأَشْرَارِ اكْتَنَفَتْنِي. ثَقَبوا يَدَيَّ وَرِجْلَيَّ. 17أحْصِي كلَّ عِظَامِي، وَهمْ يَنْظرونَ وَيَتَفَرَّسونَ فِيَّ. 18يَقْسِمونَ ثِيَابِي بَيْنَهمْ، وَعَلَى لِبَاسِي يَقْتَرِعونَ.
+
+19أَمَّا أَنْتَ يَا رَبّ، فَلاَ تَبْعدْ. يَا قوَّتِي، أَسْرِعْ إِلَى نصْرَتِي. 20أَنْقِذْ مِنَ السَّيْفِ نَفْسِي. مِنْ يَدِ الْكَلْبِ وَحِيدَتِي. 21خَلِّصْنِي مِنْ فَمِ الأَسَدِ، وَمِنْ قرونِ بَقَرِ الْوَحْشِ اسْتَجِبْ لِي. 22أخْبِرْ بِاسْمِكَ إِخْوَتِي. فِي وَسَطِ الْجَمَاعَةِ أسَبِّحكَ. 23يَا خَائِفِي الرَّبِّ سَبِّحوه! مَجِّدوه يَا مَعْشَرَ ذرِّيَّةِ يَعْقوبَ، وَاخْشَوْه يَا زَرْعَ إِسْرَائِيلَ جَمِيعًا! 24لأَنَّه لَمْ يَحْتَقِرْ وَلَمْ يرْذِلْ مَسْكَنَةَ الْمَِسْكِينِ، وَلَمْ يَحْجبْ وَجْهَه عَنْه، بَلْ عِنْدَ صرَاخِهِ إِلَيْهِ اسْتَمَعَ. 25مِنْ قِبَلِكَ تَسْبِيحِي فِي الْجَمَاعَةِ الْعَظِيمَةِ. أوفِي بِنذورِي قدَّامَ خَائِفِيهِ. 26يَأْكل الْودَعَاء وَيَشْبَعونَ. يسَبِّح الرَّبَّ طَالِبوه. تَحْيَا قلوبكمْ إِلَى الأَبَدِ. 27تَذْكر وَتَرْجع إِلَى الرَّبِّ كلّ أَقَاصِي الأَرْضِ. وَتَسْجد قدَّامَكَ كلّ قَبَائِلِ الأمَمِ. 28لأَنَّ لِلرَّبِّ الْملْكَ، وَهوَ الْمتَسَلِّط عَلَى الأمَمِ. 29أَكَلَ وَسَجَدَ كلّ سَمِينِي الأَرْضِ. قدَّامَه يَجْثو كلّ مَنْ يَنْحَدِر إِلَى التّرَابِ وَمَنْ لَمْ يحْيِ نَفْسَه. 30الذّرِّيَّة تَتَعَبَّد لَه. يخَبَّر عَنِ الرَّبِّ الْجِيل الآتِي. 31يَأْتونَ وَيخْبِرونَ بِبِرهِ شَعْبًا سَيولَد بِأَنَّه قَدْ فَعَلَ.
+
+                </ul>
+            </div>
+            
+            </div>
+        </section>
+    </main>
+    <footer>
+        © 2024 الإنجيل. جميع الحقوق محفوظة.
+    </footer>
+    <script>
+        function changeFontSize(delta) {
+            const content = document.querySelector('.text-content');
+            const currentSize = parseFloat(window.getComputedStyle(content, null).getPropertyValue('font-size'));
+            content.style.fontSize = (currentSize + delta) + 'px';
+        }
+
+        function toggleFontSizeMenu() {
+            const fontSizeControls = document.getElementById('fontSizeControls');
+            fontSizeControls.style.display = fontSizeControls.style.display === 'none' || fontSizeControls.style.display === '' ? 'flex' : 'none';
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('fontSizeControls').style.display = 'none';
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم بالخدمة - كنيسة القديسين بطرس وبولس</title>
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- CSS Theme -->
+    <link rel="stylesheet" href="css/control.css">
+    <!-- Cropper.js -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
+
+    <style>
+        /* CSS variables fallback just in case */
+        :root {
+            --gold-primary: #d4a017;
+            --bg-card: rgba(10, 25, 47, 0.85);
+            --border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Top Progress Bar */
+        .top-progress-bar {
+            position: fixed;
+            top: 0; left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--gold-primary), #f4c542, #10b981);
+            z-index: 999999;
+            width: 0%;
+            transition: width 0.4s ease, opacity 0.3s ease;
+            opacity: 0;
+            box-shadow: 0 0 8px rgba(212,160,23,0.6);
+        }
+        .top-progress-bar.active { opacity: 1; }
+
+        /* Upload Progress Overlay */
+        .upload-progress-overlay {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            max-width: 380px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, rgba(10,25,47,0.98), rgba(5,15,30,0.98));
+            border: 1px solid rgba(212,160,23,0.4);
+            border-radius: 16px;
+            padding: 16px 20px;
+            z-index: 99998;
+            opacity: 0;
+            transform: translateY(20px);
+            pointer-events: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+            font-family: 'Cairo', sans-serif;
+        }
+        .upload-progress-overlay.show {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: all;
+        }
+        .upload-progress-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--gold-primary);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .upload-progress-bar-wrap {
+            height: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 100px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+        .upload-progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold-primary), #f4c542);
+            border-radius: 100px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+        .upload-progress-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: rgba(255,255,255,0.6);
+        }
+    </style>
+
+    <script>
+        window.onerror = function (msg, url, lineNo, columnNo, error) {
+            const div = document.createElement('div');
+            div.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#ff3b30;color:white;padding:15px;z-index:999999;font-family:monospace;font-size:14px;direction:ltr;text-align:left;border-bottom:3px solid #7a0000;box-shadow:0 10px 30px rgba(0,0,0,0.5);word-break:break-all;';
+            div.innerHTML = '<b>🚨 Global JS Error:</b> ' + msg + '<br><b>File:</b> ' + url + '<br><b>Line:</b> ' + lineNo + ':' + columnNo + '<br><b>Stack:</b> <pre style="margin:5px 0 0;white-space:pre-wrap;">' + (error ? error.stack : 'N/A') + '</pre>';
+            document.body.appendChild(div);
+            return false;
+        };
+        window.onunhandledrejection = function (event) {
+            const div = document.createElement('div');
+            div.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#ff9500;color:black;padding:15px;z-index:999999;font-family:monospace;font-size:14px;direction:ltr;text-align:left;border-bottom:3px solid #cc7a00;box-shadow:0 10px 30px rgba(0,0,0,0.5);word-break:break-all;';
+            div.innerHTML = '<b>⚠️ Unhandled Promise Rejection:</b> ' + event.reason + '<br><b>Stack:</b> <pre style="margin:5px 0 0;white-space:pre-wrap;">' + (event.reason ? event.reason.stack : 'N/A') + '</pre>';
+            document.body.appendChild(div);
+        };
+    </script>
+
+    <!-- Immediate Auth Guard (localStorage fast-check before full Supabase auth) -->
+    <script>
+        (function () {
+            const localRole = localStorage.getItem('userRole');
+            const isLoggedIn = localStorage.getItem('isLoggedIn');
+            // Only 'خادم' and 'امين خدمه' may enter the service control panel
+            if (isLoggedIn !== 'true' || (localRole !== 'خادم' && localRole !== 'امين خدمه')) {
+                window.location.replace('../login.html');
+            }
+        })();
+    </script>
+</head>
+
+<body>
+    <div class="glass-bg"></div>
+
+    <div class="control-container">
+
+        <!-- Header Bar -->
+        <header class="control-header glass-card">
+            <div class="header-profile">
+                <div class="header-avatar"><i class="fas fa-chalkboard-teacher"></i></div>
+                <div class="header-title-box">
+                    <h1 id="servantName">لوحة التحكم بالخدمة</h1>
+                    <div class="class-selector-badge-wrapper">
+                        <span id="servantClass" class="badge-class">فصل الخدمة: جاري التحميل...</span>
+                        <button class="change-class-btn" id="btnChangeClass" title="تغيير فصل الخدمة">
+                            <i class="fas fa-sync-alt"></i> تغيير الفصل
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="header-nav">
+                <button class="nav-tab-btn active" data-tab="pane_students" id="navBtn_students">
+                    <i class="fas fa-users"></i> المخدومين والتحليلات
+                </button>
+                <button class="nav-tab-btn" data-tab="pane_content_manager" id="navBtn_content">
+                    <i class="fas fa-edit"></i> إدارة المنهج والامتحانات
+                </button>
+                <button class="nav-tab-btn" data-tab="pane_attendance_manager" id="navBtn_attendance">
+                    <i class="fas fa-user-check"></i> تسجيل الحضور اليومي
+                </button>
+                <a href="../index.html" class="nav-action-btn cancel-btn">
+                    <i class="fas fa-home"></i> الرئيسية
+                </a>
+            </div>
+        </header>
+
+        <!-- Main Workspace -->
+        <div class="main-workspace-wrapper">
+
+            <!-- VIEW 1: STUDENTS DASHBOARD -->
+            <div class="dashboard-pane active" id="pane_students">
+                <!-- Stats Row -->
+                <div class="stats-overview-row">
+                    <div class="stat-widget glass-card">
+                        <span class="widget-label"><i class="fas fa-users text-gold"></i> إجمالي الطلاب بالفصل</span>
+                        <span class="widget-value" id="stat_total_students">0</span>
+                    </div>
+                    <div class="stat-widget glass-card">
+                        <span class="widget-label"><i class="fas fa-user-clock text-green"></i> النشطين آخر 24
+                            ساعة</span>
+                        <span class="widget-value text-green" id="stat_active_today">0</span>
+                    </div>
+                    <div class="stat-widget glass-card">
+                        <span class="widget-label"><i class="fas fa-star text-gold"></i> متوسط نقاط طلاب الفصل</span>
+                        <span class="widget-value text-gold" id="stat_avg_points">0</span>
+                    </div>
+                </div>
+
+                <div class="coordinator-filters-bar glass-card" id="coordinatorFilterBar" style="display: none; padding: 15px; margin-bottom: 20px; border: 1px solid rgba(212, 160, 23, 0.3); border-radius: 16px; gap: 10px; justify-content: center; flex-wrap: wrap; align-items: center; background: rgba(1, 51, 70, 0.4);">
+                    <span style="font-weight: 700; color: var(--secondary-color); font-size: 14px; margin-left: 10px;"><i class="fas fa-user-shield"></i> تصفية لوحة أمين الخدمة:</span>
+                    <button class="coordinator-btn active" id="btnMyClassStudents" style="background: linear-gradient(135deg, var(--primary-color), #a00000); border: 1px solid var(--secondary-color); border-radius: 10px; padding: 8px 16px; color: white; font-family: 'Cairo'; font-weight: bold; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 0 10px rgba(212, 160, 23, 0.2);">
+                        <i class="fas fa-user-graduate"></i> مخدومين فصلي فقط
+                    </button>
+                    <button class="coordinator-btn" id="btnMyClass" style="background: rgba(237, 221, 189, 0.08); border: 1px solid rgba(237, 221, 189, 0.2); border-radius: 10px; padding: 8px 16px; color: var(--light-color); font-family: 'Cairo'; cursor: pointer; transition: all 0.3s ease;">
+                        <i class="fas fa-users-cog"></i> خدام ومخدومين فصلي
+                    </button>
+                    <button class="coordinator-btn" id="btnAllServants" style="background: rgba(237, 221, 189, 0.08); border: 1px solid rgba(237, 221, 189, 0.2); border-radius: 10px; padding: 8px 16px; color: var(--light-color); font-family: 'Cairo'; cursor: pointer; transition: all 0.3s ease;">
+                        <i class="fas fa-chalkboard-teacher"></i> جميع خدام الخدمة
+                    </button>
+                    <button class="coordinator-btn" id="btnAllStudents" style="background: rgba(237, 221, 189, 0.08); border: 1px solid rgba(237, 221, 189, 0.2); border-radius: 10px; padding: 8px 16px; color: var(--light-color); font-family: 'Cairo'; cursor: pointer; transition: all 0.3s ease;">
+                        <i class="fas fa-user-graduate"></i> جميع مخدومين الخدمة
+                    </button>
+                </div>
+
+                <!-- Filters & Search -->
+                <div class="filters-bar glass-card">
+                    <div class="search-input-wrapper">
+                        <input type="text" id="searchStudentInput" placeholder="بحث باسم المخدوم أو رقم التليفون...">
+                        <i class="fas fa-search"></i>
+                    </div>
+
+                    <div class="sort-selector-wrapper">
+                        <label for="sortSelector">ترتيب حسب:</label>
+                        <select id="sortSelector">
+                            <option value="latest_login">أحدث نشاط (الافتراضي)</option>
+                            <option value="points_desc">النقاط: من الأكثر للأقل 🪙</option>
+                            <option value="points_asc">النقاط: من الأقل للأكثر 🪙</option>
+                            <option value="name_asc">الاسم: أبجديًا (أ - ي)</option>
+                            <option value="name_desc">الاسم: أبجديًا (ي - أ)</option>
+                        </select>
+                    </div>
+
+                    <div class="sort-selector-wrapper" style="display: none;">
+                        <label for="viewFilter">عرض:</label>
+                        <select id="viewFilter">
+                            <option value="class_only">مخدومو الفصل الحالي</option>
+                            <option value="all_users">🌐 كل مستخدمي الموقع (مراقبة)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Student Grid -->
+                <div class="students-grid-container" id="studentsGrid">
+                    <!-- Cards will be dynamically loaded here -->
+                    <div class="loading-state"><i class="fas fa-circle-notch fa-spin"></i> جاري تحميل دليل المخدومين...
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW 2: CONTENT & EXAMS MANAGER -->
+            <div class="dashboard-pane" id="pane_content_manager">
+                <div class="manager-card glass-card">
+
+                    <div class="inner-tabs-row">
+                        <button class="inner-tab-btn active" data-subtab="subpane_curriculum_wizard">
+                            <i class="fas fa-cloud-upload-alt"></i> نشر وإدارة المنهج
+                        </button>
+                        <button class="inner-tab-btn" data-subtab="subpane_published_lessons">
+                            <i class="fas fa-book"></i> المنهج المنشور حالياً
+                        </button>
+                    </div>
+
+                    <!-- SUB-VIEW 2A: CURRICULUM WIZARD -->
+                    <div class="inner-dashboard-subpane active" id="subpane_curriculum_wizard">
+                        <!-- Category Selector Screen -->
+                        <div id="wizardCategorySelector" class="wizard-selector-screen">
+                            <h3 class="section-title text-center mb-25"><i class="fas fa-layer-group text-gold"></i>
+                                اختر القسم لبدء نشر أو تعديل درس</h3>
+                            <div class="wizard-grid">
+                                <div class="wizard-card-btn" data-category="bible_study">
+                                    <div class="card-icon-circle"><i class="fas fa-book-open"></i></div>
+                                    <h3>درس الكتاب المقدس</h3>
+                                    <p>إدارة فويس القراءة، نص التأمل، والامتحان اليومي</p>
+                                </div>
+                                <div class="wizard-card-btn" data-category="coptic">
+                                    <div class="card-icon-circle">Ⲁ</div>
+                                    <h3>اللغة القبطية</h3>
+                                    <p>إدارة فيديو الشرح، الامتحان اليومي، ونقاط المشاهدة</p>
+                                </div>
+                                <div class="wizard-card-btn" data-category="hymns">
+                                    <div class="card-icon-circle"><i class="fas fa-music"></i></div>
+                                    <h3>مدرسة الألحان</h3>
+                                    <p>إدارة ملفات الصوت، الفيديوهات، وهزات الألحان (PDF)</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Wizard Form Container (hidden initially) -->
+                        <div id="wizardFormContainer" class="wizard-form-container" style="display: none;">
+                            <div class="wizard-form-header">
+                                <button type="button" class="back-to-categories-btn" id="btnBackToCategories">
+                                    <i class="fas fa-arrow-right"></i> العودة لاختيار الأقسام
+                                </button>
+                                <span class="wizard-category-badge" id="wizardCategoryBadge">القسم: درس كتاب</span>
+                            </div>
+
+                            <form id="wizardCurriculumForm">
+                                <input type="hidden" id="wizardEditLessonId">
+                                <input type="hidden" id="wizardActiveCategory">
+
+                                <!-- STEP 1: Lesson Details & Media -->
+                                <div class="wizard-step-pane active" id="wizard_step_1">
+                                    <h4 class="step-title"><i class="fas fa-info-circle text-gold"></i> الخطوة 1: تفاصيل
+                                        الدرس وملفات الميديا</h4>
+
+                                    <div class="form-grid">
+                                        <div class="form-cell">
+                                            <label for="w_lessonTitle">عنوان الدرس:</label>
+                                            <input type="text" id="w_lessonTitle"
+                                                placeholder="مثال: طقس صوم الرسل الأطهار" required>
+                                        </div>
+
+                                        <div class="form-cell">
+                                            <label for="w_lessonPartition">القسم الفرعي (البارتيشن):</label>
+                                            <input type="text" id="w_lessonPartition"
+                                                placeholder="مثال: دراسات عقائدية / العهد الجديد" required>
+                                        </div>
+
+                                        <!-- Hymns Specific settings -->
+                                        <div class="form-cell span-2" id="w_hymnsSettingsCell" style="display: none;">
+                                            <label for="w_hymnsMode">الميديا المطلوبة للحن:</label>
+                                            <select id="w_hymnsMode">
+                                                <option value="both">صوت وفيديو معًا</option>
+                                                <option value="audio">ملف صوتي فقط (فويس)</option>
+                                                <option value="video">ملف فيديو فقط</option>
+                                            </select>
+                                        </div>
+
+                                        <!-- Audio Section -->
+                                        <div class="form-cell span-2" id="w_audioGroup">
+                                            <label>ملف صوتي للدرس (Audio):</label>
+                                            <div class="file-uploader-box">
+                                                <input type="file" id="w_audioFile" accept="audio/*">
+                                                <div class="or-divider">أو رابط ملف صوتي مباشر:</div>
+                                                <input type="url" id="w_audioUrl"
+                                                    placeholder="https://example.com/audio.mp3">
+                                            </div>
+                                        </div>
+
+                                        <!-- Video Section -->
+                                        <div class="form-cell span-2" id="w_videoGroup">
+                                            <label>ملف أو رابط فيديو الدرس:</label>
+                                            <div class="file-uploader-box">
+                                                <input type="file" id="w_videoFile" accept="video/*">
+                                                <div class="or-divider">أو رابط فيديو YouTube Embed أو مباشر:</div>
+                                                <input type="url" id="w_videoUrl"
+                                                    placeholder="https://www.youtube.com/embed/VIDEO_ID">
+                                            </div>
+                                        </div>
+
+                                        <!-- Reading Text (Bible Study) -->
+                                        <div class="form-cell span-2" id="w_readingGroup">
+                                            <label for="w_textContent">نص القراءة والتأمل الروحي:</label>
+                                            <textarea id="w_textContent"
+                                                placeholder="اكتب نص القراءة أو التأمل أو الشرح هنا..."
+                                                rows="6"></textarea>
+                                        </div>
+
+                                        <!-- PDFs Attachment (Hymns) -->
+                                        <div class="form-cell span-2" id="w_pdfGroup" style="display: none;">
+                                            <label>ملفات الهزات المرفقة (PDF):</label>
+                                            <div id="w_pdfContainer">
+                                                <div class="pdf-link-row">
+                                                    <input type="url" class="w-pdf-url"
+                                                        placeholder="رابط ملف PDF المرفق">
+                                                </div>
+                                            </div>
+                                            <button type="button" class="add-row-btn mt-10" id="w_btnAddPdf">
+                                                <i class="fas fa-plus"></i> إضافة ملف PDF آخر
+                                            </button>
+                                        </div>
+
+                                        <!-- Points configurations -->
+                                        <div class="form-cell" id="w_pointsListenCell">
+                                            <label for="w_pointsListen">نقاط سماع الفويس:</label>
+                                            <input type="number" id="w_pointsListen" value="10" min="0">
+                                        </div>
+
+                                        <div class="form-cell" id="w_pointsWatchCell">
+                                            <label for="w_pointsWatch">نقاط مشاهدة الفيديو:</label>
+                                            <input type="number" id="w_pointsWatch" value="10" min="0">
+                                        </div>
+
+                                        <!-- Scrubbing permissions -->
+                                        <div class="form-cell span-2">
+                                            <label class="checkbox-container">
+                                                <input type="checkbox" id="w_allowScrubbing">
+                                                <span class="checkmark"></span>
+                                                السماح بالتقديم والتأخير (إلغاء قفل شريط ميديا الدرس)
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div class="wizard-actions-footer mt-20">
+                                        <button type="button" class="submit-action-btn" id="btnWizardNextStep">
+                                            التالي: إعداد الامتحان <i class="fas fa-chevron-left"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- STEP 2: Quiz Setup -->
+                                <div class="wizard-step-pane" id="wizard_step_2" style="display: none;">
+                                    <div class="step-header-with-action">
+                                        <h4 class="step-title"><i class="fas fa-clipboard-list text-gold"></i> الخطوة 2:
+                                            اختبار الدرس والأسئلة</h4>
+                                        <label class="switch-container">
+                                            <input type="checkbox" id="w_enableQuiz" checked>
+                                            <span class="switch-slider"></span>
+                                            تفعيل امتحان لهذا الدرس
+                                        </label>
+                                    </div>
+
+                                    <div id="wizardQuizSettingsBlock" class="mt-15">
+                                        <div class="form-grid">
+                                            <div class="form-cell">
+                                                <label for="w_quizPointsPerQuestion">نقاط الإجابة الصحيحة لكل
+                                                    سؤال:</label>
+                                                <input type="number" id="w_quizPointsPerQuestion" value="5" min="0">
+                                            </div>
+                                            <div class="form-cell">
+                                                <label for="w_quizMinPassPercent">النسبة المئوية الدنيا للنجاح:</label>
+                                                <select id="w_quizMinPassPercent">
+                                                    <option value="5">5%</option>
+                                                    <option value="10">10%</option>
+                                                    <option value="15">15%</option>
+                                                    <option value="20">20%</option>
+                                                    <option value="25">25%</option>
+                                                    <option value="30">30%</option>
+                                                    <option value="35">35%</option>
+                                                    <option value="40">40%</option>
+                                                    <option value="45">45%</option>
+                                                    <option value="50" selected>50% (الافتراضي)</option>
+                                                    <option value="55">55%</option>
+                                                    <option value="60">60%</option>
+                                                    <option value="65">65%</option>
+                                                    <option value="70">70%</option>
+                                                    <option value="75">75%</option>
+                                                    <option value="80">80%</option>
+                                                    <option value="85">85%</option>
+                                                    <option value="90">90%</option>
+                                                    <option value="95">95%</option>
+                                                    <option value="100">100%</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="quiz-questions-builder mt-20" id="w_questionsList">
+                                            <!-- Dynamic questions rows here -->
+                                        </div>
+
+                                        <button type="button" class="add-row-btn primary-gold mt-15"
+                                            id="w_btnAddQuestion">
+                                            <i class="fas fa-plus-circle"></i> إضافة سؤال جديد
+                                        </button>
+                                    </div>
+
+                                    <div class="wizard-actions-footer mt-25">
+                                        <button type="button" class="cancel-btn p-12" id="btnWizardPrevStep">
+                                            <i class="fas fa-chevron-right"></i> الرجوع للتفاصيل
+                                        </button>
+                                        <button type="submit" class="submit-action-btn success-green"
+                                            id="btnWizardSubmit">
+                                            نشر الدرس الآن <i class="fas fa-save"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- SUB-VIEW 2B: PUBLISHED LESSONS LIST -->
+                    <div class="inner-dashboard-subpane" id="subpane_published_lessons">
+                        <h3 class="section-title"><i class="fas fa-book-reader text-gold"></i> المنهج والدروس المنشورة
+                            لفصلك</h3>
+
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>القسم</th>
+                                        <th>عنوان الدرس</th>
+                                        <th>القسم الفرعي</th>
+                                        <th>الامتحان المرفق</th>
+                                        <th>حالة الامتحان</th>
+                                        <th>مؤقت القفل</th>
+                                        <th>إجراءات</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="publishedLessonsTableBody">
+                                    <tr>
+                                        <td colspan="7" class="text-center">جاري تحميل الدروس المنشورة...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- VIEW 3: ATTENDANCE SCANNER PANEL -->
+            <div class="dashboard-pane" id="pane_attendance_manager">
+                <div class="manager-card glass-card">
+
+                    <!-- Attendance Session Setup Header -->
+                    <div class="attendance-session-header">
+                        <div class="session-title-block">
+                            <h2 class="section-title"><i class="fas fa-user-check text-gold"></i> جلسة تسجيل الحضور</h2>
+                            <p class="session-desc">حدد عدد نقاط الحضور أولاً، ثم ابدأ الجلسة لتسجيل المخدومين عبر QR أو
+                                الكود اليدوي.</p>
+                        </div>
+                        <div class="attendance-points-setup">
+                            <label for="attendancePoints">🪙 نقاط الحضور:</label>
+                            <input type="number" id="attendancePoints" value="10" min="0" class="points-number-input">
+                            <button class="submit-action-btn" id="btnStartAttendanceSession">
+                                <i class="fas fa-play-circle"></i> بدء الجلسة
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Active Session Panel (hidden until started) -->
+                    <div class="attendance-active-panel" id="attendanceActivePanel" style="display:none;">
+                        <div class="session-active-badge">
+                            <span class="pulse-dot"></span>
+                            <span>جلسة حضور نشطة — النقاط: <strong id="sessionPointsDisplay">10</strong> 🪙 لكل
+                                مخدوم</span>
+                            <button class="cancel-session-btn" id="btnEndAttendanceSession"><i
+                                    class="fas fa-stop-circle"></i> إنهاء الجلسة</button>
+                        </div>
+
+                        <div class="attendance-setup-grid">
+
+                            <div class="attendance-setup-column">
+                                <h3><i class="fas fa-keyboard text-gold"></i> تسجيل يدوي بالكود</h3>
+
+                                <div class="form-cell mt-15">
+                                    <label for="attendanceManualCode">كود المخدوم (6 أرقام):</label>
+                                    <div class="manual-input-row">
+                                        <input type="text" id="attendanceManualCode" placeholder="مثال: 151246"
+                                            maxlength="6">
+                                        <button class="submit-action-btn" id="btnSubmitManualAttendance">تسجيل</button>
+                                    </div>
+                                </div>
+
+                                <div class="attendance-logs-card mt-20">
+                                    <div class="logs-header-row">
+                                        <h3><i class="fas fa-list-check text-gold"></i> المسجلون حضوراً اليوم</h3>
+                                        <span class="today-count-badge" id="todayAttendanceCount">0 مخدوم</span>
+                                    </div>
+                                    <ul class="attendance-today-list" id="attendanceTodayList">
+                                        <li class="empty-list">لم يتم تسجيل حضور أي مخدوم بعد.</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="attendance-setup-column text-center">
+                                <h3><i class="fas fa-qrcode text-gold"></i> مسح QR Code</h3>
+                                <p class="modal-desc">امسح كود QR المخدوم الظاهر في صفحته الشخصية.</p>
+                                <div class="scanner-camera-box">
+                                    <div id="attendanceQrReader"></div>
+                                </div>
+                                <button class="action-btn qr-btn" id="btnToggleCamera">
+                                    <i class="fas fa-camera"></i> تشغيل الكاميرا
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+            <!-- VIEW 4: STUDENT ANALYTICS FULL PAGE -->
+            <div class="dashboard-pane" id="pane_student_analytics">
+                <!-- Back Navigation -->
+                <div class="analytics-page-header glass-card" id="analyticsPageHeader">
+                    <div class="analytics-back-row">
+                        <button class="back-to-students-btn" onclick="closeAnalyticsPage()">
+                            <i class="fas fa-arrow-right"></i> العودة لقائمة المخدومين
+                        </button>
+                        <div class="analytics-student-identity" id="analyticsStudentIdentity">
+                            <!-- Student name & avatar inserted dynamically -->
+                        </div>
+                        <div class="analytics-total-points-box" id="analyticsTotalPointsBox">
+                            <!-- Total points inserted dynamically -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Attendance Calendar -->
+                <div class="analytics-section-block glass-card mt-20" id="analyticsCalendarSection">
+                    <div class="analytics-section-title-row">
+                        <h3><i class="fas fa-calendar-check text-gold"></i> سجل حضور الأسابيع والشهور</h3>
+                        <div class="analytics-calendar-nav">
+                            <button class="cal-nav-btn-small" id="analyticsPrevMonth"><i class="fas fa-chevron-right"></i></button>
+                            <span class="analytics-month-title" id="analyticsMonthTitle">--</span>
+                            <button class="cal-nav-btn-small" id="analyticsNextMonth"><i class="fas fa-chevron-left"></i></button>
+                        </div>
+                    </div>
+                    <div class="analytics-calendar-weekdays">
+                        <div>السبت</div><div>الأحد</div><div>الاثنين</div>
+                        <div>الثلاثاء</div><div>الأربعاء</div><div>الخميس</div><div>الجمعة</div>
+                    </div>
+                    <div class="analytics-calendar-grid" id="analyticsCalendarGrid"></div>
+                    <div class="analytics-attendance-summary" id="analyticsAttendanceSummary"></div>
+                </div>
+
+                <!-- Statistics Row -->
+                <div class="analytics-stats-row mt-20" id="analyticsStatsRow">
+                    <div class="analytics-stat-card glass-card">
+                        <div class="astat-icon"><i class="fas fa-headphones"></i></div>
+                        <div class="astat-body">
+                            <div class="astat-value" id="astat_audio">0/0</div>
+                            <div class="astat-label">فويسات مكتملة</div>
+                        </div>
+                    </div>
+                    <div class="analytics-stat-card glass-card">
+                        <div class="astat-icon" style="color:#4ade80"><i class="fas fa-video"></i></div>
+                        <div class="astat-body">
+                            <div class="astat-value" id="astat_video">0/0</div>
+                            <div class="astat-label">فيديوهات مشاهَدة</div>
+                        </div>
+                    </div>
+                    <div class="analytics-stat-card glass-card">
+                        <div class="astat-icon" style="color:#818cf8"><i class="fas fa-clipboard-check"></i></div>
+                        <div class="astat-body">
+                            <div class="astat-value" id="astat_quiz">0/0</div>
+                            <div class="astat-label">امتحانات مجتازة</div>
+                        </div>
+                    </div>
+                    <div class="analytics-stat-card glass-card">
+                        <div class="astat-icon" style="color:#fb923c"><i class="fas fa-star"></i></div>
+                        <div class="astat-body">
+                            <div class="astat-value" id="astat_pts">0</div>
+                            <div class="astat-label">إجمالي النقاط</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3 Big Category Buttons -->
+                <div class="analytics-category-buttons-row mt-20">
+                    <button class="analytics-category-big-btn bible-btn" onclick="openCategoryDetailView('bible_study')">
+                        <div class="acbtn-icon"><i class="fas fa-book-open"></i></div>
+                        <div class="acbtn-body">
+                            <h3>درس الكتاب المقدس</h3>
+                            <p>فويسات القراءة والامتحانات</p>
+                        </div>
+                        <div class="acbtn-progress" id="acbtn_bible_progress">
+                            <div class="acbtn-progress-fill" id="acbtn_bible_fill" style="width:0%"></div>
+                        </div>
+                        <i class="fas fa-arrow-left acbtn-arrow"></i>
+                    </button>
+                    <button class="analytics-category-big-btn coptic-btn" onclick="openCategoryDetailView('coptic')">
+                        <div class="acbtn-icon">Ⲁ</div>
+                        <div class="acbtn-body">
+                            <h3>اللغة القبطية</h3>
+                            <p>فيديوهات الشرح والامتحانات</p>
+                        </div>
+                        <div class="acbtn-progress" id="acbtn_coptic_progress">
+                            <div class="acbtn-progress-fill" id="acbtn_coptic_fill" style="width:0%"></div>
+                        </div>
+                        <i class="fas fa-arrow-left acbtn-arrow"></i>
+                    </button>
+                    <button class="analytics-category-big-btn hymns-btn" onclick="openCategoryDetailView('hymns')">
+                        <div class="acbtn-icon"><i class="fas fa-music"></i></div>
+                        <div class="acbtn-body">
+                            <h3>مدرسة الألحان</h3>
+                            <p>الفويسات والفيديوهات الموسيقية</p>
+                        </div>
+                        <div class="acbtn-progress" id="acbtn_hymns_progress">
+                            <div class="acbtn-progress-fill" id="acbtn_hymns_fill" style="width:0%"></div>
+                        </div>
+                        <i class="fas fa-arrow-left acbtn-arrow"></i>
+                    </button>
+                </div>
+
+                <!-- Points Log Table -->
+                <div class="analytics-section-block glass-card mt-20">
+                    <h3 class="analytics-section-title-row"><i class="fas fa-history text-gold"></i> سجل النقاط التفصيلي</h3>
+                    <div class="table-responsive mt-15" id="analyticsPointsLogContainer"></div>
+                </div>
+
+                <!-- Bottom Action Buttons -->
+                <div class="analytics-action-footer mt-20" id="analyticsActionFooter"></div>
+            </div>
+
+            <!-- VIEW 5: CATEGORY DETAIL (per student) -->
+            <div class="dashboard-pane" id="pane_category_detail">
+                <div class="analytics-page-header glass-card">
+                    <div class="analytics-back-row">
+                        <button class="back-to-students-btn" onclick="closeCategoryDetailView()">
+                            <i class="fas fa-arrow-right"></i> العودة لتحليل الأداء
+                        </button>
+                        <div class="analytics-student-identity" id="catDetailStudentName"></div>
+                        <div class="category-detail-badge" id="catDetailBadge"></div>
+                    </div>
+                </div>
+
+                <!-- Category Stats -->
+                <div class="analytics-stats-row mt-20" id="catDetailStats"></div>
+
+                <!-- Detailed Lessons Table -->
+                <div class="analytics-section-block glass-card mt-20">
+                    <div class="analytics-section-title-row" id="catDetailTableTitle">
+                        <h3><i class="fas fa-list-alt text-gold"></i> تفاصيل كل درس</h3>
+                        <div style="display:flex;gap:8px;align-items:center;">
+                            <span style="font-size:12px;color:var(--text-muted);">
+                                <i class="fas fa-lock" style="color:var(--danger)"></i> = مقفول &nbsp;
+                                <i class="fas fa-lock-open" style="color:var(--success)"></i> = مفتوح
+                            </span>
+                        </div>
+                    </div>
+                    <div class="table-responsive mt-15">
+                        <table class="data-table analytics-detail-table">
+                            <thead id="catDetailTableHead"></thead>
+                            <tbody id="catDetailTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <footer class="app-footer">
+            <p>جميع الحقوق محفوظة &copy; كنيسة القديسين بطرس وبولس</p>
+        </footer>
+    </div>
+
+    <!-- MODAL 1: CLASS SELECTION MODAL -->
+    <div id="classSelectorModal" class="custom-modal-overlay">
+        <div class="custom-modal-box glass-card gold-glow">
+            <div class="modal-header-title">
+                <h2>⛪ اختر فصل الخدمة للمتابعة</h2>
+                <p>يرجى اختيار المرحلة الدراسية التي ترغب في عرضها وإدارتها حالياً:</p>
+            </div>
+            <div class="class-groups-list">
+                <button class="class-group-btn" data-class="KG1 و KG2">
+                    <span class="icon"><i class="fas fa-child"></i></span>
+                    <div class="btn-text-wrapper">
+                        <span class="title">حضانات (KG1 & KG2)</span>
+                        <span class="desc">المرحلة: KG1، KG2</span>
+                    </div>
+                </button>
+                <button class="class-group-btn" data-class="الأول والثاني الابتدائي">
+                    <span class="icon"><i class="fas fa-graduation-cap"></i></span>
+                    <div class="btn-text-wrapper">
+                        <span class="title">الأول والثاني الابتدائي</span>
+                        <span class="desc">المرحلة: الأول الابتدائي، الثاني الابتدائي</span>
+                    </div>
+                </button>
+                <button class="class-group-btn" data-class="الثالث والرابع الابتدائي">
+                    <span class="icon"><i class="fas fa-book-open"></i></span>
+                    <div class="btn-text-wrapper">
+                        <span class="title">الثالث والرابع الابتدائي</span>
+                        <span class="desc">المرحلة: الثالث الابتدائي، الرابع الابتدائي</span>
+                    </div>
+                </button>
+                <button class="class-group-btn" data-class="الخامس والسادس الابتدائي">
+                    <span class="icon"><i class="fas fa-book-reader"></i></span>
+                    <div class="btn-text-wrapper">
+                        <span class="title">الخامس والسادس الابتدائي</span>
+                        <span class="desc">المرحلة: الخامس الابتدائي، السادس الابتدائي</span>
+                    </div>
+                </button>
+                <button class="class-group-btn" data-class="الأول الإعدادي">
+                    <span class="icon"><i class="fas fa-school"></i></span>
+                    <div class="btn-text-wrapper">
+                        <span class="title">الأول الإعدادي</span>
+                        <span class="desc">المرحلة: الصف الأول الإعدادي</span>
+                    </div>
+                </button>
+                <button class="class-group-btn" data-class="الثاني الإعدادي">
+                    <span class="icon"><i class="fas fa-school"></i></span>
+                    <div class="btn-text-wrapper">
+                        <span class="title">الثاني الإعدادي</span>
+                        <span class="desc">المرحلة: الصف الثاني الإعدادي</span>
+                    </div>
+                </button>
+                <button class="class-group-btn" data-class="الثالث الإعدادي">
+                    <span class="icon"><i class="fas fa-school"></i></span>
+                    <div class="btn-text-wrapper">
+                        <span class="title">الثالث الإعدادي</span>
+                        <span class="desc">المرحلة: الصف الثالث الإعدادي</span>
+                    </div>
+                </button>
+                <button class="class-group-btn" data-class="الأول والثاني والثالث الثانوي">
+                    <span class="icon"><i class="fas fa-user-friends"></i></span>
+                    <div class="btn-text-wrapper">
+                        <span class="title">المرحلة الثانوية</span>
+                        <span class="desc">المرحلة: الأول، الثاني، الثالث الثانوي</span>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2B: STUDENT QUIZ ANSWERS REVIEW -->
+    <div id="quizAnswersReviewModal" class="custom-modal-overlay" style="z-index: 1100;">
+        <div class="custom-modal-box glass-card gold-glow wide-modal" style="max-width: 600px;">
+            <div class="modal-header">
+                <h2><i class="fas fa-tasks text-gold"></i> إجابات المخدوم في الامتحان</h2>
+                <button class="modal-close-btn" onclick="closeModal('quizAnswersReviewModal')">&times;</button>
+            </div>
+            <div class="modal-body" id="quizAnswersReviewModalBody" style="max-height: 70vh; overflow-y: auto;">
+                <!-- Data populated dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 3: MANUAL POINTS ADJUSTMENT MODAL -->
+    <div id="pointsModal" class="custom-modal-overlay">
+        <div class="custom-modal-box glass-card gold-glow small-modal">
+            <div class="modal-header">
+                <h2><i class="fas fa-coins text-gold"></i> تعديل نقاط المخدوم يدوياً</h2>
+                <button class="modal-close-btn" onclick="closeModal('pointsModal')">&times;</button>
+            </div>
+            <form id="pointsAdjustmentForm">
+                <input type="hidden" id="adjustStudentId">
+
+                <div class="student-quick-info mb-15">
+                    <span class="student-name-label" id="adjustStudentName">طالب</span>
+                    <span class="current-points-label" id="adjustStudentCurrentPoints">النقاط الحالية: 0</span>
+                </div>
+
+                <div class="form-cell">
+                    <label for="adjustAmount">عدد النقاط (موجب للإضافة وسالب للخصم):</label>
+                    <input type="number" id="adjustAmount" required placeholder="مثال: 15 أو -10">
+                </div>
+                <div class="form-cell mt-15">
+                    <label for="adjustReason">سبب التعديل:</label>
+                    <input type="text" id="adjustReason" required placeholder="مثال: التفاعل، الغياب، مسابقة...">
+                </div>
+                <div class="form-submit-row mt-20">
+                    <button type="submit" class="submit-action-btn">حفظ وتعديل النقاط <i
+                            class="fas fa-save"></i></button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 4: ATTENDANCE POINTS CONFIRMATION -->
+    <div id="attendanceConfirmModal" class="custom-modal-overlay">
+        <div class="custom-modal-box glass-card gold-glow small-modal confirm-modal">
+            <div class="confirm-icon-block">
+                <div class="confirm-icon-circle gold">
+                    <i class="fas fa-star"></i>
+                </div>
+            </div>
+            <h2 class="confirm-title">تأكيد نقاط الحضور</h2>
+            <p class="confirm-desc">ستمنح <strong id="confirmPointsVal">10</strong> نقاط لكل مخدوم يتم تسجيل حضوره في
+                هذه الجلسة.</p>
+            <p class="confirm-warning-note"><i class="fas fa-exclamation-circle"></i> لا يمكن تغيير عدد النقاط بعد بدء
+                الجلسة.</p>
+            <div class="confirm-actions-row">
+                <button class="confirm-btn-yes" id="btnConfirmStartSession"><i class="fas fa-check"></i> نعم، ابدأ
+                    الجلسة</button>
+                <button class="confirm-btn-no" onclick="closeModal('attendanceConfirmModal')"><i
+                        class="fas fa-times"></i> لا، تراجع</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 5: STUDENT ATTENDANCE SCAN CONFIRMATION -->
+    <div id="scanConfirmModal" class="custom-modal-overlay">
+        <div class="custom-modal-box glass-card gold-glow small-modal confirm-modal">
+            <div class="confirm-icon-block">
+                <div class="confirm-icon-circle green" id="scanConfirmIcon">
+                    <i class="fas fa-user-check"></i>
+                </div>
+            </div>
+            <h2 class="confirm-title" id="scanConfirmTitle">تأكيد تسجيل الحضور</h2>
+            <div class="scan-student-preview">
+                <div class="scan-avatar-placeholder" id="scanStudentAvatar">
+                    <i class="fas fa-user-graduate"></i>
+                </div>
+                <div class="scan-student-info">
+                    <span class="scan-name" id="scanStudentName">—</span>
+                    <span class="scan-grade" id="scanStudentGrade">—</span>
+                    <span class="scan-points" id="scanStudentPoints">+0 🪙</span>
+                </div>
+            </div>
+            <p class="confirm-desc" id="scanConfirmDesc">هل تريد تسجيل حضور هذا المخدوم؟</p>
+            <div class="confirm-actions-row">
+                <button class="confirm-btn-yes" id="btnConfirmScanAttendance"><i class="fas fa-check"></i> نعم، سجّل
+                    الحضور</button>
+                <button class="confirm-btn-no" onclick="closeModal('scanConfirmModal')"><i class="fas fa-times"></i> لا،
+                    تجاهل</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 6: CROSS-CLASS WARNING -->
+    <div id="crossClassModal" class="custom-modal-overlay">
+        <div class="custom-modal-box glass-card gold-glow small-modal confirm-modal">
+            <div class="confirm-icon-block">
+                <div class="confirm-icon-circle orange">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+            </div>
+            <h2 class="confirm-title">⚠️ تحذير: مخدوم من فصل آخر!</h2>
+            <div class="scan-student-preview">
+                <div class="scan-avatar-placeholder orange-border">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="scan-student-info">
+                    <span class="scan-name" id="crossStudentName">—</span>
+                    <span class="scan-grade cross-grade-warning" id="crossStudentGrade">—</span>
+                </div>
+            </div>
+            <p class="confirm-desc">هذا المخدوم ينتمي لفصل <strong id="crossStudentClass">آخر</strong> وليس لفصلك. هل
+                تريد تسجيل حضوره رغم ذلك؟</p>
+            <div class="confirm-actions-row">
+                <button class="confirm-btn-yes orange-btn" id="btnConfirmCrossClass"><i class="fas fa-check"></i> نعم،
+                    سجّل على أي حال</button>
+                <button class="confirm-btn-no" onclick="closeModal('crossClassModal')"><i class="fas fa-times"></i> لا،
+                    رفض التسجيل</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 7: EDIT STUDENT PROFILE -->
+    <div id="studentEditModal" class="custom-modal-overlay">
+        <div class="custom-modal-box glass-card gold-glow">
+            <div class="modal-header">
+                <h2><i class="fas fa-user-edit text-gold"></i> تعديل بيانات المخدوم</h2>
+                <button class="modal-close-btn" onclick="closeModal('studentEditModal')">&times;</button>
+            </div>
+            <form id="studentEditForm">
+                <input type="hidden" id="edit_student_id">
+
+                <div class="student-avatar-edit-group mb-20 text-center">
+                    <div class="edit-avatar-preview-box" id="editAvatarPreview"
+                        style="width: 80px; height: 80px; margin: 0 auto; border-radius: 50%; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; border: 2px solid var(--border-gold); overflow: hidden; font-size: 32px; color: var(--text-muted);">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                    <div class="avatar-edit-actions mt-10" style="display: flex; gap: 8px; justify-content: center;">
+                        <label class="change-class-btn p-5 cursor-pointer" style="padding: 5px 12px; font-size: 11px;">
+                            <i class="fas fa-upload"></i> صورة جديدة
+                            <input type="file" id="editStudentAvatarFile" accept="image/*" style="display: none;">
+                        </label>
+                        <button type="button" class="cancel-btn" id="btnDeleteStudentAvatar"
+                            style="background: rgba(231,29,54,0.15); border: 1px solid var(--danger); border-radius: 50px; color: #ff6b6b; padding: 5px 12px; font-size: 11px; cursor: pointer; font-family: 'Cairo', sans-serif;">
+                            <i class="fas fa-trash"></i> حذف الصورة
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-grid"
+                    style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; text-align: right;">
+                    <div class="form-cell span-2"
+                        style="grid-column: span 2; display: flex; flex-direction: column; gap: 5px;">
+                        <label for="edit_fullName"
+                            style="font-size: 12px; color: var(--text-muted); font-weight: 700;">الاسم الكامل:</label>
+                        <input type="text" id="edit_fullName" required
+                            style="width: 100%; background: rgba(5,11,20,0.7); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-medium); padding: 10px; color: white; outline: none; font-family: 'Cairo';">
+                    </div>
+                    <div class="form-cell" style="display: flex; flex-direction: column; gap: 5px;">
+                        <label for="edit_username"
+                            style="font-size: 12px; color: var(--text-muted); font-weight: 700;">اسم المستخدم (الكود):</label>
+                        <input type="text" id="edit_username" required
+                            style="width: 100%; background: rgba(5,11,20,0.7); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-medium); padding: 10px; color: white; outline: none; font-family: 'Cairo';">
+                    </div>
+                    <div class="form-cell" style="display: flex; flex-direction: column; gap: 5px;">
+                        <label for="edit_phone" style="font-size: 12px; color: var(--text-muted); font-weight: 700;">رقم تليفون المخدوم:</label>
+                        <input type="text" id="edit_phone" required
+                            style="width: 100%; background: rgba(5,11,20,0.7); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-medium); padding: 10px; color: white; outline: none; font-family: 'Cairo';">
+                    </div>
+                    <!-- Parent Phone -->
+                    <div class="form-cell" style="display: flex; flex-direction: column; gap: 5px;">
+                        <label for="edit_parentPhone" style="font-size: 12px; color: var(--text-muted); font-weight: 700;">رقم تليفون ولي الأمر:</label>
+                        <input type="text" id="edit_parentPhone" required
+                            style="width: 100%; background: rgba(5,11,20,0.7); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-medium); padding: 10px; color: white; outline: none; font-family: 'Cairo';">
+                    </div>
+                    <div class="form-cell" style="display: flex; flex-direction: column; gap: 5px;">
+                        <label for="edit_email"
+                            style="font-size: 12px; color: var(--text-muted); font-weight: 700;">البريد الإلكتروني:</label>
+                        <input type="email" id="edit_email" required
+                            style="width: 100%; background: rgba(5,11,20,0.7); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-medium); padding: 10px; color: white; outline: none; font-family: 'Cairo';">
+                    </div>
+                    <div class="form-cell" style="display: flex; flex-direction: column; gap: 5px;">
+                        <label for="edit_dob" style="font-size: 12px; color: var(--text-muted); font-weight: 700;">تاريخ الميلاد:</label>
+                        <input type="date" id="edit_dob" required
+                            style="width: 100%; background: rgba(5,11,20,0.7); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-medium); padding: 10px; color: white; outline: none; font-family: 'Cairo';">
+                    </div>
+                    <div class="form-cell" style="display: flex; flex-direction: column; gap: 5px;">
+                        <label for="edit_classYear"
+                            style="font-size: 12px; color: var(--text-muted); font-weight: 700;">المرحلة / الصف الدراسي:</label>
+                        <select id="edit_classYear"
+                            style="width: 100%; background: rgba(5,11,20,0.7); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-medium); padding: 10px; color: white; outline: none; font-family: 'Cairo'; cursor: pointer;">
+                            <option value="KG1">KG1</option>
+                            <option value="KG2">KG2</option>
+                            <option value="الأول الابتدائي">الأول الابتدائي</option>
+                            <option value="الثاني الابتدائي">الثاني الابتدائي</option>
+                            <option value="الثالث الابتدائي">الثالث الابتدائي</option>
+                            <option value="الرابع الابتدائي">الرابع الابتدائي</option>
+                            <option value="الخامس الابتدائي">الخامس الابتدائي</option>
+                            <option value="السادس الابتدائي">السادس الابتدائي</option>
+                            <option value="الأول الإعدادي">الصف الأول الإعدادي</option>
+                            <option value="الثاني الإعدادي">الصف الثاني الإعدادي</option>
+                            <option value="الثالث الإعدادي">الصف الثالث الإعدادي</option>
+                            <option value="الأول الثانوي">الصف الأول الثانوي</option>
+                            <option value="الثاني الثانوي">الصف الثاني الثانوي</option>
+                            <option value="الثالث الثانوي">الصف الثالث الثانوي</option>
+                        </select>
+                    </div>
+                    <!-- Password (Show-Only) -->
+                    <div class="form-cell" style="display: flex; flex-direction: column; gap: 5px;">
+                        <label for="edit_password" style="font-size: 12px; color: var(--text-muted); font-weight: 700;">كلمة المرور (عرض فقط):</label>
+                        <div style="position: relative; display: flex; width: 100%;">
+                            <input type="password" id="edit_password" readonly
+                                style="width: 100%; background: rgba(5,11,20,0.7); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-medium); padding: 10px 10px 10px 40px; color: white; outline: none; font-family: 'Cairo'; cursor: default; opacity: 0.85;">
+                            <button type="button" id="btnToggleEditStudentPass"
+                                style="position: absolute; left: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; color: rgba(255,255,255,0.5); cursor: pointer; padding: 5px;">
+                                <i class="fas fa-eye" id="toggleEditStudentPassIcon"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-cell" style="display: flex; flex-direction: column; gap: 5px;">
+                        <label for="edit_points"
+                            style="font-size: 12px; color: var(--text-muted); font-weight: 700;">النقاط الكلية:</label>
+                        <input type="number" id="edit_points" min="0"
+                            style="width: 100%; background: rgba(5,11,20,0.7); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-medium); padding: 10px; color: white; outline: none; font-family: 'Cairo';">
+                    </div>
+                    <!-- Home Address & GPS -->
+                    <div class="form-cell span-2" style="grid-column: span 2; display: flex; flex-direction: column; gap: 5px;">
+                        <label for="edit_address" style="font-size: 12px; color: var(--text-muted); font-weight: 700;">عنوان المنزل:</label>
+                        <div style="display: flex; gap: 10px; width: 100%;">
+                            <input type="text" id="edit_address"
+                                style="flex: 1; background: rgba(5,11,20,0.7); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-medium); padding: 10px; color: white; outline: none; font-family: 'Cairo';">
+                            <button type="button" id="btnGPSAddress" class="submit-action-btn"
+                                style="background: rgba(16,185,129,0.15); border: 1px solid #10b981; color: #10b981; padding: 10px 15px; border-radius: var(--radius-medium); cursor: pointer; font-family: 'Cairo'; font-size: 12px; display: flex; align-items: center; gap: 5px;"
+                                title="فتح الموقع في خرائط جوجل">
+                                <i class="fas fa-map-marker-alt"></i> GPS
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-submit-row mt-20"
+                    style="display: flex; gap: 10px; justify-content: flex-start; flex-wrap: wrap;">
+                    <button type="submit" class="submit-action-btn"
+                        style="flex: 2; padding: 12px 20px; font-size: 13px; font-weight: bold;">حفظ التغييرات <i
+                            class="fas fa-save"></i></button>
+                    <button type="button" class="cancel-btn" id="btnBlockStudent"
+                        style="flex: 1; background: rgba(255,159,28,0.15); border: 1px solid var(--warning); border-radius: var(--radius-medium); color: var(--warning); padding: 12px 15px; font-size: 12px; cursor: pointer; font-family: 'Cairo';">حظر</button>
+                    <button type="button" class="cancel-btn" id="btnDeleteStudent"
+                        style="flex: 1; background: rgba(231,29,54,0.15); border: 1px solid var(--danger); border-radius: var(--radius-medium); color: #ff6b6b; padding: 12px 15px; font-size: 12px; cursor: pointer; font-family: 'Cairo';"><i
+                            class="fas fa-user-slash"></i> حذف نهائي</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Cropper Modal Overlay -->
+    <div class="cropper-modal-overlay" id="cropperModalOverlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; z-index: 12000; align-items: center; justify-content: center;">
+        <div class="cropper-modal-box" style="background: #0d1b2f; border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 24px; max-width: 90%; width: 480px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+            <div class="cropper-modal-title" style="font-size: 1.25rem; font-weight: 700; color: #fff; margin-bottom: 16px; text-align: center; font-family: 'Cairo', sans-serif;">قص الصورة الشخصية</div>
+            <div class="cropper-container-wrap" style="max-height: 350px; overflow: hidden; border-radius: 8px; margin-bottom: 20px; background: #000; display: flex; align-items: center; justify-content: center;">
+                <img id="cropperImage" src="" alt="image to crop" style="max-width: 100%; max-height: 350px; display: block;">
+            </div>
+            <div class="cropper-actions" style="display: flex; gap: 12px; justify-content: flex-end; font-family: 'Cairo', sans-serif;">
+                <button type="button" class="action-btn" id="btnCropCancel" style="background: rgba(255,255,255,0.05); color: #fff; padding: 8px 16px; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; cursor: pointer;">إلغاء</button>
+                <button type="button" class="action-btn" id="btnCropSave" style="background: var(--gold-primary); color: #000; font-weight: 600; padding: 8px 16px; border: none; border-radius: 8px; cursor: pointer;">حفظ وقص</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upload Progress Overlay -->
+    <div class="upload-progress-overlay" id="uploadProgressOverlay">
+        <div class="upload-progress-title">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <span id="uploadProgressLabel">جاري رفع الملف...</span>
+        </div>
+        <div class="upload-progress-bar-wrap">
+            <div class="upload-progress-bar-fill" id="uploadProgressFill"></div>
+        </div>
+        <div class="upload-progress-info">
+            <span id="uploadProgressPct">0%</span>
+            <span id="uploadProgressSpeed">جاري الحساب...</span>
+        </div>
+    </div>
+
+    <!-- Cropper JS Dependency -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
+
+    <!-- Scripts -->
+    <!-- Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../js/supabase-config.js"></script>
+    <script src="../js/supabase-service.js"></script>
+
+    <!-- Html5Qrcode Library (Scanner) -->
+    <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
+
+    <!-- Control Panel Javascript logic -->
+    <script src="js/control.js"></script>
+    
+</body>
+
+</html>

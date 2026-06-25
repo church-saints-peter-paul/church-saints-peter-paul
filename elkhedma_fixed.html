@@ -1,0 +1,1553 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام الخدمة - المخدوم</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
+    <style>
+        :root {
+    --primary-color: #8B0000; /* أحمر غامق */
+    --secondary-color: #B8860B; /* ذهبي */
+    --accent-color: #A52A2A; /* أحمر بني */
+    --light-color: #FFF8DC; /* كريمي فاتح */
+    --dark-color: #5D0000; /* أحمر داكن جداً */
+    --success-color: #228B22; /* أخضر غامق */
+    --info-color: #1E90FF; /* أزرق */
+    --warning-color: #FF8C00; /* برتقالي */
+    --error-color: #DC143C; /* أحمر */
+    --white: #FFFFFF;
+    --gray-light: #F5F5F5;
+    --gray-medium: #E0E0E0;
+    --gray-dark: #757575;
+    --shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    --shadow-hover: 0 15px 40px rgba(0, 0, 0, 0.25);
+    --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    --border-radius: 16px;
+}
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            direction: rtl;
+            background: linear-gradient(135deg, var(--light-color) 0%, #ffffff 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--dark-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+
+        .header h1 {
+            color: var(--primary-color);
+            font-size: 3.2rem;
+            font-weight: 900;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            color: var(--gray-dark);
+            max-width: 600px;
+            margin: 0 auto;
+            font-weight: 500;
+        }
+
+        /* Main Selection Page */
+        .selection-page {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 70vh;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+
+        .role-card {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--white);
+            border: none;
+            padding: 60px 40px;
+            font-size: 2.2rem;
+            font-weight: 900;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-width: 300px;
+            text-align: center;
+        }
+
+        .role-card i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+        }
+
+        .role-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.7s;
+        }
+
+        .role-card:hover {
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .role-card:hover::before {
+            left: 100%;
+        }
+
+        .role-card:active {
+            transform: translateY(-5px) scale(1.02);
+        }
+
+        /* Forms */
+        .registration-section, .login-section, .servant-login-section {
+            display: none;
+            background: var(--white);
+            padding: 50px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            max-width: 600px;
+            margin: 50px auto;
+            animation: slideIn 0.5s ease;
+            position: relative;
+            border: 1px solid var(--gray-medium);
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .registration-section h2, .login-section h2, .servant-login-section h2 {
+            color: var(--primary-color);
+            font-size: 2.2rem;
+            margin-bottom: 30px;
+            text-align: center;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            color: var(--primary-color);
+            font-weight: 700;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid var(--gray-medium);
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-family: 'Cairo', sans-serif;
+            transition: all 0.3s ease;
+            background: var(--gray-light);
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(26, 35, 126, 0.1);
+            background: var(--white);
+        }
+
+        .form-group i {
+            position: absolute;
+            left: 15px;
+            top: 50px;
+            color: var(--primary-color);
+            font-size: 1.2rem;
+        }
+
+        .submit-btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--white);
+            border: none;
+            padding: 18px;
+            font-size: 1.3rem;
+            font-weight: 900;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: var(--transition);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 5px 15px rgba(26, 35, 126, 0.3);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(26, 35, 126, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .form-footer {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--gray-medium);
+        }
+
+        .form-footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .form-footer a:hover {
+            text-decoration: underline;
+            color: var(--secondary-color);
+        }
+
+        /* Dashboards */
+        .dashboard, .servant-dashboard {
+            display: none;
+            animation: fadeIn 0.8s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .dashboard-header, .servant-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--white);
+            padding: 40px;
+            border-radius: var(--border-radius);
+            margin-bottom: 30px;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dashboard-header::before, .servant-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M0,0 L100,0 L100,100 Z" fill="rgba(255,255,255,0.1)"/></svg>');
+            background-size: cover;
+        }
+
+        .user-name {
+            font-size: 2.8rem;
+            font-weight: 900;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        .user-info {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 10px 20px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .points-display {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            font-size: 1.8rem;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 20px 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            position: relative;
+        }
+
+        .points-number {
+            font-size: 2.8rem;
+            font-weight: 900;
+            color: #ffeb3b;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .code-section, .servant-section {
+            background: var(--white);
+            padding: 40px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+            border: 1px solid var(--gray-medium);
+        }
+
+        .code-section h3, .servant-section h3 {
+            color: var(--primary-color);
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            text-align: center;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .code-display {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .user-code {
+            font-size: 3.5rem;
+            font-weight: 900;
+            color: var(--primary-color);
+            letter-spacing: 5px;
+            background: linear-gradient(135deg, rgba(57, 73, 171, 0.05), rgba(26, 35, 126, 0.05));
+            padding: 30px;
+            border-radius: 15px;
+            border: 3px solid var(--secondary-color);
+            display: inline-block;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            font-family: monospace;
+        }
+
+        .copy-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--white);
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px auto 0;
+            box-shadow: 0 5px 15px rgba(26, 35, 126, 0.3);
+        }
+
+        .copy-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .copy-notification {
+            display: none;
+            color: var(--success-color);
+            font-weight: 700;
+            margin-top: 10px;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+
+        .qr-section {
+            text-align: center;
+            padding: 30px;
+            background: linear-gradient(135deg, rgba(57, 73, 171, 0.03), rgba(26, 35, 126, 0.03));
+            border-radius: 15px;
+            margin-top: 30px;
+            border: 1px solid var(--gray-medium);
+        }
+
+        #qrcode {
+            display: inline-block;
+            padding: 20px;
+            background: var(--white);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: 2px solid var(--secondary-color);
+        }
+
+        /* Servant Specific Styles */
+        .servant-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .manual-input-section, .qr-scanner-section {
+            background: var(--white);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--gray-medium);
+        }
+
+        .servant-input-group {
+            margin-bottom: 20px;
+        }
+
+        .servant-input-group label {
+            display: block;
+            color: var(--primary-color);
+            font-weight: 700;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .servant-input-group input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid var(--gray-medium);
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-family: 'Cairo', sans-serif;
+            background: var(--gray-light);
+            transition: all 0.3s ease;
+        }
+
+        .servant-input-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(26, 35, 126, 0.1);
+            background: var(--white);
+        }
+
+        .add-points-btn {
+            background: linear-gradient(135deg, var(--success-color), #2e7d32);
+            color: var(--white);
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 5px 15px rgba(67, 160, 71, 0.3);
+        }
+
+        .add-points-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        #qrReader {
+            width: 100%;
+            height: 300px;
+            border: 3px dashed var(--secondary-color);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--gray-light);
+        }
+
+        .scan-btn {
+            background: linear-gradient(135deg, var(--info-color), #0277bd);
+            color: var(--white);
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 5px 15px rgba(2, 136, 209, 0.3);
+        }
+
+        .scan-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .servant-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--white);
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .stat-number {
+            font-size: 2.2rem;
+            font-weight: 900;
+            margin-bottom: 10px;
+            color: #ffeb3b;
+        }
+
+        .stat-label {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .back-btn {
+            background: linear-gradient(135deg, #616161, #757575);
+            color: var(--white);
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin: 0 auto;
+            box-shadow: 0 5px 15px rgba(97, 97, 97, 0.3);
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .logout-btn {
+            background: linear-gradient(135deg, var(--error-color), #c62828);
+            box-shadow: 0 5px 15px rgba(211, 47, 47, 0.3);
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            color: var(--gray-dark);
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            z-index: 1000;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            animation: slideInRight 0.3s ease;
+            max-width: 400px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .notification.success {
+            background: var(--success-color);
+        }
+
+        .notification.error {
+            background: var(--error-color);
+        }
+
+        .notification.info {
+            background: var(--info-color);
+        }
+
+        .notification.warning {
+            background: var(--warning-color);
+        }
+
+        /* Success Animation */
+        .success-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .success-content {
+            background: var(--white);
+            padding: 50px;
+            border-radius: var(--border-radius);
+            text-align: center;
+            box-shadow: var(--shadow);
+            animation: scaleIn 0.5s ease;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .success-icon {
+            font-size: 5rem;
+            color: var(--success-color);
+            margin-bottom: 20px;
+        }
+
+        .success-message {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        /* Points Notification for Served */
+        .points-notification {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: linear-gradient(135deg, var(--success-color), #2e7d32);
+            color: white;
+            padding: 20px 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-hover);
+            z-index: 1500;
+            animation: slideInLeft 0.5s ease;
+            display: none;
+            max-width: 350px;
+        }
+
+        @keyframes slideInLeft {
+            from {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .points-notification-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .points-notification i {
+            font-size: 2.5rem;
+        }
+
+        .points-notification-text {
+            flex: 1;
+        }
+
+        .points-notification-title {
+            font-weight: 900;
+            font-size: 1.3rem;
+            margin-bottom: 5px;
+        }
+
+        .points-notification-desc {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.2rem;
+            }
+
+            .role-card {
+                padding: 40px 30px;
+                font-size: 1.8rem;
+                min-width: 250px;
+            }
+
+            .role-card i {
+                font-size: 3rem;
+            }
+
+            .registration-section, .login-section, .servant-login-section {
+                padding: 30px 20px;
+                margin: 20px;
+            }
+
+            .registration-section h2, .login-section h2, .servant-login-section h2 {
+                font-size: 1.8rem;
+            }
+
+            .user-name {
+                font-size: 1.8rem;
+            }
+
+            .user-info {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .points-display {
+                font-size: 1.4rem;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .points-number {
+                font-size: 2.2rem;
+            }
+
+            .user-code {
+                font-size: 2.2rem;
+                padding: 20px;
+            }
+
+            .code-section, .servant-section {
+                padding: 20px;
+            }
+
+            .servant-controls {
+                grid-template-columns: 1fr;
+            }
+
+            .servant-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .points-notification {
+                left: 10px;
+                right: 10px;
+                max-width: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .role-card {
+                padding: 30px 20px;
+                font-size: 1.5rem;
+                width: 100%;
+            }
+
+            .user-code {
+                font-size: 1.8rem;
+                letter-spacing: 3px;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .servant-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .success-content {
+                padding: 30px 20px;
+            }
+
+            .success-message {
+                font-size: 1.4rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>نظام الخدمة</h1>
+            <p>منصة متكاملة لإدارة الخدمات بين الخادم والمخدوم</p>
+        </div>
+
+        <!-- Main Selection Page -->
+        <div id="selectionPage" class="selection-page">
+            <div class="role-card" onclick="selectRole('servant')">
+                <i class="fas fa-hands-helping"></i>
+                <span>الخادم</span>
+            </div>
+            <div class="role-card" onclick="selectRole('served')">
+                <i class="fas fa-user"></i>
+                <span>المخدوم</span>
+            </div>
+        </div>
+
+        <!-- Registration Section for المخدوم -->
+        <div id="registrationSection" class="registration-section">
+            <h2><i class="fas fa-user-plus"></i> تسجيل المخدوم</h2>
+            <form id="registrationForm">
+                <div class="form-group">
+                    <label for="fullName">الاسم الثلاثي</label>
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="fullName" required placeholder="أدخل اسمك الثلاثي">
+                </div>
+                <div class="form-group">
+                    <label for="phone">رقم الهاتف</label>
+                    <i class="fas fa-phone"></i>
+                    <input type="tel" id="phone" required placeholder="أدخل رقم الهاتف">
+                </div>
+                <div class="form-group">
+                    <label for="servedCode">الكود الخاص</label>
+                    <i class="fas fa-key"></i>
+                    <input type="text" id="servedCode" required placeholder="أدخل الكود الخاص بك">
+                </div>
+                <button type="submit" class="submit-btn">
+                    <i class="fas fa-user-check"></i> تسجيل
+                </button>
+            </form>
+            
+            <div class="form-footer">
+                <p>هل لديك حساب بالفعل؟ <a onclick="showLogin()">سجل الدخول هنا</a></p>
+            </div>
+            
+            <button class="back-btn" onclick="goBack()">
+                <i class="fas fa-arrow-right"></i> رجوع
+            </button>
+        </div>
+
+        <!-- Login Section -->
+        <div id="loginSection" class="login-section">
+            <h2><i class="fas fa-sign-in-alt"></i> تسجيل الدخول</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginCode">الكود الخاص بك</label>
+                    <i class="fas fa-key"></i>
+                    <input type="text" id="loginCode" required placeholder="أدخل الكود الخاص بك">
+                </div>
+                <button type="submit" class="submit-btn">
+                    <i class="fas fa-sign-in-alt"></i> دخول
+                </button>
+            </form>
+            
+            <div class="form-footer">
+                <p>ليس لديك حساب؟ <a onclick="showRegistration()">سجل حساب جديد</a></p>
+            </div>
+            
+            <button class="back-btn" onclick="goBack()">
+                <i class="fas fa-arrow-right"></i> رجوع
+            </button>
+        </div>
+
+        <!-- Servant Login Section -->
+        <div id="servantLoginSection" class="servant-login-section">
+            <h2><i class="fas fa-hands-helping"></i> تسجيل الخادم</h2>
+            <form id="servantLoginForm">
+                <div class="form-group">
+                    <label for="servantName">اسم الخادم</label>
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="servantName" required placeholder="أدخل اسم الخادم">
+                </div>
+                <div class="form-group">
+                    <label for="servantCode">كود الخادم</label>
+                    <i class="fas fa-key"></i>
+                    <input type="password" id="servantCode" required placeholder="أدخل كود الخادم">
+                </div>
+                <button type="submit" class="submit-btn">
+                    <i class="fas fa-sign-in-alt"></i> دخول
+                </button>
+            </form>
+            
+            <button class="back-btn" onclick="goBack()">
+                <i class="fas fa-arrow-right"></i> رجوع
+            </button>
+        </div>
+
+        <!-- Dashboard for المخدوم -->
+        <div id="dashboard" class="dashboard">
+            <div class="dashboard-header">
+                <div class="user-name" id="dashboardName"></div>
+                <div class="user-info">
+                    <div class="info-item">
+                        <i class="fas fa-phone"></i>
+                        <span id="userPhone"></span>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-key"></i>
+                        <span id="userCodeDisplay"></span>
+                    </div>
+                </div>
+                <div class="points-display">
+                    <span>نقاط البونص:</span>
+                    <span class="points-number" id="pointsDisplay">0</span>
+                    <span>نقطة</span>
+                </div>
+            </div>
+
+            <div class="code-section">
+                <h3><i class="fas fa-qrcode"></i> الكود الخاص بك</h3>
+                <div class="code-display">
+                    <div class="user-code" id="userCode"></div>
+                    <br>
+                    <button class="copy-btn" onclick="copyCode()">
+                        <i class="fas fa-copy"></i> نسخ الكود
+                    </button>
+                    <div class="copy-notification" id="copyNotification">
+                        <i class="fas fa-check-circle"></i> تم نسخ الكود بنجاح
+                    </div>
+                </div>
+
+                <div class="qr-section">
+                    <h3><i class="fas fa-qrcode"></i> QR Code</h3>
+                    <div id="qrcode"></div>
+                </div>
+            </div>
+
+            <button class="back-btn logout-btn" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
+            </button>
+        </div>
+
+        <!-- Dashboard for الخادم -->
+        <div id="servantDashboard" class="servant-dashboard">
+            <div class="servant-header">
+                <div class="user-name" id="servantDashboardName"></div>
+                <div class="user-info">
+                    <div class="info-item">
+                        <i class="fas fa-user-tag"></i>
+                        <span>خادم معتمد</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-clock"></i>
+                        <span id="servantLoginTime"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="servant-section">
+                <h3><i class="fas fa-tasks"></i> إضافة نقاط للمخدومين</h3>
+                
+                <div class="servant-controls">
+                    <!-- Manual Input Section -->
+                    <div class="manual-input-section">
+                        <h4><i class="fas fa-keyboard"></i> إدخال يدوي</h4>
+                        <div class="servant-input-group">
+                            <label for="servedCodeInput">كود المخدوم</label>
+                            <input type="text" id="servedCodeInput" placeholder="أدخل كود المخدوم">
+                        </div>
+                        <button class="add-points-btn" onclick="addPointsManually()">
+                            <i class="fas fa-plus-circle"></i> إضافة نقطة
+                        </button>
+                    </div>
+
+                    <!-- QR Scanner Section -->
+                    <div class="qr-scanner-section">
+                        <h4><i class="fas fa-qrcode"></i> مسح QR Code</h4>
+                        <div id="qrReader">
+                            <div style="text-align: center; color: #666;">
+                                <i class="fas fa-camera" style="font-size: 3rem; margin-bottom: 10px;"></i>
+                                <p>انقر لبدء المسح</p>
+                            </div>
+                        </div>
+                        <button class="scan-btn" onclick="toggleQRScanner()">
+                            <i class="fas fa-camera"></i> بدء المسح
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Statistics -->
+                <div class="servant-stats">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalPointsAdded">0</div>
+                        <div class="stat-label">إجمالي النقاط المضافة</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="servedCount">0</div>
+                        <div class="stat-label">عدد المخدومين</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="todayPoints">0</div>
+                        <div class="stat-label">نقاط اليوم</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="sessionCount">0</div>
+                        <div class="stat-label">الجلسة الحالية</div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="back-btn logout-btn" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
+            </button>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification" style="display: none;"></div>
+
+    <!-- Success Animation -->
+    <div id="successAnimation" class="success-animation">
+        <div class="success-content">
+            <div class="success-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="success-message" id="successMessage">تمت العملية بنجاح!</div>
+            <button class="back-btn" onclick="closeSuccessAnimation()">
+                <i class="fas fa-times"></i> إغلاق
+            </button>
+        </div>
+    </div>
+
+    <!-- Points Notification for Served -->
+    <div id="pointsNotification" class="points-notification">
+        <div class="points-notification-content">
+            <i class="fas fa-gift"></i>
+            <div class="points-notification-text">
+                <div class="points-notification-title">مبروك!</div>
+                <div class="points-notification-desc">تم إضافة نقطة جديدة إلى حسابك</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>نظام الخدمة © 2023 - جميع الحقوق محفوظة</p>
+    </div>
+
+    <script>
+    // مسح أي بيانات قديمة لضمان التجربة
+    localStorage.clear();
+
+    // البيانات المخزنة محلياً
+    let servedData = JSON.parse(localStorage.getItem('servedData')) || {};
+    let servantData = JSON.parse(localStorage.getItem('servantData')) || {};
+    let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
+    let currentServant = JSON.parse(localStorage.getItem('currentServant')) || null;
+    let pointsHistory = JSON.parse(localStorage.getItem('pointsHistory')) || [];
+    let qrScanner = null;
+
+    // تهيئة النظام
+    document.addEventListener('DOMContentLoaded', function() {
+        // التحقق من وجود مستخدم مسجل دخوله
+        if (currentUser) {
+            showDashboard();
+        } else if (currentServant) {
+            showServantDashboard();
+        }
+        
+        // إنشاء بعض البيانات الافتراضية للاختبار
+        initializeDefaultData();
+    });
+
+    // إنشاء بيانات افتراضية للاختبار
+    function initializeDefaultData() {
+        // التأكد من إن servantData متعرفش ككائن فاضي
+        if (!servantData || !servantData.code) {
+            servantData = {
+                name: "خادم الخدمة",  // أي اسم ممكن
+                code: "123456"  // الكود الافتراضي للخادم
+            };
+            localStorage.setItem('servantData', JSON.stringify(servantData));
+        }
+        
+        // إنشاء بعض المخدومين الافتراضيين للاختبار
+        if (Object.keys(servedData).length === 0) {
+            servedData = {
+                "SERV001": {
+                    name: "أحمد محمد علي",
+                    phone: "01234567890",
+                    code: "SERV001",
+                    points: 5
+                },
+                "SERV002": {
+                    name: "فاطمة إبراهيم محمود",
+                    phone: "01234567891", 
+                    code: "SERV002",
+                    points: 3
+                },
+                "SERV003": {
+                    name: "محمود سعيد عبدالله",
+                    phone: "01234567892",
+                    code: "SERV003", 
+                    points: 7
+                }
+            };
+            localStorage.setItem('servedData', JSON.stringify(servedData));
+        }
+    }
+
+    // تسجيل دخول الخادم
+document.getElementById('servantLoginForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const servantName = document.getElementById('servantName').value.trim();
+    const servantCode = document.getElementById('servantCode').value.trim();
+
+    // تحديث البيانات من LocalStorage
+    servantData = JSON.parse(localStorage.getItem('servantData')) || {};
+
+    console.log("المدخل:", servantName, servantCode);
+    console.log("المتوقع:", servantData);
+
+    if (servantData.name === servantName && servantData.code === servantCode) {
+        currentServant = {
+            name: servantName,
+            loginTime: new Date().toLocaleString('ar-EG')
+        };
+        localStorage.setItem('currentServant', JSON.stringify(currentServant));
+        
+        showNotification('تم تسجيل دخول الخادم بنجاح!', 'success');
+        setTimeout(showServantDashboard, 1500);
+    } else {
+        showNotification('اسم الخادم أو الكود غير صحيح', 'error');
+    }
+});
+
+    // باقي الدوال كما هي...
+    // اختيار الدور (الخادم أو المخدوم)
+    function selectRole(role) {
+        if (role === 'servant') {
+            showServantLogin();
+        } else if (role === 'served') {
+            showRegistration();
+        }
+    }
+
+    // عرض صفحة التسجيل
+    function showRegistration() {
+        document.getElementById('selectionPage').style.display = 'none';
+        document.getElementById('registrationSection').style.display = 'block';
+        document.getElementById('loginSection').style.display = 'none';
+        document.getElementById('servantLoginSection').style.display = 'none';
+    }
+
+    // عرض صفحة تسجيل الدخول
+    function showLogin() {
+        document.getElementById('selectionPage').style.display = 'none';
+        document.getElementById('registrationSection').style.display = 'none';
+        document.getElementById('loginSection').style.display = 'block';
+        document.getElementById('servantLoginSection').style.display = 'none';
+    }
+
+    // عرض صفحة تسجيل الخادم
+    function showServantLogin() {
+        document.getElementById('selectionPage').style.display = 'none';
+        document.getElementById('registrationSection').style.display = 'none';
+        document.getElementById('loginSection').style.display = 'none';
+        document.getElementById('servantLoginSection').style.display = 'block';
+    }
+
+    // الرجوع للخلف
+    function goBack() {
+        document.getElementById('selectionPage').style.display = 'flex';
+        document.getElementById('registrationSection').style.display = 'none';
+        document.getElementById('loginSection').style.display = 'none';
+        document.getElementById('servantLoginSection').style.display = 'none';
+        document.getElementById('dashboard').style.display = 'none';
+        document.getElementById('servantDashboard').style.display = 'none';
+        
+        // إيقاف الماسح الضوئي إذا كان يعمل
+        if (qrScanner && qrScanner.isScanning) {
+            qrScanner.stop();
+        }
+    }
+
+    // تسجيل المخدوم
+    document.getElementById('registrationForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const fullName = document.getElementById('fullName').value;
+        const phone = document.getElementById('phone').value;
+        const servedCode = document.getElementById('servedCode').value;
+        
+        // التحقق من عدم وجود كود مكرر
+        if (servedData[servedCode]) {
+            showNotification('هذا الكود مستخدم بالفعل، الرجاء اختيار كود آخر', 'error');
+            return;
+        }
+        
+        // إنشاء حساب جديد
+        servedData[servedCode] = {
+            name: fullName,
+            phone: phone,
+            code: servedCode,
+            points: 0
+        };
+        
+        localStorage.setItem('servedData', JSON.stringify(servedData));
+        
+        // تسجيل الدخول تلقائياً
+        currentUser = servedCode;
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+        
+        showNotification('تم التسجيل بنجاح!', 'success');
+        setTimeout(showDashboard, 1500);
+    });
+
+    // تسجيل دخول المخدوم
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const loginCode = document.getElementById('loginCode').value;
+        
+        // التحقق من صحة الكود
+        if (servedData[loginCode]) {
+            currentUser = loginCode;
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            
+            showNotification('تم تسجيل الدخول بنجاح!', 'success');
+            setTimeout(showDashboard, 1500);
+        } else {
+            showNotification('الكود غير صحيح، الرجاء المحاولة مرة أخرى', 'error');
+        }
+    });
+
+    // عرض لوحة تحكم المخدوم
+    function showDashboard() {
+        document.getElementById('selectionPage').style.display = 'none';
+        document.getElementById('registrationSection').style.display = 'none';
+        document.getElementById('loginSection').style.display = 'none';
+        document.getElementById('servantLoginSection').style.display = 'none';
+        document.getElementById('dashboard').style.display = 'block';
+        document.getElementById('servantDashboard').style.display = 'none';
+        
+        // تحديث بيانات المستخدم
+        const user = servedData[currentUser];
+        document.getElementById('dashboardName').textContent = user.name;
+        document.getElementById('userPhone').textContent = user.phone;
+        document.getElementById('userCodeDisplay').textContent = user.code;
+        document.getElementById('userCode').textContent = user.code;
+        document.getElementById('pointsDisplay').textContent = user.points;
+        
+        // إنشاء QR Code
+        document.getElementById('qrcode').innerHTML = '';
+        new QRCode(document.getElementById('qrcode'), {
+            text: user.code,
+            width: 200,
+            height: 200,
+            colorDark: "#1a237e",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
+        });
+    }
+
+    // عرض لوحة تحكم الخادم
+    function showServantDashboard() {
+        document.getElementById('selectionPage').style.display = 'none';
+        document.getElementById('registrationSection').style.display = 'none';
+        document.getElementById('loginSection').style.display = 'none';
+        document.getElementById('servantLoginSection').style.display = 'none';
+        document.getElementById('dashboard').style.display = 'none';
+        document.getElementById('servantDashboard').style.display = 'block';
+        
+        // تحديث بيانات الخادم
+        document.getElementById('servantDashboardName').textContent = currentServant.name;
+        document.getElementById('servantLoginTime').textContent = currentServant.loginTime;
+        
+        // تحديث الإحصائيات
+        updateServantStats();
+    }
+
+    // تحديث إحصائيات الخادم
+    function updateServantStats() {
+        let totalPoints = 0;
+        let servedCount = Object.keys(servedData).length;
+        let todayPoints = 0;
+        let sessionCount = 0;
+        
+        // حساب الإحصائيات
+        for (const code in servedData) {
+            totalPoints += servedData[code].points;
+        }
+        
+        // تحديث العرض
+        document.getElementById('totalPointsAdded').textContent = totalPoints;
+        document.getElementById('servedCount').textContent = servedCount;
+        document.getElementById('todayPoints').textContent = todayPoints;
+        document.getElementById('sessionCount').textContent = sessionCount;
+    }
+
+    // نسخ الكود
+    function copyCode() {
+        const code = document.getElementById('userCode').textContent;
+        navigator.clipboard.writeText(code).then(() => {
+            const notification = document.getElementById('copyNotification');
+            notification.style.display = 'block';
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        });
+    }
+
+    // إضافة نقطة يدوياً
+    function addPointsManually() {
+        const servedCode = document.getElementById('servedCodeInput').value;
+        
+        if (!servedCode) {
+            showNotification('الرجاء إدخال كود المخدوم', 'warning');
+            return;
+        }
+        
+        if (!servedData[servedCode]) {
+            showNotification('كود المخدوم غير صحيح', 'error');
+            return;
+        }
+        
+        // إضافة النقطة
+        servedData[servedCode].points += 1;
+        localStorage.setItem('servedData', JSON.stringify(servedData));
+        
+        // تسجيل العملية
+        pointsHistory.push({
+            servedCode: servedCode,
+            servantName: currentServant.name,
+            date: new Date().toLocaleString('ar-EG')
+        });
+        localStorage.setItem('pointsHistory', JSON.stringify(pointsHistory));
+        
+        // عرض رسالة النجاح
+        document.getElementById('successMessage').textContent = `تم إضافة نقطة بنجاح للمخدوم ${servedData[servedCode].name}`;
+        document.getElementById('successAnimation').style.display = 'flex';
+        
+        // تحديث الإحصائيات
+        updateServantStats();
+        
+        // إظهار إشعار للمخدوم (محاكاة)
+        simulateServedNotification(servedCode);
+        
+        // تفريغ الحقل
+        document.getElementById('servedCodeInput').value = '';
+    }
+
+    // محاكاة إشعار للمخدوم
+    function simulateServedNotification(servedCode) {
+        // في التطبيق الحقيقي، سيتم إرسال إشعار حقيقي
+        console.log(`تم إرسال إشعار للمخدوم ${servedData[servedCode].name} بإضافة نقطة جديدة`);
+        
+        // إذا كان المخدوم هو المستخدم الحالي، عرض الإشعار
+        if (currentUser === servedCode) {
+            document.getElementById('pointsNotification').style.display = 'block';
+            setTimeout(() => {
+                document.getElementById('pointsNotification').style.display = 'none';
+            }, 5000);
+            
+            // تحديث النقاط في لوحة التحكم
+            document.getElementById('pointsDisplay').textContent = servedData[servedCode].points;
+        }
+    }
+
+    // تبديل حالة الماسح الضوئي
+    function toggleQRScanner() {
+        const qrReader = document.getElementById('qrReader');
+        const scanBtn = document.querySelector('.scan-btn');
+        
+        if (!qrScanner) {
+            // بدء المسح
+            qrScanner = new Html5Qrcode("qrReader");
+            
+            qrScanner.start(
+                { facingMode: "environment" },
+                {
+                    fps: 10,
+                    qrbox: { width: 250, height: 250 }
+                },
+                onQRCodeScanned,
+                (errorMessage) => {
+                    // تجاهل الأخطاء
+                }
+            ).then(() => {
+                scanBtn.innerHTML = '<i class="fas fa-stop"></i> إيقاف المسح';
+                qrReader.style.border = '3px solid #43a047';
+            }).catch((err) => {
+                showNotification('فشل في تشغيل الكاميرا', 'error');
+            });
+        } else {
+            // إيقاف المسح
+            qrScanner.stop().then(() => {
+                qrScanner = null;
+                scanBtn.innerHTML = '<i class="fas fa-camera"></i> بدء المسح';
+                qrReader.style.border = '3px dashed #3949ab';
+                qrReader.innerHTML = '<div style="text-align: center; color: #666;"><i class="fas fa-camera" style="font-size: 3rem; margin-bottom: 10px;"></i><p>انقر لبدء المسح</p></div>';
+            }).catch((err) => {
+                console.error("Failed to stop QR scanner", err);
+            });
+        }
+    }
+
+    // معالجة QR Code الممسوح
+    function onQRCodeScanned(decodedText) {
+        if (servedData[decodedText]) {
+            // إضافة النقطة
+            servedData[decodedText].points += 1;
+            localStorage.setItem('servedData', JSON.stringify(servedData));
+            
+            // تسجيل العملية
+            pointsHistory.push({
+                servedCode: decodedText,
+                servantName: currentServant.name,
+                date: new Date().toLocaleString('ar-EG')
+            });
+            localStorage.setItem('pointsHistory', JSON.stringify(pointsHistory));
+            
+            // عرض رسالة النجاح
+            document.getElementById('successMessage').textContent = `تم إضافة نقطة بنجاح للمخدوم ${servedData[decodedText].name}`;
+            document.getElementById('successAnimation').style.display = 'flex';
+            
+            // تحديث الإحصائيات
+            updateServantStats();
+            
+            // إظهار إشعار للمخدوم (محاكاة)
+            simulateServedNotification(decodedText);
+            
+            // إيقاف الماسح الضوئي
+            if (qrScanner) {
+                qrScanner.stop().then(() => {
+                    qrScanner = null;
+                    const scanBtn = document.querySelector('.scan-btn');
+                    const qrReader = document.getElementById('qrReader');
+                    scanBtn.innerHTML = '<i class="fas fa-camera"></i> بدء المسح';
+                    qrReader.style.border = '3px dashed #3949ab';
+                    qrReader.innerHTML = '<div style="text-align: center; color: #666;"><i class="fas fa-camera" style="font-size: 3rem; margin-bottom: 10px;"></i><p>انقر لبدء المسح</p></div>';
+                });
+            }
+        } else {
+            showNotification('كود QR غير صحيح', 'error');
+        }
+    }
+
+    // إغلاق رسالة النجاح
+    function closeSuccessAnimation() {
+        document.getElementById('successAnimation').style.display = 'none';
+    }
+
+    // تسجيل الخروج
+    function logout() {
+        currentUser = null;
+        currentServant = null;
+        localStorage.removeItem('currentUser');
+        localStorage.removeItem('currentServant');
+        
+        // إيقاف الماسح الضوئي إذا كان يعمل
+        if (qrScanner && qrScanner.isScanning) {
+            qrScanner.stop();
+        }
+        
+        showNotification('تم تسجيل الخروج بنجاح', 'info');
+        setTimeout(goBack, 1500);
+    }
+
+    // عرض الإشعارات
+    function showNotification(message, type) {
+        const notification = document.getElementById('notification');
+        notification.textContent = message;
+        notification.className = `notification ${type}`;
+        notification.style.display = 'flex';
+        
+        setTimeout(() => {
+            notification.style.display = 'none';
+        }, 5000);
+    }
+</script>
+        </body>
+        </html>

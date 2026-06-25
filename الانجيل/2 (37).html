@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>التكوين</title>
+</head>
+<style>
+
+@import url('https://fonts.googleapis.com/css2?family=Amiri&display=swap');
+
+body {
+    font-family: 'Amiri', serif;
+    direction: rtl;
+    font-size: 16px; /* حجم الخط الأساسي */
+    text-align: center; /* لضبط النص في المنتصف */
+    margin: 0;
+    padding: 0;
+}
+
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: #800000;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+.top-bar a {
+    color: white;
+    text-decoration: none;
+    font-size: 1.2em;
+}
+
+.theme-toggle {
+    background-color: #800000;
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    font-size: 1em;
+    border-radius: 5px;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.theme-toggle:hover {
+    background-color: #0056b3;
+    transform: scale(1.05);
+}
+
+.navbar {
+    background-color: #800000;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+}
+
+.navbar .site-name {
+    font-size: 1.5em;
+    margin: 0;
+}
+
+.about-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 50px;
+    opacity: 0;
+    transform: translateY(50px);
+    transition: opacity 1s, transform 1s;
+}
+
+.about-section.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.about-section ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.about-section ul li {
+    margin: 10px 0;
+}
+
+.about-section ul li a {
+    text-decoration: none;
+    color: #800000;
+    font-size: 1.2em;
+}
+
+.about-section ul li a:hover {
+    text-decoration: underline;
+}
+
+.text-content {
+    margin: 20px;
+    text-align: justify;
+    line-height: 1.6;
+}
+
+footer {
+    background: #1f1f1f;
+    color: #ffffff;
+    text-align: center;
+    padding: 1rem 0;
+    width: 100%;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+    font-size: 0.875rem;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+footer a {
+    color: #3ad1ff;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+footer a:hover {
+    color: #1e90ff;
+}
+
+.font-size-controls {
+    display: flex;
+    justify-content: center;
+    margin: 20px;
+}
+
+.font-size-controls button {
+    margin: 0 10px;
+    padding: 10px;
+    font-size: 1em;
+    cursor: pointer;
+}
+
+/* تصميم المؤشر بشكل جذاب */
+.font-size-indicator {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #ffffff;
+    border: 2px solid #800000;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 1.2em;
+    color: #800000;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.font-size-indicator:hover {
+    background-color: #800000;
+    color: #ffffff;
+    transform: scale(1.2);
+}
+
+
+</style>
+
+<body>
+<body class="light-mode">
+    <div class="top-bar">
+        <a href="enjeel.html">الرجوع</a>
+        <div class="font-size-indicator" onclick="toggleFontSizeMenu()">أ</div>
+    </div>
+    <header class="navbar">
+        <span class="site-name">اَلْمَزْمور السَّابع وَالثَّلاَثونَ</span>
+        <div class="font-size-controls" id="fontSizeControls">
+            <button onclick="changeFontSize(-1)">تصغير النص</button>
+            <button onclick="changeFontSize(1)">تكبير النص</button>
+    </header>
+    <main>
+        <section class="about-section show">
+            <div class="text-content">
+                <ul>
+                    
+                    1لاَ تَغَرْ مِنَ الأَشْرَارِ، وَلاَ تَحْسِدْ عمَّالَ الإِثْمِ، 2فَإِنَّهمْ مِثْلَ الْحَشِيشِ سَرِيعًا يقْطَعونَ، وَمِثْلَ الْعشْبِ الأَخْضَرِ يَذْبلونَ. 3اتَّكِلْ عَلَى الرَّبِّ وَافْعَلِ الْخَيْرَ. اسْكنِ الأَرْضَ وَارْعَ الأَمَانَةَ. 4وَتَلَذَّذْ بِالرَّبِّ فَيعْطِيَكَ سؤْلَ قَلْبِكَ. 5سَلِّمْ لِلرَّبِّ طَرِيقَكَ وَاتَّكِلْ عَلَيْهِ وَهوَ يجْرِي، 6وَيخْرِج مِثْلَ النّورِ بِرَّكَ، وَحَقَّكَ مِثْلَ الظَّهِيرَةِ. 7انْتَظِرِ الرَّبَّ وَاصْبِرْ لَه، وَلاَ تَغَرْ مِنَ الَّذِي يَنْجَح فِي طَرِيقِهِ، مِنَ الرَّجلِ الْمجْرِي مَكَايِدَ. 8كفَّ عَنِ الْغَضَبِ، وَاتْركِ السَّخَطَ، وَلاَ تَغَرْ لِفِعْلِ الشَّرِّ، 9لأَنَّ عَامِلِي الشَّرِّ يقْطَعونَ، وَالَّذِينَ يَنْتَظِرونَ الرَّبَّ همْ يَرِثونَ الأَرْضَ. 10بَعْدَ قَلِيلٍلاَ يَكون الشِّرِّير. تَطَّلِع فِي مَكَانِهِ فَلاَ يَكون. 11أَمَّا الْودَعَاء فَيَرِثونَ الأَرْضَ، وَيَتَلَذَّذونَ فِي كَثْرَةِ السَّلاَمَةِ.
+
+12الشِّرِّير يَتَفَكَّر ضِدَّ الصِّدِّيقِ وَيحَرِّق عَلَيْهِ أَسْنَانَه. 13الرَّبّ يَضْحَك بِهِ لأَنَّه رَأَى أَنَّ يَوْمَه آتٍ! 14الأَشْرَار قَدْ سَلّوا السَّيْفَ وَمَدّوا قَوْسَهمْ لِرَمْيِالْمِسْكِينِ وَالْفَقِيرِ، لِقَتْلِ الْمسْتَقِيمِ طَرِيقهمْ. 15سَيْفهمْ يَدْخل فِي قَلْبِهِمْ، وَقِسِيّهمْ تَنْكَسِر.
+
+16اَلْقَلِيل الَّذِي لِلصِّدِّيقِ خَيْرٌ مِنْ ثَرْوَةِ أَشْرَارٍ كَثِيرِينَ. 17لأَنَّ سَوَاعِدَ الأَشْرَارِ تَنْكَسِر، وَعَاضِد الصِّدِّيقِينَ الرَّبّ. 18الرَّبّ عَارِفٌ أَيَّامَ الْكَمَلَةِ، وَمِيرَاثهمْ إِلَى الأَبَدِ يَكون. 19لاَ يخْزَوْنَ فِي زَمَنِ السّوءِ، وَفِي أَيَّامِ الْجوعِ يَشْبَعونَ. 20لأَنَّ الأَشْرَارَ يَهْلِكونَ، وَأَعْدَاء الرَّبِّ كَبَهَاءِ الْمَرَاعِي. فَنوا. كَالدّخَانِ فَنوا. 21الشِّرِّير يَسْتَقْرِض وَلاَ يَفِي، أَمَّا الصِّدِّيق فَيَتَرَأَّف وَيعْطِي. 22لأَنَّ الْمبَارَكِينَ مِنْه يَرِثونَ الأَرْضَ، وَالْمَلْعونِينَ مِنْه يقْطَعونَ.
+
+23مِنْ قِبَلِ الرَّبِّ ََتَثَبَّت خَطَوَات الإِنْسَانِ وَفِي طَرِيقِهِ يسَرّ. 24إِذَا سَقَطَ لاَ يَنْطَرِح، لأَنَّ الرَّبَّ مسْنِدٌ يَدَه. 25أَيْضًا كنْت فَتىً وَقَدْ شِخْت، وَلَمْ أَرَ صِدِّيقًا تخلِّيَ عَنْه، وَلاَ ذرِّيَّةً لَه تَلْتَمِس خبْزًا. 26الْيَوْمَ كلَّه يَتَرَأَّف وَيقْرِض، وَنَسْله لِلْبَرَكَةِ.
+
+27حِدْ عَنِ الشَّرِّ وَافْعَلِ الْخَيْرَ، وَاسْكنْ إِلَى الأَبَدِ. 28لأَنَّ الرَّبَّ يحِبّ الْحَقَّ، وَلاَ يَتَخَلَّى عَنْ أَتْقِيَائِهِ. إِلَى الأَبَدِ يحْفَظونَ. أَمَّا نَسْل الأَشْرَارِ فَيَنْقَطِع. 29الصِّدِّيقونَ يَرِثونَ الأَرْضَ وَيَسْكنونَهَا إِلَى الأَبَدِ. 30فَم الصِّدِّيقِ يَلْهَج بِالْحِكْمَةِ، وَلِسَانه يَنْطِق بِالْحَقِّ. 31شَرِيعَة إِلهِهِ فِي قَلْبِهِ. لاَ تَتَقَلْقَل خَطَوَاته. 32الشِّرِّير يرَاقِب الصِّدِّيقَ محَاوِلاً أَنْ يمِيتَه. 33الرَّبّ لاَ يَتْركه فِي يَدِهِ، وَلاَ يَحْكم عَلَيْهِ عِنْدَ محَاكَمَتِهِ. 34انْتَظِرِ الرَّبَّ وَاحْفَظْ طَرِيقَه، فَيَرْفَعَكَ لِتَرِثَ الأَرْضَ. إِلَى انْقِرَاضِ الأَشْرَارِ تَنْظر.
+
+35قَدْ رَأَيْت الشِّرِّيرَ عَاتِيًا، وَارِفًا مِثْلَ شَجَرَةٍ شَارِقَةٍ نَاضِرَةٍ. 36عَبَرَ فَإِذَا هوَ لَيْسَ بِمَوْجودٍ، وَالْتَمَسْته فَلَمْ يوجَدْ. 37لاَحِظِ الْكَامِلَ وَانْظرِ الْمسْتَقِيمَ، فَإِنَّ الْعَقِبَ لإِنْسَانِ السَّلاَمَةِ. 38أَمَّا الأَشْرَار فَيبَادونَ جَمِيعًا. عَقِب الأَشْرَارِ يَنْقَطِع. 39أَمَّا خَلاَص الصِّدِّيقِينَ فَمِنْ قِبَلِ الرَّبِّ، حِصْنِهمْ فِي زَمَانِ الضِّيقِ. 40وَيعِينهم الرَّبّ وَينَجِّيهِمْ. ينْقِذهمْ مِنَ الأَشْرَارِ وَيخَلِّصهمْ، لأَنَّهم احْتَمَوْا بِهِ.
+
+
+
+                </ul>
+            </div>
+            
+            </div>
+        </section>
+    </main>
+    <footer>
+        © 2024 الإنجيل. جميع الحقوق محفوظة.
+    </footer>
+    <script>
+        function changeFontSize(delta) {
+            const content = document.querySelector('.text-content');
+            const currentSize = parseFloat(window.getComputedStyle(content, null).getPropertyValue('font-size'));
+            content.style.fontSize = (currentSize + delta) + 'px';
+        }
+
+        function toggleFontSizeMenu() {
+            const fontSizeControls = document.getElementById('fontSizeControls');
+            fontSizeControls.style.display = fontSizeControls.style.display === 'none' || fontSizeControls.style.display === '' ? 'flex' : 'none';
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('fontSizeControls').style.display = 'none';
+        });
+    </script>
+</body>
+</html>

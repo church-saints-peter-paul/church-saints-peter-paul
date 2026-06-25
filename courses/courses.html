@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>صفحة الكورسات</title>
+    <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            emailjs.init("PGtztibZ6P4HIegi4"); 
+
+            // تحميل قائمة الطلاب من localStorage إذا كانت موجودة
+            if (!localStorage.getItem("studentCodes")) {
+                // قائمة افتراضية للطلاب (يمكن تحديثها لاحقًا)
+                const defaultStudentCodes = {
+                    "123": { name: "مينا", class: "classroom.html" },
+                    "102": { name: "محمد علي", class: "first-class.html" },
+                    "103": { name: "سارة أحمد", class: "first-class.html" },
+                    "201": { name: "محمود خالد", class: "second-class.html" },
+                    "202": { name: "نور حسن", class: "second-class.html" },
+                    "203": { name: "يوسف علي", class: "second-class.html" },
+                    "301": { name: "علي إبراهيم", class: "third-class.html" },
+                    "302": { name: "هبة يوسف", class: "third-class.html" },
+                    "303": { name: "زياد مصطفى", class: "third-class.html" },
+                    "401": { name: "منى عبد الرحمن", class: "fourth-class.html" },
+                    "402": { name: "عمر فاروق", class: "fourth-class.html" },
+                    "403": { name: "ليلى سامي", class: "fourth-class.html" },
+                    "501": { name: "سمير حسين", class: "fifth-class.html" },
+                    "502": { name: "آلاء عماد", class: "fifth-class.html" },
+                    "503": { name: "نادر سعيد", class: "fifth-class.html" }
+                };
+                localStorage.setItem("studentCodes", JSON.stringify(defaultStudentCodes));
+            }
+        });
+
+        function sendEmail() {
+            const name = document.getElementById("studentName").value.trim();
+            const code = document.getElementById("studentCode").value.trim();
+            const errorMessage = document.getElementById("errorMessage");
+
+            if (name === "" || code === "") {
+                errorMessage.textContent = " همممم. شكلك نسيت الكود او الاسم بتاعك ";
+                errorMessage.style.animation = "shake 0.6s ease-in-out";
+                return;
+            }
+
+            // جلب قائمة الطلاب من localStorage
+            const studentCodes = JSON.parse(localStorage.getItem("studentCodes"));
+
+            if (studentCodes[code]) {
+                if (studentCodes[code].name === name) {
+                    showSuccessMessage(` ازيك يا ${name}! يتم توجيهك الآن...`);
+                    setTimeout(() => {
+                        window.location.href = studentCodes[code].class;
+                    }, 2000);
+                } else {
+                    errorMessage.textContent = "هممممم. الاسم ده مش متطابق مع الكود بتاعك";
+                    errorMessage.style.animation = "shake 0.6s ease-in-out";
+                }
+            } else {
+                window.location.href = "error.html";
+            }
+        }
+
+        function showSuccessMessage(message) {
+            const successDiv = document.createElement('div');
+            successDiv.className = 'success-message';
+            successDiv.textContent = message;
+            document.body.appendChild(successDiv);
+            
+            setTimeout(() => {
+                successDiv.remove();
+            }, 3000);
+        }
+
+        // عرض بيانات المستخدم من localStorage
+        document.addEventListener("DOMContentLoaded", function() {
+            let firstName = localStorage.getItem('userFirstName');
+            let lastName = localStorage.getItem('userLastName');
+            let year = localStorage.getItem('userYear');
+            let code = localStorage.getItem('userCode');
+
+            if (firstName && lastName && year && code) {
+                document.getElementById("studentName").value = firstName + " " + lastName;
+                document.getElementById("studentCode").value = code;
+            }
+
+            // Initialize floating particles
+            createFloatingParticles();
+            
+            // Initialize cursor effects
+            if (window.innerWidth > 768) {
+                initCustomCursor();
+            }
+        });
+
+        // Floating particles animation
+        function createFloatingParticles() {
+            const particlesContainer = document.createElement('div');
+            particlesContainer.className = 'particles-container';
+            document.body.appendChild(particlesContainer);
+
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'floating-particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 10 + 's';
+                particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // Custom cursor
+        function initCustomCursor() {
+            const cursor = document.createElement('div');
+            cursor.className = 'custom-cursor';
+            document.body.appendChild(cursor);
+
+            document.addEventListener('mousemove', (e) => {
+                cursor.style.left = e.clientX + 'px';
+                cursor.style.top = e.clientY + 'px';
+            });
+
+            // Add hover effects
+            const interactiveElements = document.querySelectorAll('button, input, .navbar .home-button');
+            interactiveElements.forEach(el => {
+                el.addEventListener('mouseenter', () => cursor.classList.add('hovered'));
+                el.addEventListener('mouseleave', () => cursor.classList.remove('hovered'));
+            });
+        }
+    </script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(135deg, #efdfbf 0%, #f5e6c7 25%, #e8d5b7 50%, #f2e1c1 75%, #efdfbf 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            color: #013346;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+            direction: rtl;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Custom Cursor */
+        @media (min-width: 768px) {
+            body {
+                cursor: none;
+            }
+
+            .custom-cursor {
+                position: fixed;
+                width: 30px;
+                height: 30px;
+                border: 2px solid #d4a017;
+                border-radius: 50%;
+                pointer-events: none;
+                transform: translate(-50%, -50%);
+                transition: transform 0.2s ease, border-color 0.2s ease;
+                z-index: 9999;
+                box-shadow: 0 0 10px rgba(212, 160, 23, 0.5);
+            }
+
+            .custom-cursor::before {
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 10px;
+                height: 10px;
+                background: #d4a017;
+                border-radius: 50%;
+                transform: translate(-50%, -50%);
+                transition: background 0.2s ease;
+            }
+
+            .custom-cursor.hovered {
+                transform: translate(-50%, -50%) scale(1.3);
+                border-color: #800000;
+            }
+        }
+
+        /* Floating Particles */
+        .particles-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .floating-particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: linear-gradient(45deg, #d4a017, #800000);
+            border-radius: 50%;
+            opacity: 0.7;
+            animation: float 15s linear infinite;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.7;
+            }
+            90% {
+                opacity: 0.7;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Background Pattern */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 20%, rgba(212, 160, 23, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(128, 0, 0, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 60%, rgba(212, 160, 23, 0.05) 0%, transparent 50%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, #800000, #a00000, #800000);
+            background-size: 200% 200%;
+            animation: gradientMove 8s ease infinite;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 30px;
+            font-size: 24px;
+            font-weight: 900;
+            box-shadow: 0 8px 32px rgba(128, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid rgba(212, 160, 23, 0.3);
+            position: relative;
+            z-index: 10;
+            overflow: hidden;
+        }
+
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .navbar::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to bottom right,
+                rgba(212, 160, 23, 0.1),
+                rgba(212, 160, 23, 0),
+                rgba(212, 160, 23, 0.1)
+            );
+            transform: rotate(30deg);
+            z-index: -1;
+            animation: navShine 4s infinite;
+        }
+
+        @keyframes navShine {
+            0% { transform: translateX(-100%) rotate(30deg); }
+            100% { transform: translateX(100%) rotate(30deg); }
+        }
+
+        .navbar .title {
+            flex-grow: 1;
+            text-align: center;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+
+        .navbar .home-button {
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 12px 20px;
+            cursor: pointer;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: 700;
+            transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(5px);
+        }
+
+        .navbar .home-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .navbar .home-button:hover {
+            background: linear-gradient(45deg, #0056b3, #004085);
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(0, 123, 255, 0.4);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .navbar .home-button:hover::before {
+            left: 100%;
+        }
+
+        .container {
+            margin-top: 80px;
+            padding: 50px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            width: 90%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            border-radius: 30px;
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.1),
+                0 0 0 1px rgba(212, 160, 23, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            position: relative;
+            z-index: 5;
+            animation: containerFloat 6s ease-in-out infinite;
+            border: 1px solid rgba(212, 160, 23, 0.2);
+        }
+
+        @keyframes containerFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, 
+                rgba(212, 160, 23, 0.05) 0%, 
+                rgba(128, 0, 0, 0.02) 50%, 
+                rgba(212, 160, 23, 0.05) 100%
+            );
+            border-radius: 30px;
+            z-index: -1;
+        }
+
+        h2 {
+            color: #800000;
+            font-size: 32px;
+            margin-bottom: 15px;
+            font-weight: 900;
+            text-shadow: 2px 2px 4px rgba(128, 0, 0, 0.2);
+            position: relative;
+            animation: titlePulse 3s ease-in-out infinite;
+        }
+
+        @keyframes titlePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        h2::after {
+            content: "";
+            width: 120px;
+            height: 4px;
+            background: linear-gradient(90deg, #800000, #d4a017, #800000);
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 2px;
+            animation: underlineGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes underlineGlow {
+            0%, 100% { box-shadow: 0 0 5px rgba(212, 160, 23, 0.5); }
+            50% { box-shadow: 0 0 15px rgba(212, 160, 23, 0.8); }
+        }
+
+        p {
+            font-size: 18px;
+            color: #555;
+            margin-bottom: 30px;
+            line-height: 1.6;
+            font-weight: 400;
+        }
+
+        label {
+            display: block;
+            font-size: 20px;
+            margin: 25px 0 10px;
+            color: #800000;
+            font-weight: 700;
+            text-shadow: 1px 1px 2px rgba(128, 0, 0, 0.1);
+            position: relative;
+        }
+
+        label::before {
+            content: "✦";
+            position: absolute;
+            right: -25px;
+            color: #d4a017;
+            animation: sparkle 2s ease-in-out infinite;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { opacity: 0.5; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 25px;
+        }
+
+        input {
+            width: 100%;
+            padding: 18px 25px;
+            margin: 8px 0;
+            border: 2px solid transparent;
+            border-radius: 25px;
+            font-size: 18px;
+            text-align: center;
+            transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+            background: linear-gradient(white, white) padding-box,
+                        linear-gradient(45deg, #d4a017, #800000, #d4a017) border-box;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+            font-family: 'Cairo', sans-serif;
+            font-weight: 600;
+            position: relative;
+        }
+
+        input::placeholder {
+            color: #888;
+            font-weight: 400;
+        }
+
+        input:focus {
+            outline: none;
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 
+                0 12px 35px rgba(0, 0, 0, 0.12),
+                0 0 0 4px rgba(212, 160, 23, 0.2);
+            background: linear-gradient(#f8f8f8, #f8f8f8) padding-box,
+                        linear-gradient(45deg, #d4a017, #800000, #d4a017) border-box;
+        }
+
+        input:valid {
+            background: linear-gradient(#f0fff0, #f0fff0) padding-box,
+                        linear-gradient(45deg, #28a745, #20c997, #28a745) border-box;
+        }
+
+        button {
+            background: linear-gradient(135deg, #007bff, #0056b3, #004085);
+            background-size: 200% 200%;
+            animation: buttonGradient 4s ease infinite;
+            color: white;
+            padding: 18px 40px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 20px;
+            font-weight: 700;
+            transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+            margin-top: 30px;
+            box-shadow: 
+                0 8px 25px rgba(0, 123, 255, 0.3),
+                0 0 0 2px rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        @keyframes buttonGradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+        }
+
+        button:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 
+                0 15px 40px rgba(0, 123, 255, 0.4),
+                0 0 0 4px rgba(255, 255, 255, 0.2);
+        }
+
+        button:hover::before {
+            transform: translateX(100%);
+        }
+
+        button:active {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 8px 20px rgba(0, 123, 255, 0.3);
+        }
+
+        .error-message, .success-message {
+            font-size: 18px;
+            margin-top: 20px;
+            padding: 15px 25px;
+            border-radius: 15px;
+            font-weight: 600;
+            position: relative;
+            animation: messageSlide 0.5s ease-out;
+        }
+
+        .error-message {
+            color: #dc3545;
+            background: linear-gradient(135deg, rgba(220, 53, 69, 0.1), rgba(220, 53, 69, 0.05));
+            border: 1px solid rgba(220, 53, 69, 0.3);
+            box-shadow: 0 4px 15px rgba(220, 53, 69, 0.1);
+        }
+
+        .success-message {
+            color: #28a745;
+            background: linear-gradient(135deg, rgba(40, 167, 69, 0.1), rgba(40, 167, 69, 0.05));
+            border: 1px solid rgba(40, 167, 69, 0.3);
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.1);
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        @keyframes messageSlide {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 15px 20px;
+                font-size: 20px;
+            }
+
+            .navbar .home-button {
+                padding: 10px 15px;
+                font-size: 16px;
+            }
+
+            .container {
+                width: 95%;
+                padding: 30px 25px;
+                margin-top: 50px;
+            }
+
+            h2 {
+                font-size: 26px;
+            }
+
+            input {
+                padding: 15px 20px;
+                font-size: 16px;
+            }
+
+            button {
+                padding: 15px 30px;
+                font-size: 18px;
+            }
+
+            .custom-cursor {
+                display: none;
+            }
+
+            body {
+                cursor: auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 25px 20px;
+                border-radius: 20px;
+            }
+
+            h2 {
+                font-size: 22px;
+            }
+
+            input {
+                padding: 12px 18px;
+                font-size: 15px;
+            }
+
+            button {
+                padding: 12px 25px;
+                font-size: 16px;
+                width: 100%;
+            }
+
+            label {
+                font-size: 18px;
+            }
+
+            p {
+                font-size: 16px;
+            }
+        }
+
+        /* Special Effects */
+        @keyframes ripple {
+            0% {
+                transform: scale(0);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        .ripple-effect {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ripple-effect::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            transform: translate(-50%, -50%);
+            animation: ripple 0.6s ease-out;
+        }
+
+        /* Loading Animation */
+        .loading {
+            position: relative;
+        }
+
+        .loading::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 2px solid transparent;
+            border-top: 2px solid #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            top: 50%;
+            right: 15px;
+            transform: translateY(-50%);
+        }
+
+       
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <button onclick="window.location.href='https://mina-samuel-2010.github.io/Church-of-Saints-Peter-Paul/'" class="home-button">الرئيسية</button>
+        <div class="title">كنيسة القديسين بطرس وبولس</div>
+        <div>الكورسات</div>
+    </div>
+
+    <div class="container">
+        <h2>أهلاً بك في صفحة تسجيل الدخول</h2>
+        <p>يرجى إدخال اسمك والكود الخاص بك للوصول إلى الكورسات</p>
+
+        <form id="studentForm">
+            <div class="input-group">
+                <label>الاسم:</label>
+                <input type="text" id="studentName" placeholder="اسم المخدوم" required>
+            </div>
+
+            <div class="input-group">
+                <label>الكود:</label>
+                <input type="text" id="studentCode" placeholder="كود المخدوم" required>
+            </div>
+
+            <button type="button" onclick="sendEmail()" class="ripple-effect">دخول</button>
+        </form>
+
+        <p id="errorMessage" class="error-message" style="display: none;"></p>
+    </div>
+
+</body>
+</html>

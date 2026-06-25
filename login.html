@@ -1,0 +1,1884 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="تسجيل الدخول وإنشاء حساب - كنيسة القديسين بطرس وبولس">
+    <meta name="robots" content="noindex, nofollow">
+    <title>بوابة العضوية - كنيسة القديسين بطرس وبولس</title>
+
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Cropper.js -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
+
+    <style>
+        :root {
+            --primary-color: #800000;
+            --secondary-color: #d4a017;
+            --light-color: #EDDDBD;
+            --dark-color: #013346;
+            --gradient-primary: linear-gradient(135deg, #800000, #a00000);
+            --gradient-secondary: linear-gradient(135deg, #d4a017, #f4c542);
+            --gradient-bg: linear-gradient(135deg, #013346, #024a63);
+            --gradient-card: linear-gradient(135deg, rgba(1, 51, 70, 0.95), rgba(0, 40, 56, 0.95));
+            --shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
+            --radius: 20px;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: var(--gradient-bg);
+            color: var(--light-color);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* ===== CUSTOM CURSOR ===== */
+        @media (min-width: 992px) {
+            body {
+                cursor: none;
+            }
+
+            .custom-cursor {
+                position: fixed;
+                width: 24px;
+                height: 24px;
+                border: 2px solid var(--secondary-color);
+                border-radius: 50%;
+                pointer-events: none;
+                transform: translate(-50%, -50%);
+                transition: transform 0.1s ease, width 0.1s ease, height 0.1s ease, border-color 0.2s ease;
+                z-index: 9999;
+                box-shadow: 0 0 10px rgba(212, 160, 23, 0.4);
+                will-change: transform;
+            }
+
+            .custom-cursor::before {
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 8px;
+                height: 8px;
+                background: var(--secondary-color);
+                border-radius: 50%;
+                transform: translate(-50%, -50%);
+                transition: all 0.1s ease;
+            }
+
+            .custom-cursor.hovered {
+                transform: translate(-50%, -50%) scale(1.5);
+                border-color: var(--primary-color);
+            }
+
+            .custom-cursor.hovered::before {
+                background: var(--primary-color);
+            }
+        }
+
+        /* Animated Background & Particles */
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            overflow: hidden;
+        }
+
+        .animated-bg::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background:
+                radial-gradient(circle at 20% 30%, rgba(212, 160, 23, 0.08) 0%, transparent 20%),
+                radial-gradient(circle at 80% 70%, rgba(128, 0, 0, 0.08) 0%, transparent 20%);
+            animation: float 25s ease-in-out infinite;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+
+            50% {
+                transform: translate(-2%, 3%) rotate(2deg);
+            }
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(212, 160, 23, 0.15);
+            border-radius: 50%;
+            animation: particleFloat 18s infinite linear;
+        }
+
+        @keyframes particleFloat {
+            0% {
+                transform: translateY(100vh) scale(0.5);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 0.8;
+            }
+
+            90% {
+                opacity: 0.8;
+            }
+
+            100% {
+                transform: translateY(-20vh) scale(1.2);
+                opacity: 0;
+            }
+        }
+
+        /* Container */
+        .auth-container {
+            width: 100%;
+            max-width: 520px;
+            margin: 30px 20px;
+            z-index: 10;
+        }
+
+        .auth-card {
+            background: var(--gradient-card);
+            backdrop-filter: blur(15px);
+            border-radius: var(--radius);
+            padding: 35px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(212, 160, 23, 0.25);
+            position: relative;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .auth-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--gradient-secondary);
+        }
+
+        /* Logo & Brand */
+        .brand-section {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .logo {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 75px;
+            height: 75px;
+            background: var(--gradient-primary);
+            border-radius: 50%;
+            margin-bottom: 12px;
+            box-shadow: 0 5px 20px rgba(128, 0, 0, 0.35);
+        }
+
+        .logo i {
+            font-size: 32px;
+            color: var(--light-color);
+        }
+
+        .title {
+            font-size: 26px;
+            font-weight: 900;
+            margin-bottom: 4px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .subtitle {
+            font-size: 15px;
+            color: rgba(237, 221, 189, 0.85);
+            font-weight: 300;
+        }
+
+        /* Dynamic Tabs */
+        .auth-tabs {
+            display: flex;
+            border-bottom: 2px solid rgba(237, 221, 189, 0.15);
+            margin-bottom: 25px;
+            gap: 10px;
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            background: none;
+            border: none;
+            color: rgba(237, 221, 189, 0.6);
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            border-bottom: 3px solid transparent;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        .auth-tab.active {
+            color: var(--secondary-color);
+            border-bottom-color: var(--secondary-color);
+        }
+
+        /* Form styling */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .input-group {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-icon {
+            position: absolute;
+            right: 15px;
+            color: rgba(212, 160, 23, 0.7);
+            font-size: 16px;
+            z-index: 2;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 13px 45px 13px 15px;
+            background: rgba(237, 221, 189, 0.08);
+            border: 2px solid rgba(237, 221, 189, 0.1);
+            border-radius: 12px;
+            color: var(--light-color);
+            font-size: 15px;
+            font-family: 'Cairo', sans-serif;
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            background: rgba(237, 221, 189, 0.12);
+            box-shadow: 0 0 0 3px rgba(212, 160, 23, 0.2);
+        }
+
+        select.form-control option {
+            background-color: #013346;
+            color: #EDDDBD;
+        }
+
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(0.8) sepia(1) saturate(5) hue-rotate(330deg);
+            cursor: pointer;
+        }
+
+        .password-container {
+            position: relative;
+        }
+
+        .toggle-password {
+            position: absolute;
+            left: 15px;
+            background: none;
+            border: none;
+            color: rgba(212, 160, 23, 0.7);
+            cursor: pointer;
+            font-size: 16px;
+            z-index: 2;
+            padding: 5px;
+        }
+
+        .toggle-password:hover {
+            color: var(--secondary-color);
+        }
+
+        .error-message {
+            color: #ff6b6b;
+            font-size: 12px;
+            margin-top: 4px;
+            display: block;
+            min-height: 16px;
+            opacity: 0;
+            transform: translateY(-3px);
+            transition: opacity 0.2s, transform 0.2s;
+        }
+
+        .error-message.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .form-control.is-invalid {
+            border-color: #ff6b6b;
+        }
+
+        /* Password Strength Meter */
+        .password-strength {
+            margin-top: 8px;
+        }
+
+        .strength-bar {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 4px;
+        }
+
+        .strength-segment {
+            flex: 1;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            transition: all 0.3s ease;
+        }
+
+        .strength-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: rgba(237, 221, 189, 0.6);
+        }
+
+        /* Submit Button */
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--gradient-primary);
+            border: none;
+            border-radius: 12px;
+            color: var(--light-color);
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(128, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .submit-btn:hover {
+            background: linear-gradient(135deg, #a00000, #c00000);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(128, 0, 0, 0.4);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* Spinner */
+        .spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .submit-btn.loading .btn-text {
+            display: none;
+        }
+
+        .submit-btn.loading .spinner {
+            display: block;
+        }
+
+        /* Alert System (Toasts) */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 99999;
+        }
+
+        .custom-toast {
+            background: rgba(1, 51, 70, 0.95);
+            border: 1px solid rgba(212, 160, 23, 0.4);
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--light-color);
+            min-width: 300px;
+            animation: slideIn 0.3s ease forwards;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .toast-success {
+            border-left: 5px solid #51cf66;
+        }
+
+        .toast-error {
+            border-left: 5px solid #ff6b6b;
+        }
+
+        .toast-warning {
+            border-left: 5px solid #ffd166;
+        }
+
+        /* Success Animation Screen */
+        .success-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s ease;
+        }
+
+        .success-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .success-box {
+            background: var(--gradient-card);
+            padding: 40px;
+            border-radius: var(--radius);
+            text-align: center;
+            max-width: 420px;
+            width: 90%;
+            border: 1px solid rgba(212, 160, 23, 0.3);
+            box-shadow: var(--shadow);
+            transform: scale(0.8);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .success-overlay.show .success-box {
+            transform: scale(1);
+        }
+
+        .success-icon {
+            font-size: 55px;
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+            animation: pulse 1.8s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.08);
+            }
+        }
+
+        .terms-box {
+            background: rgba(237, 221, 189, 0.06);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(212, 160, 23, 0.2);
+            font-size: 13px;
+        }
+
+        .terms-title {
+            color: var(--secondary-color);
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .terms-list {
+            list-style: none;
+            padding-right: 0;
+            margin: 0;
+        }
+
+        .terms-list li {
+            padding: 2px 0;
+            position: relative;
+            padding-right: 15px;
+        }
+
+        .terms-list li::before {
+            content: '✓';
+            position: absolute;
+            right: 0;
+            color: var(--secondary-color);
+            font-weight: bold;
+        }
+
+        .footer-link {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: rgba(237, 221, 189, 0.6);
+        }
+
+        .footer-link a {
+            color: var(--secondary-color);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .footer-link a:hover {
+            text-decoration: underline;
+        }
+
+        /* ===== AVATAR DROPZONE ===== */
+        .avatar-upload-zone {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 3px dashed rgba(212, 160, 23, 0.5);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            margin: 0 auto 15px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            background: rgba(212, 160, 23, 0.05);
+        }
+        .avatar-upload-zone:hover {
+            border-color: var(--secondary-color);
+            background: rgba(212, 160, 23, 0.1);
+            transform: scale(1.02);
+        }
+        .avatar-upload-zone .upload-icon { font-size: 28px; color: rgba(212, 160, 23, 0.7); }
+        .avatar-upload-zone .upload-text { font-size: 10px; color: rgba(237,221,189,0.6); margin-top: 4px; }
+        .avatar-upload-zone .preview-img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0; left: 0;
+        }
+        .avatar-optional-badge {
+            display: inline-block;
+            font-size: 10px;
+            background: rgba(212,160,23,0.15);
+            border: 1px solid rgba(212,160,23,0.3);
+            color: var(--secondary-color);
+            padding: 2px 8px;
+            border-radius: 20px;
+            margin-bottom: 8px;
+        }
+        #avatarUploadGroup { display: none; text-align: center; margin-bottom: 20px; }
+
+        /* ===== CROPPER MODAL ===== */
+        .cropper-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.92);
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .cropper-modal-overlay.open {
+            opacity: 1;
+            pointer-events: all;
+        }
+        .cropper-modal-box {
+            background: linear-gradient(135deg, rgba(1,51,70,0.98), rgba(0,30,45,0.98));
+            border: 1px solid rgba(212,160,23,0.3);
+            border-radius: 20px;
+            padding: 24px;
+            width: 90%;
+            max-width: 520px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .cropper-modal-title {
+            font-size: 16px;
+            font-weight: 900;
+            color: var(--secondary-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .cropper-container-wrap {
+            width: 100%;
+            max-height: 360px;
+            overflow: hidden;
+            border-radius: 12px;
+            background: #000;
+        }
+        #cropperImage { max-width: 100%; display: block; }
+        .cropper-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        .cropper-btn-save {
+            background: linear-gradient(135deg, var(--secondary-color), #f4c542);
+            color: #000;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 24px;
+            font-family: 'Cairo', sans-serif;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+        .cropper-btn-save:hover { transform: translateY(-1px); box-shadow: 0 4px 15px rgba(212,160,23,0.4); }
+        .cropper-btn-cancel {
+            background: rgba(255,255,255,0.08);
+            color: rgba(237,221,189,0.7);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 10px 20px;
+            font-family: 'Cairo', sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        /* ===== UPLOAD PROGRESS OVERLAY ===== */
+        .upload-progress-overlay {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            max-width: 380px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, rgba(1,51,70,0.97), rgba(0,30,45,0.97));
+            border: 1px solid rgba(212,160,23,0.4);
+            border-radius: 16px;
+            padding: 16px 20px;
+            z-index: 99998;
+            opacity: 0;
+            transform: translateY(20px);
+            pointer-events: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+        }
+        .upload-progress-overlay.show {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: all;
+        }
+        .upload-progress-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--secondary-color);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .upload-progress-bar-wrap {
+            height: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 100px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+        .upload-progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--secondary-color), #f4c542);
+            border-radius: 100px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+        .upload-progress-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: rgba(237,221,189,0.6);
+        }
+
+        /* ===== TOP PROGRESS BAR ===== */
+        .top-progress-bar {
+            position: fixed;
+            top: 0; left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--secondary-color), #f4c542, var(--primary-color));
+            z-index: 999999;
+            width: 0%;
+            transition: width 0.4s ease, opacity 0.3s ease;
+            opacity: 0;
+            box-shadow: 0 0 8px rgba(212,160,23,0.6);
+        }
+        .top-progress-bar.active { opacity: 1; }
+
+    </style>
+</head>
+
+<body>
+    <!-- Top Progress Bar -->
+    <div class="top-progress-bar" id="topProgressBar"></div>
+
+    <!-- Upload Progress Overlay -->
+    <div class="upload-progress-overlay" id="uploadProgressOverlay">
+        <div class="upload-progress-title">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <span id="uploadProgressLabel">جاري رفع الصورة...</span>
+        </div>
+        <div class="upload-progress-bar-wrap">
+            <div class="upload-progress-bar-fill" id="uploadProgressFill"></div>
+        </div>
+        <div class="upload-progress-info">
+            <span id="uploadProgressPct">0%</span>
+            <span id="uploadProgressSpeed">جاري الحساب...</span>
+        </div>
+    </div>
+
+    <!-- Cropper Modal -->
+    <div class="cropper-modal-overlay" id="cropperModalOverlay">
+        <div class="cropper-modal-box">
+            <div class="cropper-modal-title">
+                <i class="fas fa-crop-alt"></i>
+                قص الصورة الشخصية
+            </div>
+            <div class="cropper-container-wrap">
+                <img id="cropperImage" src="" alt="image to crop">
+            </div>
+            <div class="cropper-actions">
+                <button type="button" class="cropper-btn-cancel" id="btnCropCancel">
+                    <i class="fas fa-times"></i> إلغاء
+                </button>
+                <button type="button" class="cropper-btn-save" id="btnCropSave">
+                    <i class="fas fa-save"></i> حفظ الصورة
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="animated-bg" id="animatedBg"></div>
+    <div class="custom-cursor"></div>
+
+    <!-- Success Modal Overlay -->
+    <div class="success-overlay" id="successOverlay">
+        <div class="success-box">
+            <div class="success-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h3 id="successTitle" style="color: var(--light-color); margin-bottom: 12px;">تمت العملية بنجاح!</h3>
+            <p id="successDesc" style="color: rgba(237, 221, 189, 0.8); margin-bottom: 20px;">يتم الآن تحويلك إلى الصفحة
+                الرئيسية...</p>
+            <div class="spinner" style="display: block;"></div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <div class="auth-container">
+        <div class="auth-card">
+            <!-- Brand header -->
+            <div class="brand-section">
+                <div class="logo">
+                    <i class="fas fa-church"></i>
+                </div>
+                <h1 class="title">كنيسة القديسين بطرس وبولس</h1>
+                <p class="subtitle">شبين الكوم - بوابة الخدمات الإلكترونية</p>
+            </div>
+
+            <!-- Tabs switcher -->
+            <div class="auth-tabs">
+                <button class="auth-tab active" id="tabLogin">تسجيل الدخول</button>
+                <button class="auth-tab" id="tabRegister">حساب جديد</button>
+            </div>
+
+            <!-- Info / Terms box -->
+            <div class="terms-box" id="infoBox">
+                <div class="terms-title">
+                    <i class="fas fa-info-circle"></i>
+                    <span id="infoBoxTitle">بوابة الدخول الموحد</span>
+                </div>
+                <p style="margin: 0;" id="infoBoxText">سجل دخولك لتتمكن من التسجيل في القداسات، متابعة كورسات الكنيسة
+                    التعليمية، والوصول إلى كافة الخدمات التفاعلية.</p>
+            </div>
+
+            <!-- 1. LOGIN FORM -->
+            <form id="loginForm">
+                <div class="form-group">
+                    <label class="form-label" for="loginEmail">البريد الإلكتروني</label>
+                    <div class="input-group">
+                        <input type="email" id="loginEmail" class="form-control" placeholder="example@domain.com"
+                            required autocomplete="email">
+                        <div class="input-icon"><i class="fas fa-envelope"></i></div>
+                    </div>
+                    <span class="error-message" id="loginEmailError"></span>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="loginPassword">كلمة المرور</label>
+                    <div class="input-group password-container">
+                        <input type="password" id="loginPassword" class="form-control" placeholder="أدخل كلمة المرور"
+                            required autocomplete="current-password">
+                        <button type="button" class="toggle-password"
+                            onclick="togglePasswordVisibility('loginPassword', this)">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <div class="input-icon"><i class="fas fa-lock"></i></div>
+                    </div>
+                    <span class="error-message" id="loginPasswordError"></span>
+                </div>
+
+                <div class="form-group form-check d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <input type="checkbox" class="form-check-input" id="rememberMe" checked>
+                        <label class="form-check-label ms-1 text-light" style="font-size:13px; cursor:pointer;"
+                            for="rememberMe">تذكرني على هذا الجهاز</label>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn" id="loginSubmitBtn">
+                    <span class="btn-text">دخول</span>
+                    <div class="spinner"></div>
+                </button>
+            </form>
+
+            <!-- 2. REGISTRATION FORM (Initially Hidden) -->
+            <form id="registerForm" style="display: none;">
+
+                <!-- Avatar Upload (Optional, shown for all) -->
+                <div id="avatarUploadGroup">
+                    <span class="avatar-optional-badge">📷 صورة شخصية (اختيارية)</span>
+                    <div class="avatar-upload-zone" id="avatarDropzone" onclick="document.getElementById('avatarFileInput').click()">
+                        <i class="fas fa-camera upload-icon"></i>
+                        <span class="upload-text">اضغط لاختيار صورة</span>
+                    </div>
+                    <input type="file" id="avatarFileInput" accept="image/*" style="display:none;">
+                    <p style="font-size: 11px; color: rgba(237,221,189,0.5); margin: 0;">JPG أو PNG — حتى 5 ميجابايت</p>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        <label class="form-label" for="regFirstName">الاسم</label>
+                        <div class="input-group">
+                            <input type="text" id="regFirstName" class="form-control"
+                                placeholder="الاسم الشخصي باللغة العربية" required>
+                            <div class="input-icon"><i class="fas fa-user"></i></div>
+                        </div>
+                        <span class="error-message" id="regFirstNameError"></span>
+                    </div>
+
+                    <div class="col-md-6 form-group">
+                        <label class="form-label" for="regLastName">اسم الأب</label>
+                        <div class="input-group">
+                            <input type="text" id="regLastName" class="form-control"
+                                placeholder="اسم الأب بالكامل باللغة العربية" required>
+                            <div class="input-icon"><i class="fas fa-user"></i></div>
+                        </div>
+                        <span class="error-message" id="regLastNameError"></span>
+                    </div>
+                </div>
+
+                <div class="form-group" style="display: none;">
+                    <label class="form-label" for="regUsername">اسم المستخدم</label>
+                    <div class="input-group">
+                        <input type="text" id="regUsername" class="form-control" placeholder="username"
+                            value="auto_username">
+                        <div class="input-icon"><i class="fas fa-at"></i></div>
+                    </div>
+                    <span class="error-message" id="regUsernameError"></span>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="regEmail">البريد الإلكتروني</label>
+                    <div class="input-group">
+                        <input type="email" id="regEmail" class="form-control" placeholder="example@domain.com"
+                            required>
+                        <div class="input-icon"><i class="fas fa-envelope"></i></div>
+                    </div>
+                    <span class="error-message" id="regEmailError"></span>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="regPhone">رقم الهاتف المحمول</label>
+                    <div class="input-group">
+                        <input type="tel" id="regPhone" class="form-control" value="+20" required
+                            placeholder="+201XXXXXXXXX">
+                        <div class="input-icon"><i class="fas fa-phone"></i></div>
+                    </div>
+                    <span class="error-message" id="regPhoneError"></span>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        <label class="form-label" for="regDob">تاريخ الميلاد</label>
+                        <div class="input-group">
+                            <input type="date" id="regDob" class="form-control" required>
+                            <div class="input-icon"><i class="fas fa-calendar-alt"></i></div>
+                        </div>
+                        <span class="error-message" id="regDobError"></span>
+                    </div>
+
+                    <div class="col-md-6 form-group">
+                        <label class="form-label" for="regRole">الصفة في الخدمة</label>
+                        <div class="input-group">
+                            <select id="regRole" class="form-control" required
+                                style="padding-left: 30px; -webkit-appearance: none; -moz-appearance: none; appearance: none;">
+                                <option value="" disabled selected>اختر الصفة</option>
+                                <option value="اب كاهن">اب كاهن</option>
+                                <option value="امين خدمه">امين خدمه</option>
+                                <option value="خادم">خادم</option>
+                                <option value="مخدوم">مخدوم</option>
+                            </select>
+                            <div class="input-icon"><i class="fas fa-user-tag"></i></div>
+                        </div>
+                        <span class="error-message" id="regRoleError"></span>
+                    </div>
+                </div>
+
+                <!-- Sunday school class selection dropdown (Visible for مخدوم only) -->
+                <div class="form-group" id="classYearGroup" style="display: none; margin-bottom: 20px;">
+                    <label class="form-label" for="regClassYear">السنة الدراسية (الصف)</label>
+                    <div class="input-group">
+                        <select id="regClassYear" class="form-control"
+                            style="padding-left: 30px; -webkit-appearance: none; -moz-appearance: none; appearance: none;">
+                            <option value="" disabled selected>اختر السنة الدراسية</option>
+                            <option value="KG1">KG1</option>
+                            <option value="KG2">KG2</option>
+                            <option value="الأول الابتدائي">الأول الابتدائي</option>
+                            <option value="الثاني الابتدائي">الثاني الابتدائي</option>
+                            <option value="الثالث الابتدائي">الثالث الابتدائي</option>
+                            <option value="الرابع الابتدائي">الرابع الابتدائي</option>
+                            <option value="الخامس الابتدائي">الخامس الابتدائي</option>
+                            <option value="السادس الابتدائي">السادس الابتدائي</option>
+                            <option value="الأول الإعدادي">الأول الإعدادي</option>
+                            <option value="الثاني الإعدادي">الثاني الإعدادي</option>
+                            <option value="الثالث الإعدادي">الثالث الإعدادي</option>
+                            <option value="الأول الثانوي">الأول الثانوي</option>
+                            <option value="الثاني الثانوي">الثاني الثانوي</option>
+                            <option value="الثالث الثانوي">الثالث الثانوي</option>
+                        </select>
+                        <div class="input-icon"><i class="fas fa-graduation-cap"></i></div>
+                    </div>
+                    <span class="error-message" id="regClassYearError"></span>
+                </div>
+
+                <!-- Guardian Phone (Shown for مخدوم only) -->
+                <div class="form-group" id="parentPhoneGroup" style="display: none; margin-bottom: 20px;">
+                    <label class="form-label" for="regParentPhone">رقم تليفون ولي الأمر <span style="color:#ff6b6b;">*</span></label>
+                    <div class="input-group">
+                        <input type="tel" id="regParentPhone" class="form-control" value="+20" placeholder="+201XXXXXXXXX">
+                        <div class="input-icon"><i class="fas fa-phone-volume"></i></div>
+                    </div>
+                    <span class="error-message" id="regParentPhoneError"></span>
+                </div>
+
+                <!-- Home Address (Shown for مخدوم only) -->
+                <div class="form-group" id="addressGroup" style="display: none; margin-bottom: 20px;">
+                    <label class="form-label" for="regAddress">عنوان المنزل <span style="color:#ff6b6b;">*</span></label>
+                    <div class="input-group">
+                        <input type="text" id="regAddress" class="form-control" placeholder="مثال: شارع الجمهورية، شبين الكوم، المنوفية">
+                        <div class="input-icon"><i class="fas fa-map-marker-alt"></i></div>
+                    </div>
+                    <span class="error-message" id="regAddressError"></span>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="regPassword">كلمة المرور</label>
+                    <div class="input-group password-container">
+                        <input type="password" id="regPassword" class="form-control"
+                            placeholder="أدخل كلمة المرور (8 أحرف كحد أدنى)" required minlength="8">
+                        <button type="button" class="toggle-password"
+                            onclick="togglePasswordVisibility('regPassword', this)">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <div class="input-icon"><i class="fas fa-lock"></i></div>
+                    </div>
+
+                    <div class="password-strength" id="passwordStrength">
+                        <div class="strength-bar">
+                            <div class="strength-segment" id="strength1"></div>
+                            <div class="strength-segment" id="strength2"></div>
+                            <div class="strength-segment" id="strength3"></div>
+                            <div class="strength-segment" id="strength4"></div>
+                        </div>
+                        <div class="strength-info">
+                            <span id="strengthText">قوة كلمة المرور</span>
+                            <span id="strengthScore"></span>
+                        </div>
+                    </div>
+                    <span class="error-message" id="regPasswordError"></span>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="regConfirmPassword">تأكيد كلمة المرور</label>
+                    <div class="input-group password-container">
+                        <input type="password" id="regConfirmPassword" class="form-control"
+                            placeholder="أعد إدخال كلمة المرور" required>
+                        <button type="button" class="toggle-password"
+                            onclick="togglePasswordVisibility('regConfirmPassword', this)">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <div class="input-icon"><i class="fas fa-lock"></i></div>
+                    </div>
+                    <span class="error-message" id="regConfirmPasswordError"></span>
+                </div>
+
+                <button type="submit" class="submit-btn" id="regSubmitBtn">
+                    <span class="btn-text">إنشاء حساب</span>
+                    <div class="spinner"></div>
+                </button>
+            </form>
+
+            <div class="footer-link">
+                جميع الحقوق محفوظة &copy; <span id="currentYear"></span> | <a href="index.html">العودة للرئيسية</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Cropper.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
+
+    <!-- Supabase Client Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/supabase-service.js"></script>
+
+    <script>
+        // Set Current Year in Footer
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+        // Global check: redirect if already logged in (role-based routing)
+        window.addEventListener('DOMContentLoaded', async () => {
+            if (localStorage.getItem('isLoggedIn') === 'true') {
+                const role = localStorage.getItem('userRole') || '';
+                if (role === 'خادم' || role === 'امين خدمه') {
+                    window.location.href = "el5dma/control.html";
+                } else {
+                    window.location.href = "index.html";
+                }
+            }
+        });
+
+        // Toggle Password Visibility
+        function togglePasswordVisibility(inputId, btn) {
+            const input = document.getElementById(inputId);
+            const icon = btn.querySelector('i');
+            if (input.type === "password") {
+                input.type = "text";
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = "password";
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        // Custom Cursor Setup (Smooth Follow)
+        const cursor = document.querySelector('.custom-cursor');
+        let mouseX = 0, mouseY = 0;
+        let cursorX = 0, cursorY = 0;
+
+        if (window.innerWidth >= 992) {
+            document.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+            });
+
+            function animateCursor() {
+                cursorX += (mouseX - cursorX) * 0.15;
+                cursorY += (mouseY - cursorY) * 0.15;
+                cursor.style.left = cursorX + 'px';
+                cursor.style.top = cursorY + 'px';
+                requestAnimationFrame(animateCursor);
+            }
+            animateCursor();
+
+            // Hover interactions
+            document.querySelectorAll('input, button, a, .auth-tab').forEach(el => {
+                el.addEventListener('mouseenter', () => cursor.classList.add('hovered'));
+                el.addEventListener('mouseleave', () => cursor.classList.remove('hovered'));
+            });
+        }
+
+        // Particle System Background
+        function createParticles() {
+            const bg = document.getElementById('animatedBg');
+            const count = window.innerWidth < 768 ? 10 : 25;
+            for (let i = 0; i < count; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle';
+                const size = Math.random() * 5 + 2;
+                p.style.width = size + 'px';
+                p.style.height = size + 'px';
+                p.style.left = Math.random() * 100 + '%';
+                p.style.animationDuration = (Math.random() * 8 + 12) + 's';
+                p.style.animationDelay = (Math.random() * 5) + 's';
+                bg.appendChild(p);
+            }
+        }
+        createParticles();
+
+        // Toast Messages Helper
+        function showToast(message, type = 'error') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `custom-toast toast-${type}`;
+
+            let icon = 'fa-exclamation-triangle';
+            if (type === 'success') icon = 'fa-check-circle';
+            else if (type === 'warning') icon = 'fa-exclamation-circle';
+
+            toast.innerHTML = `
+                <i class="fas ${icon}" style="font-size:18px;"></i>
+                <span style="font-size:14px; font-weight:600;">${message}</span>
+            `;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.animation = 'slideIn 0.3s ease reverse forwards';
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        // Tab Switching Logic
+        const tabLogin = document.getElementById('tabLogin');
+        const tabRegister = document.getElementById('tabRegister');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const infoBoxTitle = document.getElementById('infoBoxTitle');
+        const infoBoxText = document.getElementById('infoBoxText');
+
+        tabLogin.addEventListener('click', () => {
+            tabLogin.classList.add('active');
+            tabRegister.classList.remove('active');
+            loginForm.style.display = 'block';
+            registerForm.style.display = 'none';
+            infoBoxTitle.textContent = "بوابة الدخول الموحد";
+            infoBoxText.textContent = "سجل دخولك لتتمكن من التسجيل في القداسات، متابعة كورسات الكنيسة التعليمية، والوصول إلى كافة الخدمات التفاعلية.";
+            clearValidationErrors();
+        });
+
+        tabRegister.addEventListener('click', () => {
+            tabRegister.classList.add('active');
+            tabLogin.classList.remove('active');
+            loginForm.style.display = 'none';
+            registerForm.style.display = 'block';
+            infoBoxTitle.textContent = "شروط تسجيل حساب جديد";
+            infoBoxText.innerHTML = `
+                <ul class="terms-list">
+                    <li>يجب كتابة الاسم باللغة العربية الفصحى فقط.</li>
+                    <li>رقم الهاتف يجب أن يكون رقم محمول مصري نشط (+20).</li>
+                    <li>اسم المستخدم يجب أن يكون فريداً وبالأحرف الإنجليزية.</li>
+                    <li>كلمة المرور يجب ألا تقل عن 8 رموز (تتضمن أرقام وحروف).</li>
+                </ul>
+            `;
+            clearValidationErrors();
+        });
+
+        // ===== TOP PROGRESS BAR =====
+        const topBar = document.getElementById('topProgressBar');
+        let topBarTimer = null;
+        function showTopProgress(pct = 30) {
+            topBar.style.width = pct + '%';
+            topBar.classList.add('active');
+        }
+        function finishTopProgress() {
+            topBar.style.width = '100%';
+            setTimeout(() => { topBar.classList.remove('active'); topBar.style.width = '0%'; }, 400);
+        }
+
+        // ===== UPLOAD PROGRESS =====
+        const uploadOverlay = document.getElementById('uploadProgressOverlay');
+        let uploadStartTime = 0;
+        function showUploadProgress(pct, filename = 'الملف') {
+            uploadOverlay.classList.add('show');
+            document.getElementById('uploadProgressLabel').textContent = `جاري رفع ${filename}...`;
+            document.getElementById('uploadProgressFill').style.width = pct + '%';
+            document.getElementById('uploadProgressPct').textContent = Math.round(pct) + '%';
+            if (uploadStartTime > 0) {
+                const elapsed = (Date.now() - uploadStartTime) / 1000;
+                const speed = pct > 0 ? Math.round((pct / 100 * 1) / elapsed * 1024) : 0;
+                document.getElementById('uploadProgressSpeed').textContent = speed > 0 ? speed + ' KB/s' : 'جاري الحساب...';
+            }
+        }
+        function hideUploadProgress() {
+            document.getElementById('uploadProgressFill').style.width = '100%';
+            document.getElementById('uploadProgressPct').textContent = '100%';
+            setTimeout(() => { uploadOverlay.classList.remove('show'); }, 800);
+        }
+
+        // ===== CLOUDINARY UPLOAD WITH PROGRESS =====
+        const CLOUDINARY_CLOUD = 'driqr3dec';
+        const CLOUDINARY_PRESET = 'church_preset';
+        async function uploadToCloudinary(blob, filename = 'image') {
+            return new Promise((resolve, reject) => {
+                uploadStartTime = Date.now();
+                const formData = new FormData();
+                formData.append('file', blob, filename);
+                formData.append('upload_preset', CLOUDINARY_PRESET);
+
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`);
+
+                xhr.upload.addEventListener('progress', (e) => {
+                    if (e.lengthComputable) {
+                        const pct = (e.loaded / e.total) * 100;
+                        showUploadProgress(pct, filename);
+                    }
+                });
+
+                xhr.onload = () => {
+                    if (xhr.status === 200) {
+                        const result = JSON.parse(xhr.responseText);
+                        hideUploadProgress();
+                        resolve(result.secure_url);
+                    } else {
+                        reject(new Error('فشل رفع الصورة إلى Cloudinary'));
+                    }
+                };
+
+                xhr.onerror = () => reject(new Error('خطأ في الاتصال بـ Cloudinary'));
+                xhr.send(formData);
+            });
+        }
+
+        // ===== CROPPER.JS LOGIC =====
+        let cropperInstance = null;
+        let croppedBlob = null;
+        const cropperModalEl = document.getElementById('cropperModalOverlay');
+        const cropperImg = document.getElementById('cropperImage');
+
+        document.getElementById('avatarFileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            if (file.size > 5 * 1024 * 1024) {
+                alert('حجم الصورة كبير جداً. يجب أن يكون أقل من 5 ميجابايت.');
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                cropperImg.src = ev.target.result;
+                cropperModalEl.classList.add('open');
+                if (cropperInstance) { cropperInstance.destroy(); cropperInstance = null; }
+                setTimeout(() => {
+                    cropperInstance = new Cropper(cropperImg, {
+                        aspectRatio: 1,
+                        viewMode: 2,
+                        dragMode: 'move',
+                        autoCropArea: 0.9,
+                        restore: false,
+                        guides: true,
+                        center: true,
+                        highlight: false,
+                        cropBoxMovable: true,
+                        cropBoxResizable: true,
+                        toggleDragModeOnDblclick: false,
+                    });
+                }, 100);
+            };
+            reader.readAsDataURL(file);
+            this.value = '';
+        });
+
+        document.getElementById('btnCropSave').addEventListener('click', () => {
+            if (!cropperInstance) return;
+            cropperInstance.getCroppedCanvas({ width: 400, height: 400 }).toBlob((blob) => {
+                croppedBlob = blob;
+                // Show preview in dropzone
+                const url = URL.createObjectURL(blob);
+                const dz = document.getElementById('avatarDropzone');
+                dz.innerHTML = `<img src="${url}" class="preview-img" alt="preview">`;
+                cropperModalEl.classList.remove('open');
+                cropperInstance.destroy();
+                cropperInstance = null;
+            }, 'image/jpeg', 0.9);
+        });
+
+        document.getElementById('btnCropCancel').addEventListener('click', () => {
+            cropperModalEl.classList.remove('open');
+            if (cropperInstance) { cropperInstance.destroy(); cropperInstance = null; }
+        });
+
+        // Error utilities
+        function showError(inputId, errorId, msg) {
+            const input = document.getElementById(inputId);
+            const err = document.getElementById(errorId);
+            input.classList.add('is-invalid');
+            err.textContent = msg;
+            err.classList.add('show');
+        }
+
+        function clearError(inputId, errorId) {
+            const input = document.getElementById(inputId);
+            const err = document.getElementById(errorId);
+            input.classList.remove('is-invalid');
+            err.textContent = '';
+            err.classList.remove('show');
+        }
+
+        function clearValidationErrors() {
+            document.querySelectorAll('.form-control').forEach(el => el.classList.remove('is-invalid'));
+            document.querySelectorAll('.error-message').forEach(el => {
+                el.textContent = '';
+                el.classList.remove('show');
+            });
+        }
+
+        // Live validations
+        const arabicNameRegex = /^[\u0600-\u06FF\s]+$/;
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const phoneRegex = /^\+201[0-2,5][0-9]{8}$/;
+
+        document.getElementById('regFirstName').addEventListener('input', function () {
+            if (!arabicNameRegex.test(this.value.trim())) {
+                showError('regFirstName', 'regFirstNameError', 'يجب أن يكون الاسم الأول باللغة العربية فقط.');
+            } else {
+                clearError('regFirstName', 'regFirstNameError');
+            }
+        });
+
+        document.getElementById('regLastName').addEventListener('input', function () {
+            if (!arabicNameRegex.test(this.value.trim())) {
+                showError('regLastName', 'regLastNameError', 'يجب أن يكون اسم العائلة باللغة العربية فقط.');
+            } else {
+                clearError('regLastName', 'regLastNameError');
+            }
+        });
+
+        document.getElementById('regEmail').addEventListener('input', function () {
+            if (!emailRegex.test(this.value.trim())) {
+                showError('regEmail', 'regEmailError', 'البريد الإلكتروني غير صحيح.');
+            } else {
+                clearError('regEmail', 'regEmailError');
+            }
+        });
+
+        const phoneInput = document.getElementById('regPhone');
+        phoneInput.addEventListener('input', function () {
+            if (!this.value.startsWith('+20')) {
+                this.value = '+20';
+            }
+            this.value = this.value.replace(/[^0-9+]/g, '');
+        });
+
+        // Password strength meter
+        const regPassword = document.getElementById('regPassword');
+        regPassword.addEventListener('input', function () {
+            const val = this.value;
+            let score = 0;
+            if (val.length >= 8) score++;
+            if (/[0-9]/.test(val)) score++;
+            if (/[a-zA-Z]/.test(val)) score++;
+            if (/[^a-zA-Z0-9]/.test(val)) score++;
+
+            const segments = ['strength1', 'strength2', 'strength3', 'strength4'];
+            const textEl = document.getElementById('strengthText');
+            const scoreEl = document.getElementById('strengthScore');
+
+            let color = 'rgba(255,255,255,0.1)';
+            let status = 'ضعيفة';
+            if (score === 1) { color = '#ff6b6b'; status = 'ضعيفة جداً'; }
+            else if (score === 2) { color = '#ff9e6b'; status = 'ضعيفة'; }
+            else if (score === 3) { color = '#ffd166'; status = 'جيدة'; }
+            else if (score === 4) { color = '#51cf66'; status = 'قوية جداً'; }
+
+            segments.forEach((segId, idx) => {
+                const seg = document.getElementById(segId);
+                if (idx < score) {
+                    seg.style.background = color;
+                    seg.style.boxShadow = `0 0 5px ${color}`;
+                } else {
+                    seg.style.background = 'rgba(255,255,255,0.1)';
+                    seg.style.boxShadow = 'none';
+                }
+            });
+
+            textEl.textContent = status;
+            textEl.style.color = score > 0 ? color : 'rgba(237,221,189,0.6)';
+            scoreEl.textContent = score > 0 ? `${score}/4` : '';
+            scoreEl.style.color = color;
+        });
+
+        // Handle Login Submission
+        document.getElementById('loginForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            const rememberMe = document.getElementById('rememberMe').checked;
+            const btn = document.getElementById('loginSubmitBtn');
+
+            // Visual loading state
+            btn.classList.add('loading');
+            btn.disabled = true;
+
+            try {
+                // Call Supabase Authentication
+                const loginResult = await authService.login(email, password, rememberMe);
+                const userRole = loginResult?.profile?.role || localStorage.getItem('userRole') || '';
+
+                // Show success modal overlay
+                document.getElementById('successTitle').textContent = "تم تسجيل الدخول بنجاح!";
+                document.getElementById('successDesc').textContent = "أهلاً بك مجدداً في موقع كنيستك. يتم توجيهك الآن...";
+                document.getElementById('successOverlay').classList.add('show');
+
+                // Role-based routing: servants go to service control panel
+                setTimeout(() => {
+                    if (userRole === 'خادم' || userRole === 'امين خدمه') {
+                        window.location.href = "el5dma/control.html";
+                    } else {
+                        window.location.href = "el5dma/index.html";
+                    }
+                }, 2000);
+
+            } catch (err) {
+                console.error("Login failure:", err);
+                showToast(err.message || "فشل تسجيل الدخول، تحقق من البريد الإلكتروني وكلمة المرور.", 'error');
+                btn.classList.remove('loading');
+                btn.disabled = false;
+            }
+        });
+
+        // Clear errors on change
+        document.getElementById('regDob').addEventListener('change', function () {
+            if (this.value) clearError('regDob', 'regDobError');
+        });
+        // Clear errors on change
+        document.getElementById('regDob').addEventListener('change', function () {
+            if (this.value) clearError('regDob', 'regDobError');
+        });
+        document.getElementById('regRole').addEventListener('change', function () {
+            if (this.value) clearError('regRole', 'regRoleError');
+
+            const classGroup = document.getElementById('classYearGroup');
+            const classSelect = document.getElementById('regClassYear');
+            const classLabel = document.querySelector('label[for="regClassYear"]');
+            const parentPhoneGroup = document.getElementById('parentPhoneGroup');
+            const addressGroup = document.getElementById('addressGroup');
+            const avatarGroup = document.getElementById('avatarUploadGroup');
+
+            if (this.value === 'مخدوم') {
+                classGroup.style.display = 'block';
+                classSelect.required = true;
+                // Show student-specific fields
+                parentPhoneGroup.style.display = 'block';
+                document.getElementById('regParentPhone').required = true;
+                addressGroup.style.display = 'block';
+                document.getElementById('regAddress').required = true;
+                avatarGroup.style.display = 'block';
+                if (classLabel) classLabel.textContent = 'السنة الدراسية (الصف)';
+
+                classSelect.innerHTML = `
+                    <option value="" disabled selected>اختر السنة الدراسية</option>
+                    <option value="KG1">KG1</option>
+                    <option value="KG2">KG2</option>
+                    <option value="الأول الابتدائي">الأول الابتدائي</option>
+                    <option value="الثاني الابتدائي">الثاني الابتدائي</option>
+                    <option value="الثالث الابتدائي">الثالث الابتدائي</option>
+                    <option value="الرابع الابتدائي">الرابع الابتدائي</option>
+                    <option value="الخامس الابتدائي">الخامس الابتدائي</option>
+                    <option value="السادس الابتدائي">السادس الابتدائي</option>
+                    <option value="الأول الإعدادي">الأول الإعدادي</option>
+                    <option value="الثاني الإعدادي">الثاني الإعدادي</option>
+                    <option value="الثالث الإعدادي">الثالث الإعدادي</option>
+                    <option value="الأول الثانوي">الأول الثانوي</option>
+                    <option value="الثاني الثانوي">الثاني الثانوي</option>
+                    <option value="الثالث الثانوي">الثالث الثانوي</option>
+                `;
+            } else if (this.value === 'خادم' || this.value === 'امين خدمه') {
+                classGroup.style.display = 'block';
+                classSelect.required = true;
+                // Hide student-specific fields
+                parentPhoneGroup.style.display = 'none';
+                document.getElementById('regParentPhone').required = false;
+                addressGroup.style.display = 'none';
+                document.getElementById('regAddress').required = false;
+                avatarGroup.style.display = 'block';
+                if (classLabel) classLabel.textContent = 'فصل الخدمة المسؤول عنه';
+
+                classSelect.innerHTML = `
+                    <option value="" disabled selected>اختر فصل الخدمة</option>
+                    <option value="KG1 و KG2">KG1 و KG2</option>
+                    <option value="الأول والثاني الابتدائي">الأول والثاني الابتدائي</option>
+                    <option value="الثالث والرابع الابتدائي">الثالث والرابع الابتدائي</option>
+                    <option value="الخامس والسادس الابتدائي">الخامس والسادس الابتدائي</option>
+                    <option value="الأول الإعدادي">الأول الإعدادي</option>
+                    <option value="الثاني الإعدادي">الثاني الإعدادي</option>
+                    <option value="الثالث الإعدادي">الثالث الإعدادي</option>
+                    <option value="الأول والثاني والثالث الثانوي">الأول والثاني والثالث الثانوي</option>
+                `;
+            } else {
+                classGroup.style.display = 'none';
+                classSelect.required = false;
+                classSelect.value = '';
+                clearError('regClassYear', 'regClassYearError');
+                parentPhoneGroup.style.display = 'none';
+                document.getElementById('regParentPhone').required = false;
+                addressGroup.style.display = 'none';
+                document.getElementById('regAddress').required = false;
+                avatarGroup.style.display = 'none';
+            }
+        });
+        document.getElementById('regClassYear').addEventListener('change', function () {
+            if (this.value) clearError('regClassYear', 'regClassYearError');
+        });
+
+        // Handle Register Submission
+        // Parent phone input validation
+        const parentPhoneInput = document.getElementById('regParentPhone');
+        parentPhoneInput.addEventListener('input', function() {
+            if (!this.value.startsWith('+20')) this.value = '+20';
+            this.value = this.value.replace(/[^0-9+]/g, '');
+        });
+
+        document.getElementById('registerForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const firstName = document.getElementById('regFirstName').value.trim();
+            const lastName = document.getElementById('regLastName').value.trim();
+            const email = document.getElementById('regEmail').value.trim();
+            const phone = document.getElementById('regPhone').value.trim();
+            const dob = document.getElementById('regDob').value;
+            const role = document.getElementById('regRole').value;
+            const parentPhone = document.getElementById('regParentPhone').value.trim();
+            const address = document.getElementById('regAddress').value.trim();
+            // For servants/coordinators: class_year = their assigned service class group
+            // For students (مخدوم): class_year = their individual school grade
+            const classYear = (role === 'مخدوم' || role === 'خادم' || role === 'امين خدمه')
+                ? (document.getElementById('regClassYear').value || null)
+                : null;
+            const password = document.getElementById('regPassword').value;
+            const confirmPassword = document.getElementById('regConfirmPassword').value;
+            const btn = document.getElementById('regSubmitBtn');
+
+            // Generate username automatically from email prefix
+            const username = email.split('@')[0];
+
+            // Perform manual validations before submission
+            let isValid = true;
+            if (!arabicNameRegex.test(firstName)) {
+                showError('regFirstName', 'regFirstNameError', 'يجب أن يكون الاسم باللغة العربية فقط.');
+                isValid = false;
+            }
+            if (!arabicNameRegex.test(lastName)) {
+                showError('regLastName', 'regLastNameError', 'يجب أن يكون اسم الأب باللغة العربية فقط.');
+                isValid = false;
+            }
+            if (!emailRegex.test(email)) {
+                showError('regEmail', 'regEmailError', 'البريد الإلكتروني غير صحيح.');
+                isValid = false;
+            }
+            if (!phoneRegex.test(phone)) {
+                showError('regPhone', 'regPhoneError', 'رقم الهاتف المصري غير صحيح (+201XXXXXXXXX).');
+                isValid = false;
+            }
+            if (!dob) {
+                showError('regDob', 'regDobError', 'يرجى اختيار تاريخ الميلاد.');
+                isValid = false;
+            }
+            if (!role) {
+                showError('regRole', 'regRoleError', 'يرجى اختيار الصفة في الخدمة.');
+                isValid = false;
+            }
+            if (role === 'مخدوم') {
+                if (!parentPhone) {
+                    showError('regParentPhone', 'regParentPhoneError', 'رقم تليفون ولي الأمر مطلوب للمخدوم.');
+                    isValid = false;
+                } else if (!phoneRegex.test(parentPhone)) {
+                    showError('regParentPhone', 'regParentPhoneError', 'رقم تليفون ولي الأمر غير صحيح (+201XXXXXXXXX).');
+                    isValid = false;
+                }
+                if (!address) {
+                    showError('regAddress', 'regAddressError', 'عنوان المنزل مطلوب للمخدوم.');
+                    isValid = false;
+                }
+            }
+            if ((role === 'مخدوم' || role === 'خادم' || role === 'امين خدمه') && !classYear) {
+                showError('regClassYear', 'regClassYearError',
+                    role === 'مخدوم' ? 'يرجى اختيار السنة الدراسية.' : 'يرجى اختيار فصل الخدمة المسؤول عنه.');
+                isValid = false;
+            }
+
+            // Age restrictions:
+            let age = 20;
+            if (dob) {
+                const dobDate = new Date(dob);
+                const today = new Date();
+                age = today.getFullYear() - dobDate.getFullYear();
+                const m = today.getMonth() - dobDate.getMonth();
+                if (m < 0 || (m === 0 && today.getDate() < dobDate.getDate())) {
+                    age--;
+                }
+            }
+
+            // 1. Servant/Leader/Priest must be > 18
+            if (age <= 18 && (role === 'اب كاهن' || role === 'امين خدمه' || role === 'خادم')) {
+                showToast("⚠️ عذراً، يجب أن يكون عمر الخادم / أمين الخدمة / الأب الكاهن أكبر من 18 سنة لتسجيل الحساب.", 'error');
+                isValid = false;
+            }
+
+            // 2. Makhdoum must be < 19
+            if (age >= 19 && role === 'مخدوم') {
+                showToast("⚠️ عذراً، يجب أن يكون عمر المخدوم أقل من 19 سنة لتسجيل الحساب.", 'error');
+                isValid = false;
+            }
+
+            if (password.length < 8) {
+                showError('regPassword', 'regPasswordError', 'يجب ألا تقل كلمة المرور عن 8 رموز.');
+                isValid = false;
+            }
+            if (password !== confirmPassword) {
+                showError('regConfirmPassword', 'regConfirmPasswordError', 'كلمات المرور غير متطابقة.');
+                isValid = false;
+            }
+
+            if (!isValid) {
+                return;
+            }
+
+            // Visual loading state
+            btn.classList.add('loading');
+            btn.disabled = true;
+
+            try {
+                let avatarUrl = null;
+                if (croppedBlob) {
+                    try {
+                        avatarUrl = await uploadToCloudinary(croppedBlob, `avatar_${username || Date.now()}`);
+                    } catch (uploadErr) {
+                        console.error("Cloudinary upload failed:", uploadErr);
+                        showToast("⚠️ فشل رفع الصورة الشخصية. جاري التسجيل بدون صورة...", "warning");
+                    }
+                }
+
+                // Call Supabase registration API
+                const registerResult = await authService.register(
+                    email, 
+                    password, 
+                    firstName, 
+                    lastName, 
+                    username, 
+                    phone, 
+                    role, 
+                    dob, 
+                    classYear,
+                    role === 'مخدوم' ? parentPhone : null,
+                    role === 'مخدوم' ? address : null,
+                    avatarUrl
+                );
+
+                // Show success modal overlay
+                document.getElementById('successTitle').textContent = "تم إنشاء الحساب بنجاح!";
+                document.getElementById('successDesc').textContent = "تم تسجيل بياناتك وتفعيل حسابك بنجاح. يتم تحويلك الآن للرئيسية...";
+                document.getElementById('successOverlay').classList.add('show');
+
+                // Automatically log in the user after signup with role-based routing
+                setTimeout(async () => {
+                    try {
+                        const signupLoginResult = await authService.login(email, password, true);
+                        const newUserRole = signupLoginResult?.profile?.role || role;
+                        if (newUserRole === 'خادم' || newUserRole === 'امين خدمه') {
+                            window.location.href = "el5dma/control.html";
+                        } else {
+                            window.location.href = "el5dma/index.html";
+                        }
+                    } catch (e) {
+                        // fallback based on selected role in form
+                        if (role === 'خادم' || role === 'امين خدمه') {
+                            window.location.href = "el5dma/control.html";
+                        } else {
+                            window.location.href = "el5dma/index.html";
+                        }
+                    }
+                }, 2500);
+
+            } catch (err) {
+                console.error("Registration failure:", err);
+                let errorMsg = err.message || "فشل تسجيل الحساب. قد يكون البريد الإلكتروني مسجلاً مسبقاً.";
+                if (errorMsg.includes("profiles_phone_unique") || errorMsg.includes("idx_profiles_phone_unique") || (errorMsg.toLowerCase().includes("unique constraint") && errorMsg.toLowerCase().includes("phone"))) {
+                    errorMsg = "رقم الهاتف هذا مسجل بالفعل لمستخدم آخر.";
+                }
+                showToast(errorMsg, 'error');
+                btn.classList.remove('loading');
+                btn.disabled = false;
+            }
+        });
+        // Check URL error params (blocked/suspended redirects)
+        window.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            const errorType = params.get('error');
+            if (errorType === 'blocked') {
+                showBlockedScreen(
+                    '🚫 تم حظر حسابك نهائياً',
+                    'تم حظر حسابك نهائياً من قِبَل إدارة الكنيسة. لن تتمكن من الدخول للموقع. إذا كنت تعتقد أن هذا خطأ، يرجى التواصل مع الإدارة عبر الواتساب.',
+                    true
+                );
+            } else if (errorType === 'suspended') {
+                showBlockedScreen(
+                    '⚠️ تم إيقاف حسابك مؤقتاً',
+                    'تم إيقاف حسابك مؤقتاً من قِبَل إدارة الكنيسة. يرجى التواصل مع الإدارة لمعرفة السبب وإعادة تفعيل حسابك.',
+                    false
+                );
+            }
+        });
+
+        function showBlockedScreen(title, message, isPermanent) {
+            // Create overlay
+            const overlay = document.createElement('div');
+            overlay.id = 'blockedOverlay';
+            overlay.style.cssText = `
+                position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+                background: rgba(1, 51, 70, 0.98); backdrop-filter: blur(20px);
+                z-index: 999999; display: flex; justify-content: center; align-items: center;
+                animation: fadeIn 0.5s ease forwards;
+            `;
+
+            const iconColor = isPermanent ? '#d63af9' : '#ff9e6b';
+            const iconClass = isPermanent ? 'fa-ban' : 'fa-pause-circle';
+            const borderColor = isPermanent ? 'rgba(214,58,249,0.4)' : 'rgba(255,158,107,0.4)';
+            const whatsappText = encodeURIComponent(`سلام ونعمة، لقد تم ${isPermanent ? 'حظر' : 'إيقاف'} حسابي في موقع كنيسة القديسين بطرس وبولس. يرجى المساعدة في إعادة تفعيله.`);
+
+            overlay.innerHTML = `
+                <div style="
+                    background: linear-gradient(135deg, rgba(1,51,70,0.98), rgba(0,30,45,0.98));
+                    border: 2px solid ${borderColor};
+                    border-radius: 24px;
+                    padding: 50px 40px;
+                    max-width: 480px;
+                    width: 90%;
+                    text-align: center;
+                    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+                    position: relative;
+                ">
+                    <div style="
+                        width: 90px; height: 90px;
+                        background: ${isPermanent ? 'linear-gradient(135deg,#8b00b3,#d63af9)' : 'linear-gradient(135deg,#c25a00,#ff9e6b)'};
+                        border-radius: 50%;
+                        display: inline-flex;
+                        align-items: center;
+                        justify-content: center;
+                        margin-bottom: 25px;
+                        box-shadow: 0 8px 30px ${iconColor}55;
+                        animation: pulse 2s ease-in-out infinite;
+                    ">
+                        <i class="fas ${iconClass}" style="font-size: 40px; color: white;"></i>
+                    </div>
+                    <h2 style="font-family:'Cairo',sans-serif; font-weight:900; font-size:26px; color:${iconColor}; margin-bottom:15px;">${title}</h2>
+                    <p style="font-family:'Cairo',sans-serif; font-size:15px; color:rgba(237,221,189,0.85); line-height:1.8; margin-bottom:30px;">${message}</p>
+                    <a href="https://wa.me/201275916745?text=${whatsappText}" target="_blank" style="
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 10px;
+                        background: #25d366;
+                        color: white;
+                        padding: 14px 28px;
+                        border-radius: 12px;
+                        text-decoration: none;
+                        font-family: 'Cairo', sans-serif;
+                        font-weight: 700;
+                        font-size: 16px;
+                        box-shadow: 0 5px 15px rgba(37,211,102,0.3);
+                        transition: all 0.3s ease;
+                        margin-bottom: 15px;
+                        width: 100%;
+                        justify-content: center;
+                    " onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                        <i class="fab fa-whatsapp" style="font-size:22px;"></i>
+                        تواصل مع الإدارة عبر الواتساب
+                    </a>
+                    <br>
+                    <button onclick="document.getElementById('blockedOverlay').remove(); window.history.replaceState({}, document.title, window.location.pathname);" style="
+                        background: rgba(237,221,189,0.1);
+                        border: 1px solid rgba(237,221,189,0.2);
+                        color: rgba(237,221,189,0.6);
+                        padding: 10px 25px;
+                        border-radius: 10px;
+                        font-family: 'Cairo', sans-serif;
+                        font-size: 13px;
+                        cursor: pointer;
+                        margin-top: 10px;
+                        transition: all 0.2s ease;
+                    " onmouseover="this.style.background='rgba(237,221,189,0.15)'" onmouseout="this.style.background='rgba(237,221,189,0.1)'">
+                        إغلاق هذه الرسالة
+                    </button>
+                </div>
+                <style>
+                    @keyframes pulse {
+                        0%,100% { box-shadow: 0 8px 30px ${iconColor}55; }
+                        50% { box-shadow: 0 8px 50px ${iconColor}99; }
+                    }
+                    @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+                </style>
+            `;
+            document.body.appendChild(overlay);
+        }
+    </script>
+</body>
+
+</html>

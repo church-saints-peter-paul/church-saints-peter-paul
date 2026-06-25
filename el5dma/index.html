@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="بوابة الخدمات الإلكترونية وتوجيه المستخدمين لنظام الخدمة والتحكم بكنيسة القديسين بطرس وبولس.">
+    <title>بوابة الخدمة - كنيسة القديسين بطرس وبولس</title>
+    
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-color: #800000;
+            --secondary-color: #d4a017;
+            --light-color: #EDDDBD;
+            --dark-color: #013346;
+            --gradient-bg: linear-gradient(135deg, #012230 0%, #013346 50%, #024a63 100%);
+            --glass-bg: rgba(1, 51, 70, 0.7);
+            --glass-border: rgba(212, 160, 23, 0.25);
+            --text-color: #edf5f7;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: var(--gradient-bg);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            direction: rtl;
+        }
+
+        /* Ambient Background Elements */
+        .ambient-glow {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(212, 160, 23, 0.15) 0%, transparent 70%);
+            filter: blur(40px);
+            z-index: 1;
+            animation: floatGlow 10s ease-in-out infinite alternate;
+        }
+
+        .glow-1 { top: 10%; right: 10%; }
+        .glow-2 { bottom: 10%; left: 10%; animation-delay: -5s; }
+
+        @keyframes floatGlow {
+            0% { transform: translateY(0) scale(1); }
+            100% { transform: translateY(20px) scale(1.1); }
+        }
+
+        /* Glassmorphic Portal Card */
+        .portal-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 40px 30px;
+            width: 90%;
+            max-width: 450px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+            z-index: 10;
+            position: relative;
+            transform: translateY(0);
+            animation: cardLoad 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes cardLoad {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Brand Icon / Logo */
+        .brand-logo {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary-color), #a00000);
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 25px rgba(128, 0, 0, 0.4), 0 0 0 4px rgba(212, 160, 23, 0.2);
+            position: relative;
+        }
+
+        .brand-logo i {
+            font-size: 36px;
+            color: #fff;
+            animation: pulseIcon 2s infinite alternate;
+        }
+
+        @keyframes pulseIcon {
+            0% { transform: scale(1); filter: drop-shadow(0 0 2px rgba(255,255,255,0.5)); }
+            100% { transform: scale(1.05); filter: drop-shadow(0 0 10px rgba(212, 160, 23, 0.8)); }
+        }
+
+        /* Typography */
+        h1 {
+            font-size: 24px;
+            font-weight: 900;
+            color: var(--secondary-color);
+            margin-bottom: 10px;
+            letter-spacing: 0.5px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        p {
+            font-size: 14px;
+            color: rgba(237, 245, 247, 0.8);
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        /* Gilded Progress Spinner */
+        .spinner-container {
+            position: relative;
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 25px;
+        }
+
+        .spinner-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 4px solid rgba(212, 160, 23, 0.1);
+            border-top: 4px solid var(--secondary-color);
+            border-radius: 50%;
+            animation: spinRing 1s linear infinite;
+        }
+
+        @keyframes spinRing {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Fallback Link / Manual Action */
+        .fallback-btn {
+            display: none;
+            text-decoration: none;
+            background: linear-gradient(135deg, var(--primary-color), #a00000);
+            color: #fff;
+            padding: 12px 25px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 14px;
+            box-shadow: 0 4px 15px rgba(128, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            margin-top: 15px;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .fallback-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(128, 0, 0, 0.4);
+            background: linear-gradient(135deg, #a00000, #c00000);
+        }
+
+        /* Footer */
+        .portal-footer {
+            margin-top: 25px;
+            font-size: 12px;
+            color: rgba(237, 245, 247, 0.4);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
+
+    <main class="portal-card" id="router-container">
+        <!-- Logo -->
+        <div class="brand-logo">
+            <i class="fas fa-church"></i>
+        </div>
+
+        <!-- Heading -->
+        <h1 id="router-heading">بوابة الخدمة الإلكترونية</h1>
+        
+        <!-- Status Message -->
+        <p id="router-status-msg">جاري التحقق من الهوية وصلاحيات الوصول وتوجيهك إلى لوحة التحكم المناسبة...</p>
+
+        <!-- Premium Spinner -->
+        <div class="spinner-container" id="router-spinner">
+            <div class="spinner-ring"></div>
+        </div>
+
+        <!-- Fallback Action Button -->
+        <a href="../login.html" class="fallback-btn" id="router-fallback-btn">
+            <i class="fas fa-sign-in-alt"></i> الانتقال لصفحة تسجيل الدخول
+        </a>
+
+        <!-- Footer -->
+        <div class="portal-footer">
+            كنيسة القديسين بطرس وبولس &copy; <span id="currentYear"></span>
+        </div>
+    </main>
+
+    <!-- Supabase Core & Custom Services -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../js/supabase-config.js"></script>
+    <script src="../js/supabase-service.js"></script>
+
+    <script>
+        // Set year
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+        // Safe routing execution
+        async function runRouter() {
+            const statusMsg = document.getElementById('router-status-msg');
+            const fallbackBtn = document.getElementById('router-fallback-btn');
+            const spinner = document.getElementById('router-spinner');
+
+            try {
+                // Ensure authService is initialized
+                if (typeof authService === 'undefined' || !supabaseClient) {
+                    throw new Error("Supabase client or services failed to load correctly.");
+                }
+
+                // Verify session & role
+                const result = await authService.checkAuth();
+                
+                if (!result || !result.session) {
+                    statusMsg.textContent = "لم يتم العثور على جلسة تسجيل دخول نشطة. جاري تحويلك لصفحة الدخول...";
+                    setTimeout(() => {
+                        window.location.replace("../login.html");
+                    }, 1200);
+                    return;
+                }
+
+                const role = result.profile.role;
+                const name = result.profile.full_name.split(' ')[0] || "يا صديقي";
+
+                if (role === 'مخدوم') {
+                    statusMsg.innerHTML = `أهلاً بك يا <strong>${name}</strong>. جاري فتح بوابة المخدومين الخاصة بك...`;
+                    setTimeout(() => {
+                        window.location.replace("elkhedma.html");
+                    }, 1000);
+                } else if (role === 'خادم' || role === 'امين خدمه') {
+                    statusMsg.innerHTML = `مرحباً يا خادم المسيح <strong>${name}</strong>. جاري تحميل لوحة التحكم الخاصة بالخدمة...`;
+                    setTimeout(() => {
+                        window.location.replace("control.html");
+                    }, 1000);
+                } else if (role === 'اب كاهن') {
+                    statusMsg.innerHTML = `قدس أبونا <strong>${name}</strong>، سلام ونعمة. جاري تحويلك للوحة التحكم الإدارية...`;
+                    setTimeout(() => {
+                        window.location.replace("../login-system/admin.html");
+                    }, 1000);
+                } else {
+                    // fallback to main site
+                    statusMsg.textContent = `مرحباً بك يا ${name}. جاري توجيهك للموقع الرئيسي...`;
+                    setTimeout(() => {
+                        window.location.replace("../index.html");
+                    }, 1200);
+                }
+
+            } catch (err) {
+                console.error("Router error:", err);
+                statusMsg.textContent = "حدث خطأ غير متوقع أثناء التحقق من الصلاحيات. يرجى تسجيل الدخول يدوياً.";
+                statusMsg.style.color = "#ff6b6b";
+                if (spinner) spinner.style.display = 'none';
+                if (fallbackBtn) {
+                    fallbackBtn.style.display = 'inline-flex';
+                }
+            }
+        }
+
+        // Trigger on load
+        window.addEventListener('load', runRouter);
+    </script>
+</body>
+</html>

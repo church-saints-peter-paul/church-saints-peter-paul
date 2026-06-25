@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الصف الدراسي</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #800000;
+            --secondary: #d4a017;
+            --accent: #007bff;
+            --light: #f8f9fa;
+            --dark: #013346;
+            --white: #ffffff;
+            --gray: #6c757d;
+            --success: #28a745;
+            --shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(135deg, #efdfbf 0%, #f5e6c7 25%, #e8d5b7 50%, #f2e1c1 75%, #efdfbf 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            direction: rtl;
+            color: var(--dark);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Floating Particles */
+        .particles-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .floating-particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: linear-gradient(45deg, var(--secondary), var(--primary));
+            border-radius: 50%;
+            opacity: 0.7;
+            animation: float 15s linear infinite;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.7;
+            }
+            90% {
+                opacity: 0.7;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Navbar */
+        .navbar {
+            background: linear-gradient(135deg, var(--primary), #a00000, var(--primary));
+            background-size: 200% 200%;
+            animation: gradientMove 8s ease infinite;
+            color: var(--white);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            font-size: 22px;
+            font-weight: 900;
+            box-shadow: var(--shadow);
+            border-bottom: 2px solid rgba(212, 160, 23, 0.3);
+            position: relative;
+            z-index: 10;
+            overflow: hidden;
+        }
+
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .navbar .title {
+            flex-grow: 1;
+            text-align: center;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .navbar .home-button {
+            background: linear-gradient(45deg, var(--accent), #0056b3);
+            color: var(--white);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 700;
+            transition: var(--transition);
+            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .navbar .home-button:hover {
+            background: linear-gradient(45deg, #0056b3, #004085);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 123, 255, 0.4);
+        }
+
+        /* Main Container */
+        .main-container {
+            padding: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 5;
+        }
+
+        /* Welcome Section */
+        .welcome-section {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(212, 160, 23, 0.2);
+            animation: containerFloat 6s ease-in-out infinite;
+        }
+
+        @keyframes containerFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .welcome-section h1 {
+            color: var(--primary);
+            font-size: 32px;
+            margin-bottom: 10px;
+            font-weight: 900;
+            text-shadow: 2px 2px 4px rgba(128, 0, 0, 0.2);
+        }
+
+        .welcome-section p {
+            font-size: 18px;
+            color: var(--gray);
+            margin-bottom: 20px;
+        }
+
+        .progress-container {
+            background: rgba(128, 0, 0, 0.1);
+            border-radius: 10px;
+            height: 12px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            width: 65%;
+            border-radius: 10px;
+            transition: width 1s ease;
+        }
+
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            color: var(--gray);
+        }
+
+        /* Courses Grid */
+        .courses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .course-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            border: 1px solid rgba(212, 160, 23, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .course-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .course-header {
+            background: linear-gradient(135deg, var(--primary), #a00000);
+            color: var(--white);
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .course-icon {
+            font-size: 28px;
+            background: rgba(255, 255, 255, 0.2);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .course-title {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .course-description {
+            padding: 15px 20px;
+            font-size: 15px;
+            color: var(--gray);
+            line-height: 1.5;
+        }
+
+        .course-stats {
+            display: flex;
+            justify-content: space-between;
+            padding: 0 20px 15px;
+            font-size: 14px;
+            color: var(--gray);
+        }
+
+        .course-action {
+            padding: 0 20px 20px;
+        }
+
+        .view-course-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(45deg, var(--accent), #0056b3);
+            color: var(--white);
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .view-course-btn:hover {
+            background: linear-gradient(45deg, #0056b3, #004085);
+            transform: translateY(-2px);
+        }
+
+        /* Course Content Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: var(--white);
+            border-radius: 15px;
+            width: 100%;
+            max-width: 900px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            animation: modalAppear 0.3s ease;
+        }
+
+        @keyframes modalAppear {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary), #a00000);
+            color: var(--white);
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 15px 15px 0 0;
+        }
+
+        .modal-title {
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            color: var(--white);
+            font-size: 24px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .close-modal:hover {
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .video-container {
+            position: relative;
+            width: 100%;
+            height: 0;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio */
+            margin-bottom: 20px;
+            background: #000;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .lesson-list {
+            list-style: none;
+        }
+
+        .lesson-item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .lesson-item:hover {
+            background: #f9f9f9;
+        }
+
+        .lesson-item:last-child {
+            border-bottom: none;
+        }
+
+        .lesson-icon {
+            font-size: 20px;
+            color: var(--primary);
+        }
+
+        .lesson-info {
+            flex: 1;
+        }
+
+        .lesson-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .lesson-duration {
+            font-size: 14px;
+            color: var(--gray);
+        }
+
+        .lesson-status {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .lesson-status.completed {
+            background: var(--success);
+            border-color: var(--success);
+            color: var(--white);
+        }
+
+        /* Resources Section */
+        .resources-section {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(212, 160, 23, 0.2);
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            color: var(--primary);
+            font-size: 24px;
+            margin-bottom: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .resources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .resource-card {
+            background: var(--white);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+        }
+
+        .resource-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .resource-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 20px;
+        }
+
+        .resource-info h3 {
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .resource-info p {
+            font-size: 14px;
+            color: var(--gray);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: var(--gray);
+            font-size: 14px;
+            border-top: 1px solid rgba(212, 160, 23, 0.2);
+            margin-top: 40px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 15px 20px;
+                font-size: 18px;
+            }
+            
+            .navbar .home-button {
+                padding: 8px 15px;
+                font-size: 14px;
+            }
+            
+            .main-container {
+                padding: 20px;
+            }
+            
+            .welcome-section h1 {
+                font-size: 26px;
+            }
+            
+            .courses-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .resources-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal-content {
+                margin: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .navbar {
+                flex-direction: column;
+                gap: 15px;
+                padding: 15px;
+            }
+            
+            .welcome-section {
+                padding: 20px;
+            }
+            
+            .course-header {
+                flex-direction: column;
+                text-align: center;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating Particles -->
+    <div class="particles-container" id="particlesContainer"></div>
+
+    <!-- Navbar -->
+    <div class="navbar">
+        <button class="home-button" onclick="goToHome()">
+            <i class="fas fa-home"></i> الرئيسية
+        </button>
+        <div class="title">مرحبًا، <span id="studentName">الطالب</span>!</div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <!-- Welcome Section -->
+        <section class="welcome-section">
+            <h1>أهلاً بك في الفصل الدراسي</h1>
+            <p>استمر في رحلة التعلم الخاصة بك واستكشف الكورسات المتاحة</p>
+            
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            <div class="progress-text">
+                <span>تقدمك في الكورسات</span>
+                <span id="progressPercent">65%</span>
+            </div>
+        </section>
+
+        <!-- Courses Grid -->
+        <section class="courses-section">
+            <h2 class="section-title"><i class="fas fa-book-open"></i> الكورسات المتاحة</h2>
+            
+            <div class="courses-grid">
+                <!-- Course 1 Card -->
+                <div class="course-card">
+                    <div class="course-header">
+                        <div class="course-icon"><i class="fas fa-book"></i></div>
+                        <div>
+                            <div class="course-title">دراسات كتابية</div>
+                        </div>
+                    </div>
+                    <div class="course-description">
+                        تعلم أساسيات الدراسات الكتابية وتفسير النبوات والرسائل.
+                    </div>
+                    <div class="course-stats">
+                        <span>عدد الدروس: 3</span>
+                        <span>مدة الكورس: 2 ساعة</span>
+                    </div>
+                    <div class="course-action">
+                        <button class="view-course-btn" onclick="document.getElementById('course1Modal').style.display='flex'">
+                            <i class="fas fa-eye"></i> عرض الكورس
+                        </button>
+                    </div>
+                </div>
+                <!-- Course 2 Card -->
+                <div class="course-card">
+                    <div class="course-header">
+                        <div class="course-icon"><i class="fas fa-pray"></i></div>
+                        <div>
+                            <div class="course-title">أساسيات الصلاة</div>
+                        </div>
+                    </div>
+                    <div class="course-description">
+                        تعرف على أنواع الصلاة وأهميتها وكيفية تطوير حياة الصلاة.
+                    </div>
+                    <div class="course-stats">
+                        <span>عدد الدروس: 3</span>
+                        <span>مدة الكورس: 2 ساعة</span>
+                    </div>
+                    <div class="course-action">
+                        <button class="view-course-btn" onclick="document.getElementById('course2Modal').style.display='flex'">
+                            <i class="fas fa-eye"></i> عرض الكورس
+                        </button>
+                    </div>
+                </div>
+                <!-- Course 3 Card -->
+                <div class="course-card">
+                    <div class="course-header">
+                        <div class="course-icon"><i class="fas fa-heart"></i></div>
+                        <div>
+                            <div class="course-title">حياة القداسة</div>
+                        </div>
+                    </div>
+                    <div class="course-description">
+                        اكتشف معنى القداسة وكيف تعيش حياة مقدسة في العصر الحديث.
+                    </div>
+                    <div class="course-stats">
+                        <span>عدد الدروس: 3</span>
+                        <span>مدة الكورس: 2 ساعة</span>
+                    </div>
+                    <div class="course-action">
+                        <button class="view-course-btn" onclick="document.getElementById('course3Modal').style.display='flex'">
+                            <i class="fas fa-eye"></i> عرض الكورس
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+<!-- Course 1 Modal -->
+<div class="modal" id="course1Modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">دراسات كتابية</h3>
+            <button class="close-modal" onclick="document.getElementById('course1Modal').style.display='none'">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="video-container">
+<iframe width="560" height="315" src="https://youtu.be/ntznB1dqWBs?si=llmjR51YCbZpC8D3" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>            </div>
+            <h3>قائمة الدروس</h3>
+            <ul class="lesson-list">
+                <li class="lesson-item">مقدمة في الدراسات الكتابية</li>
+                <li class="lesson-item">فهم النبوات</li>
+                <li class="lesson-item">تفسير الرسائل</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Course 2 Modal -->
+<div class="modal" id="course2Modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">أساسيات الصلاة</h3>
+            <button class="close-modal" onclick="document.getElementById('course2Modal').style.display='none'">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="video-container">
+                <iframe src="https://www.youtube.com/embed/VIDEO_ID_HERE"
+                        frameborder="0" allowfullscreen></iframe>
+            </div>
+            <h3>قائمة الدروس</h3>
+            <ul class="lesson-list">
+                <li class="lesson-item">مقدمة في الصلاة</li>
+                <li class="lesson-item">أنواع الصلاة</li>
+                <li class="lesson-item">أهمية الصلاة اليومية</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Course 3 Modal -->
+<div class="modal" id="course3Modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">حياة القداسة</h3>
+            <button class="close-modal" onclick="document.getElementById('course3Modal').style.display='none'">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="video-container">
+                <iframe src="https://www.youtube.com/embed/ntznB1dqWBs?si=ObS1pVAckqgz86nP&amp;controls=0"
+                        frameborder="0" allowfullscreen></iframe>
+            </div>
+            <h3>قائمة الدروس</h3>
+            <ul class="lesson-list">
+                <li class="lesson-item">ما هي القداسة</li>
+                <li class="lesson-item">كيف أعيش حياة مقدسة</li>
+                <li class="lesson-item">القداسة في العهد الجديد</li>
+            </ul>
+        </div>
+    </div>
+</div>
+        </section>
+
+
+        <!-- Resources Section -->
+        <section class="resources-section">
+            <h2 class="section-title"><i class="fas fa-folder-open"></i> الموارد التعليمية</h2>
+            
+            <div class="resources-grid">
+                <div class="resource-card">
+                    <div class="resource-icon">
+                        <i class="fas fa-file-pdf"></i>
+                    </div>
+                    <div class="resource-info">
+                        <h3>ملخصات الدروس</h3>
+                        <p>ملفات PDF تحتوي على ملخصات للدروس</p>
+                    </div>
+                </div>
+                
+                <div class="resource-card">
+                    <div class="resource-icon">
+                        <i class="fas fa-images"></i>
+                    </div>
+                    <div class="resource-info">
+                        <h3>عروض تقديمية</h3>
+                        <p>عروض بوربوينت للدروس</p>
+                    </div>
+                </div>
+                
+                <div class="resource-card">
+                    <div class="resource-icon">
+                        <i class="fas fa-headphones"></i>
+                    </div>
+                    <div class="resource-info">
+                        <h3>ملفات صوتية</h3>
+                        <p>تسجيلات صوتية للدروس</p>
+                    </div>
+                </div>
+                
+                <div class="resource-card">
+                    <div class="resource-icon">
+                        <i class="fas fa-video"></i>
+                    </div>
+                    <div class="resource-info">
+                        <h3>فيديوهات إضافية</h3>
+                        <p>مقاطع فيديو تكميلية</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>كنيسة القديسين بطرس وبولس &copy; 2023</p>
+    </div>
+
+    <!-- Course Modal -->
+    <div class="modal" id="courseModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalCourseTitle">دراسات كتابية</h3>
+                <button class="close-modal" onclick="closeCourseModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="video-container">
+                    <iframe id="courseVideo" src="https://www.youtube.com/embed/dQw4w9WgXcQ" 
+                            title="درس تعليمي" frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                    </iframe>
+                </div>
+                
+                <h3>قائمة الدروس</h3>
+                <ul class="lesson-list" id="lessonList">
+                    <!-- Lessons will be populated by JavaScript -->
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize page
+        document.addEventListener("DOMContentLoaded", function() {
+            // Set student name
+            let studentName = localStorage.getItem("studentName") || "الطالب";
+            document.getElementById("studentName").textContent = studentName;
+            
+            // Create floating particles
+            createFloatingParticles();
+            
+            // Initialize progress bar
+            initializeProgress();
+        });
+
+        // Create floating particles
+        function createFloatingParticles() {
+            const particlesContainer = document.getElementById('particlesContainer');
+            
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'floating-particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 10 + 's';
+                particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        function openCourseModal(id) {
+    document.getElementById(id).style.display = 'flex';
+}
+
+function closeCourseModal(id) {
+    document.getElementById(id).style.display = 'none';
+}
+
+
+        // Initialize progress bar
+        function initializeProgress() {
+            const progressBar = document.getElementById('progressBar');
+            const progressPercent = document.getElementById('progressPercent');
+            
+            // Simulate progress (in a real app, this would come from user data)
+            const progress = 65;
+            progressBar.style.width = progress + '%';
+            progressPercent.textContent = progress + '%';
+        }
+
+        // Open course modal
+        function openCourseModal(courseId) {
+            const modal = document.getElementById('courseModal');
+            const modalTitle = document.getElementById('modalCourseTitle');
+            const lessonList = document.getElementById('lessonList');
+            
+            // Set course title based on courseId
+            let title = "";
+            let lessons = [];
+            
+            switch(courseId) {
+                case 'course1':
+                    title = "دراسات كتابية";
+                    lessons = [
+                        { title: "مقدمة في الدراسات الكتابية", duration: "30 دقيقة", completed: true },
+                        { title: "فهم النبوات", duration: "45 دقيقة", completed: true },
+                        { title: "تفسير الرسائل", duration: "40 دقيقة", completed: false },
+                        { title: "دراسة الأمثال", duration: "35 دقيقة", completed: false }
+                    ];
+                    break;
+                case 'course2':
+                    title = "أساسيات الصلاة";
+                    lessons = [
+                        { title: "ما هي الصلاة؟", duration: "25 دقيقة", completed: true },
+                        { title: "أنواع الصلاة", duration: "35 دقيقة", completed: true },
+                        { title: "الصلاة الربانية", duration: "30 دقيقة", completed: false },
+                        { title: "تطوير حياة الصلاة", duration: "40 دقيقة", completed: false }
+                    ];
+                    break;
+                case 'course3':
+                    title = "حياة القداسة";
+                    lessons = [
+                        { title: "معنى القداسة", duration: "30 دقيقة", completed: true },
+                        { title: "قداسة الله", duration: "35 دقيقة", completed: false },
+                        { title: "قداسة الإنسان", duration: "40 دقيقة", completed: false },
+                        { title: "تطبيقات عملية", duration: "45 دقيقة", completed: false }
+                    ];
+                    break;
+            }
+            
+            modalTitle.textContent = title;
+            
+            // Clear previous lessons
+            lessonList.innerHTML = "";
+            
+            // Add lessons to the list
+            lessons.forEach(lesson => {
+                const lessonItem = document.createElement('li');
+                lessonItem.className = 'lesson-item';
+                lessonItem.innerHTML = `
+                    <div class="lesson-icon">
+                        <i class="fas fa-play-circle"></i>
+                    </div>
+                    <div class="lesson-info">
+                        <div class="lesson-title">${lesson.title}</div>
+                        <div class="lesson-duration">${lesson.duration}</div>
+                    </div>
+                    <div class="lesson-status ${lesson.completed ? 'completed' : ''}">
+                        ${lesson.completed ? '✓' : ''}
+                    </div>
+                `;
+                
+                lessonList.appendChild(lessonItem);
+            });
+            
+            // Show modal
+            modal.style.display = 'flex';
+        }
+
+        // Close course modal
+        function closeCourseModal() {
+            const modal = document.getElementById('courseModal');
+            modal.style.display = 'none';
+            
+            // Stop video when modal is closed
+            const iframe = document.getElementById('courseVideo');
+            iframe.src = iframe.src; // This reloads the iframe, stopping the video
+        }
+
+        // Go to home page
+        function goToHome() {
+            window.location.href = 'index.html';
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('courseModal');
+            if (event.target === modal) {
+                closeCourseModal();
+            }
+        }
+    </script>
+</body>
+</html>

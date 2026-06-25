@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>كتاب صلوات الأجبية | الكنيسة القبطية الأرثوذكسية</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        /* استيراد الـ CSS الذي أرسلته مع تعديلات بسيطة */
+        :root {
+            --maroon: #800000;
+            --dark-maroon: #600000;
+            --gold: #d4a017;
+            --dark-gold: #b3880e;
+            --light-bg: #efdfbf;
+            --dark-bg: #013346;
+            --dark-secondary: #1a3d4a;
+            --text-light: #333333;
+            --text-dark: #f0f0f0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            line-height: 1.8;
+            direction: rtl;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+            transition: background 0.5s ease, color 0.5s ease;
+            background: var(--light-bg);
+            color: var(--text-light);
+        }
+
+        body.dark-mode {
+            background: var(--dark-bg);
+            color: var(--text-dark);
+        }
+
+        /* تخصيصات للصلاة */
+        .prayer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* الهيدر */
+        .agpeya-header {
+            background: linear-gradient(135deg, var(--maroon) 0%, var(--dark-maroon) 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+            border-radius: 0 0 30px 30px;
+            box-shadow: 0 10px 30px rgba(128, 0, 0, 0.2);
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .agpeya-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M0,0 L100,0 L100,100 Z" fill="rgba(212,160,23,0.1)"/></svg>');
+            background-size: cover;
+        }
+
+        .agpeya-header h1 {
+            font-size: 3.2rem;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 1;
+        }
+
+        .agpeya-header p {
+            font-size: 1.3rem;
+            max-width: 800px;
+            margin: 0 auto;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* شريط التنقل بين الصلوات */
+        .prayer-nav {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 40px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+        }
+
+        .dark-mode .prayer-nav {
+            background: var(--dark-secondary);
+        }
+
+        .prayer-nav h2 {
+            color: var(--maroon);
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.8rem;
+            border-bottom: 2px solid var(--gold);
+            padding-bottom: 10px;
+        }
+
+        .dark-mode .prayer-nav h2 {
+            color: var(--gold);
+        }
+
+        .prayer-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .prayer-btn {
+            background: linear-gradient(135deg, var(--maroon) 0%, var(--dark-maroon) 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(128, 0, 0, 0.2);
+            flex: 1;
+            min-width: 140px;
+            text-align: center;
+        }
+
+        .prayer-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 18px rgba(128, 0, 0, 0.3);
+            background: linear-gradient(135deg, var(--dark-maroon) 0%, var(--maroon) 100%);
+        }
+
+        .prayer-btn.active {
+            background: linear-gradient(135deg, var(--gold) 0%, var(--dark-gold) 100%);
+            box-shadow: 0 0 15px rgba(212, 160, 23, 0.5);
+        }
+
+        /* قسم الصلاة */
+        .prayer-section {
+            background: white;
+            border-radius: 25px;
+            padding: 40px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.8s forwards;
+            animation-delay: calc(var(--order) * 0.1s);
+        }
+
+        .dark-mode .prayer-section {
+            background: var(--dark-secondary);
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .prayer-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 3px double var(--gold);
+            position: relative;
+        }
+
+        .prayer-header h2 {
+            color: var(--maroon);
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .dark-mode .prayer-header h2 {
+            color: var(--gold);
+        }
+
+        .prayer-header .time {
+            background: linear-gradient(135deg, var(--gold) 0%, var(--dark-gold) 100%);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-top: 10px;
+            box-shadow: 0 4px 10px rgba(212, 160, 23, 0.3);
+        }
+
+        .prayer-content {
+            font-size: 1.25rem;
+            line-height: 2;
+        }
+
+        /* أقسام الصلاة */
+        .prayer-part {
+            margin-bottom: 40px;
+            padding: 25px;
+            border-radius: 20px;
+            background: rgba(239, 223, 191, 0.2);
+            border-right: 5px solid var(--maroon);
+        }
+
+        .dark-mode .prayer-part {
+            background: rgba(26, 61, 74, 0.3);
+            border-right-color: var(--gold);
+        }
+
+        .prayer-part h3 {
+            color: var(--maroon);
+            font-size: 1.8rem;
+            margin-bottom: 25px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(212, 160, 23, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .dark-mode .prayer-part h3 {
+            color: var(--gold);
+        }
+
+        .prayer-text {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.03);
+        }
+
+        .dark-mode .prayer-text {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .prayer-text p {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+
+        .prayer-text p:last-child {
+            margin-bottom: 0;
+        }
+
+        .response {
+            background: rgba(212, 160, 23, 0.1);
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin: 15px 0;
+            border-right: 3px solid var(--gold);
+            font-weight: 600;
+        }
+
+        .dark-mode .response {
+            background: rgba(212, 160, 23, 0.15);
+        }
+
+        .congregation {
+            color: var(--maroon);
+            font-weight: 700;
+            margin-left: 10px;
+        }
+
+        .dark-mode .congregation {
+            color: var(--gold);
+        }
+
+        .psalm {
+            background: rgba(128, 0, 0, 0.05);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            font-style: italic;
+            border-right: 3px solid var(--maroon);
+        }
+
+        .dark-mode .psalm {
+            background: rgba(128, 0, 0, 0.1);
+        }
+
+        .psalm .number {
+            display: inline-block;
+            background: var(--maroon);
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 35px;
+            margin-left: 10px;
+            font-weight: bold;
+        }
+
+        .dark-mode .psalm .number {
+            background: var(--gold);
+            color: var(--dark-bg);
+        }
+
+        /* أدوات التحكم */
+        .controls {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .control-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--maroon) 0%, var(--dark-maroon) 100%);
+            color: white;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .control-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .theme-toggle {
+            background: linear-gradient(135deg, var(--gold) 0%, var(--dark-gold) 100%);
+        }
+
+        /* الفوتر */
+        .agpeya-footer {
+            background: linear-gradient(135deg, var(--maroon) 0%, var(--dark-maroon) 100%);
+            color: white;
+            text-align: center;
+            padding: 30px 20px;
+            margin-top: 60px;
+            border-radius: 30px 30px 0 0;
+        }
+
+        .agpeya-footer p {
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .agpeya-footer a {
+            color: var(--gold);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .agpeya-footer a:hover {
+            text-decoration: underline;
+            color: white;
+        }
+
+        /* التكيف مع الشاشات المختلفة */
+        @media (max-width: 992px) {
+            .agpeya-header h1 {
+                font-size: 2.5rem;
+            }
+            
+            .prayer-section {
+                padding: 30px;
+            }
+            
+            .prayer-header h2 {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .agpeya-header h1 {
+                font-size: 2rem;
+            }
+            
+            .agpeya-header p {
+                font-size: 1.1rem;
+            }
+            
+            .prayer-section {
+                padding: 20px;
+            }
+            
+            .prayer-buttons {
+                flex-direction: column;
+            }
+            
+            .prayer-btn {
+                min-width: 100%;
+            }
+            
+            .controls {
+                bottom: 20px;
+                left: 20px;
+            }
+            
+            .control-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 1.3rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .agpeya-header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .prayer-header h2 {
+                font-size: 1.6rem;
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .prayer-content {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body class="light-mode">
+    <!-- الهيدر -->
+    <header class="agpeya-header">
+        <h1><i class="fas fa-book-bible"></i> كتاب صلوات الأجبية</h1>
+        <p>الصلوات السبع اليومية حسب تقليد الكنيسة القبطية الأرثوذكسية</p>
+    </header>
+
+    <!-- التنقل بين الصلوات -->
+    <nav class="prayer-nav">
+        <h2><i class="fas fa-clock"></i> صلوات الأجبية</h2>
+        <div class="prayer-buttons">
+            <button class="prayer-btn active" data-prayer="morning">صلاة باكر</button>
+            <button class="prayer-btn" data-prayer="third">صلاة الساعة الثالثة</button>
+            <button class="prayer-btn" data-prayer="sixth">صلاة الساعة السادسة</button>
+            <button class="prayer-btn" data-prayer="ninth">صلاة الساعة التاسعة</button>
+            <button class="prayer-btn" data-prayer="sunset">صلاة الغروب</button>
+            <button class="prayer-btn" data-prayer="sleep">صلاة النوم</button>
+            <button class="prayer-btn" data-prayer="midnight">صلاة نصف الليل</button>
+        </div>
+    </nav>
+
+    <!-- المحتوى الرئيسي -->
+    <main class="prayer-container">
+        <!-- صلاة باكر -->
+        <section id="morning" class="prayer-section" style="--order: 1">
+            <div class="prayer-header">
+                <h2><i class="fas fa-sun"></i> صلاة باكر</h2>
+                <div class="time">وقت الصلاة: من شروق الشمس حتى الظهر</div>
+            </div>
+            
+            <div class="prayer-content">
+                <!-- مقدمة الصلاة -->
+                <div class="prayer-part">
+                    <h3><i class="fas fa-cross"></i> مقدمة الصلاة</h3>
+                    <div class="prayer-text">
+                        <p>باسم الآب والابن والروح القدس، الإله الواحد، آمين.</p>
+                        <p>قوموا أيها المباركون، هيا بنا نسبح الرب إلهنا، ولنرفع قلوبنا وأيدينا إلى الله في السماوات.</p>
+                        <div class="response">
+                            <span class="congregation">الشعب:</span> نعظمك يا رب وإلهنا ونسجد أمام مسيحك الملك الصالح، أيها الصالح دائماً.
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- المزمور الخمسين -->
+                <div class="prayer-part">
+                    <h3><i class="fas fa-music"></i> المزمور الخمسين (50)</h3>
+                    <div class="psalm">
+                        <span class="number">1</span>
+                        <p>ارحمني يا الله حسب رحمتك، وحسب كثرة رأفتك امحُ معاصي.</p>
+                        
+                        <span class="number">2</span>
+                        <p>اغسلني كثيراً من إثمي، ومن خطيتي طهرني.</p>
+                        
+                        <span class="number">3</span>
+                        <p>لأني عارف بمعاصي، وخطيتي أمامي في كل حين.</p>
+                        
+                        <span class="number">10</span>
+                        <p>قلباً نقياً اخلق فيّ يا الله، وروحاً مستقيماً جدد في أحشائي.</p>
+                        
+                        <span class="number">11</span>
+                        <p>لا تطرحني من قدام وجهك، وروحك القدوس لا تنزعه مني.</p>
+                    </div>
+                </div>
+                
+                <!-- إنجيل باكر -->
+                <div class="prayer-part">
+                    <h3><i class="fas fa-book-open"></i> إنجيل باكر (يوحنا 20: 1-18)</h3>
+                    <div class="prayer-text">
+                        <p>وفي أول الأسبوع جاءت مريم المجدلية إلى القبر باكراً والظلام باق، فنظرت الحجر مرفوعاً عن القبر.</p>
+                        <p>فركضت وجاءت إلى سمعان بطرس وإلى التلميذ الآخر الذي كان يسوع يحبه، وقالت لهما: أخذوا السيد من القبر، ولسنا نعلم أين وضعوه.</p>
+                        <div class="response">
+                            <span class="congregation">المجد لك يا رب، المجد لك.</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- قطع الساعة -->
+                <div class="prayer-part">
+                    <h3><i class="fas fa-pray"></i> قطع الساعة</h3>
+                    <div class="prayer-text">
+                        <p>يا رب إله القوات، ارحمنا. يا رب إله القوات، استمع لنا.</p>
+                        <p>يا رب إله القوات، ارحمنا. يا رب إله القوات، استمع لنا.</p>
+                        <p>يا رب إله القوات، ارحمنا. يا رب إله القوات، استمع لنا.</p>
+                        
+                        <div class="response">
+                            <span class="congregation">القطعة:</span> أيها الرب يسوع المسيح، يا من قمت من الأموات في اليوم الثالث، ارحمنا وخلصنا آمين.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- صلاة الساعة الثالثة -->
+        <section id="third" class="prayer-section" style="display: none; --order: 2">
+            <div class="prayer-header">
+                <h2><i class="fas fa-clock"></i> صلاة الساعة الثالثة</h2>
+                <div class="time">وقت الصلاة: الساعة التاسعة صباحاً</div>
+            </div>
+            
+            <div class="prayer-content">
+                <div class="prayer-part">
+                    <h3><i class="fas fa-cross"></i> مقدمة الصلاة</h3>
+                    <div class="prayer-text">
+                        <p>باسم الآب والابن والروح القدس، الإله الواحد، آمين.</p>
+                        <p>هيئوا طريق الرب، اصنعوا سبله مستقيمة. كل واد يمتلئ، وكل جبل وأكمة ينخفض، وتصير المعوجات مستقيمة، والعراقيب سهلة.</p>
+                    </div>
+                </div>
+                
+                <div class="prayer-part">
+                    <h3><i class="fas fa-music"></i> المزمور السادس والعشرون (26)</h3>
+                    <div class="psalm">
+                        <span class="number">1</span>
+                        <p>احكم لي يا رب لأني في بلاي سلكت، وعلى الرب توكلت فلا أتزعزع.</p>
+                        
+                        <span class="number">8</span>
+                        <p>يا رب أحببت بهاء بيتك، ومكان مسكن مجدك.</p>
+                    </div>
+                </div>
+                
+                <div class="prayer-part">
+                    <h3><i class="fas fa-book-open"></i> إنجيل الساعة الثالثة (أعمال 2: 1-21)</h3>
+                    <div class="prayer-text">
+                        <p>ولما حضر يوم الخمسين، كان الجميع معاً بنفس واحدة.</p>
+                        <p>وصار بغتة من السماء صوت كما من هبوب ريح عاصفة، وملأ كل البيت حيث كانوا جالسين.</p>
+                        <p>وظهرت لهم ألسنة منقسمة كأنها من نار، واستقرت على كل واحد منهم.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- صلاة الساعة السادسة -->
+        <section id="sixth" class="prayer-section" style="display: none; --order: 3">
+            <div class="prayer-header">
+                <h2><i class="fas fa-sun"></i> صلاة الساعة السادسة</h2>
+                <div class="time">وقت الصلاة: الظهر</div>
+            </div>
+            
+            <div class="prayer-content">
+                <div class="prayer-part">
+                    <h3><i class="fas fa-cross"></i> مقدمة الصلاة</h3>
+                    <div class="prayer-text">
+                        <p>باسم الآب والابن والروح القدس، الإله الواحد، آمين.</p>
+                        <p>سبحوا الرب من السموات، سبحوه في الأعالي. سبحيه يا شمس وقمر، سبحيه يا جميع الكواكب المضيئة.</p>
+                    </div>
+                </div>
+                
+                <div class="prayer-part">
+                    <h3><i class="fas fa-music"></i> المزمور الثالث والخمسون (53)</h3>
+                    <div class="psalm">
+                        <span class="number">1</span>
+                        <p>قال الجاهل في قلبه: ليس إله. فسدوا ورجسوا بالآثام، ليس من يعمل صلاحاً.</p>
+                        
+                        <span class="number">6</span>
+                        <p>من صهيون يخلص إسرائيل. حين يرد الرب سبي شعبه، يبتهج يعقوب ويفرح إسرائيل.</p>
+                    </div>
+                </div>
+                
+                <div class="prayer-part">
+                    <h3><i class="fas fa-book-open"></i> إنجيل الساعة السادسة (متى 27: 45-54)</h3>
+                    <div class="prayer-text">
+                        <p>ومن الساعة السادسة كانت ظلمة على كل الأرض إلى الساعة التاسعة.</p>
+                        <p>ونحو الساعة التاسعة صرخ يسوع بصوت عظيم قائلاً: "إيلي، إيلي، لما شبقتني؟" أي: إلهي، إلهي، لماذا تركتني؟</p>
+                        <p>وإذا حجاب الهيكل قد انشق إلى اثنين من فوق إلى أسفل. والأرض تزلزلت، والصخور تشققت.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- يمكنك إضافة بقية الصلوات بنفس الهيكل -->
+        
+        <!-- صلاة الغروب -->
+        <section id="sunset" class="prayer-section" style="display: none; --order: 5">
+            <div class="prayer-header">
+                <h2><i class="fas fa-moon"></i> صلاة الغروب</h2>
+                <div class="time">وقت الصلاة: عند غروب الشمس</div>
+            </div>
+            
+            <div class="prayer-content">
+                <div class="prayer-part">
+                    <h3><i class="fas fa-cross"></i> مقدمة الصلاة</h3>
+                    <div class="prayer-text">
+                        <p>باسم الآب والابن والروح القدس، الإله الواحد، آمين.</p>
+                        <p>هلمّ نسبح الرب ونرنم لإله خلاصنا. فلنسبق وجهه بالاعتراف، وبالمزامير نرنم له.</p>
+                    </div>
+                </div>
+                
+                <div class="prayer-part">
+                    <h3><i class="fas fa-music"></i> المزمور المئة والواحد والأربعون (141)</h3>
+                    <div class="psalm">
+                        <span class="number">1</span>
+                        <p>يا رب إليك صرخت، أسرع إليّ، وأصغ إلى صوتي حين أدعوك.</p>
+                        
+                        <span class="number">2</span>
+                        <p>ليقم صلاتي كبخور قدامك، ورفع يديّ كذبيحة مسائية.</p>
+                    </div>
+                </div>
+                
+                <div class="prayer-part">
+                    <h3><i class="fas fa-book-open"></i> إنجيل الغروب (لوقا 24: 29-35)</h3>
+                    <div class="prayer-text">
+                        <p>فألزماه قائلين: امكث معنا، لأن المساء قد أقبل، واليوم قد مَال. فدخل ليمكث معهما.</p>
+                        <p>ولما اتكأ معهما، أخذ الخبز وبارك وكسر وناولهما.</p>
+                        <p>فانفتحت أعينهما وعرفاه، ثم اختفى عنهما.</p>
+                    </div>
+                </div>
+                
+                <div class="prayer-part">
+                    <h3><i class="fas fa-pray"></i> قطع الساعة</h3>
+                    <div class="prayer-text">
+                        <p>يا رب إله القوات، ارحمنا. يا رب إله القوات، استمع لنا.</p>
+                        <p>يا رب إله القوات، ارحمنا. يا رب إله القوات، استمع لنا.</p>
+                        <p>يا رب إله القوات، ارحمنا. يا رب إله القوات، استمع لنا.</p>
+                        
+                        <div class="response">
+                            <span class="congregation">القطعة:</span> أيها الرب يسوع المسيح، يا نور العالم الحقيقي، ارحمنا وخلصنا آمين.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- أدوات التحكم -->
+    <div class="controls">
+        <button class="control-btn theme-toggle" id="themeToggle">
+            <i class="fas fa-moon"></i>
+        </button>
+        <button class="control-btn" id="scrollTop">
+            <i class="fas fa-arrow-up"></i>
+        </button>
+        <button class="control-btn" id="fontSize">
+            <i class="fas fa-text-height"></i>
+        </button>
+    </div>
+
+    <!-- الفوتر -->
+    <footer class="agpeya-footer">
+        <p>جميع الحقوق محفوظة © 2023 - كتاب صلوات الأجبية</p>
+        <p>للكنيسة القبطية الأرثوذكسية - <a href="#">الموقع الرسمي</a></p>
+        <p>تم التصميم باستخدام الألوان التقليدية للكنيسة القبطية</p>
+    </footer>
+
+    <script>
+        // تفعيل الوضع الداكن/الفاتح
+        const themeToggle = document.getElementById('themeToggle');
+        const body = document.body;
+        
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            body.classList.toggle('light-mode');
+            
+            if (body.classList.contains('dark-mode')) {
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+                themeToggle.title = 'الوضع الفاتح';
+            } else {
+                themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+                themeToggle.title = 'الوضع الداكن';
+            }
+        });
+
+        // التنقل بين الصلوات
+        const prayerButtons = document.querySelectorAll('.prayer-btn');
+        const prayerSections = document.querySelectorAll('.prayer-section');
+        
+        prayerButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // إزالة النشاط من جميع الأزرار
+                prayerButtons.forEach(btn => btn.classList.remove('active'));
+                // إخفاء جميع الأقسام
+                prayerSections.forEach(section => section.style.display = 'none');
+                
+                // إضافة النشاط للزر المختار
+                button.classList.add('active');
+                
+                // إظهار القسم المطلوب
+                const prayerId = button.getAttribute('data-prayer');
+                const targetSection = document.getElementById(prayerId);
+                if (targetSection) {
+                    targetSection.style.display = 'block';
+                    
+                    // إضافة تأثير الظهور
+                    targetSection.style.animation = 'none';
+                    setTimeout(() => {
+                        targetSection.style.animation = 'fadeInUp 0.8s forwards';
+                    }, 10);
+                    
+                    // التمرير إلى الأعلى
+                    window.scrollTo({
+                        top: targetSection.offsetTop - 100,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // التمرير إلى الأعلى
+        document.getElementById('scrollTop').addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // تغيير حجم الخط
+        const fontSizeBtn = document.getElementById('fontSize');
+        const prayerContent = document.querySelector('.prayer-content');
+        let fontSize = 1;
+        
+        fontSizeBtn.addEventListener('click', () => {
+            fontSize = fontSize === 1 ? 1.1 : fontSize === 1.1 ? 0.9 : 1;
+            prayerContent.style.fontSize = `${fontSize}rem`;
+            
+            // تغيير الأيقونة
+            if (fontSize === 1.1) {
+                fontSizeBtn.innerHTML = '<i class="fas fa-text-width"></i>';
+                fontSizeBtn.title = 'تصغير الخط';
+            } else if (fontSize === 0.9) {
+                fontSizeBtn.innerHTML = '<i class="fas fa-text-height"></i>';
+                fontSizeBtn.title = 'الخط العادي';
+            } else {
+                fontSizeBtn.innerHTML = '<i class="fas fa-text-height"></i>';
+                fontSizeBtn.title = 'تكبير الخط';
+            }
+        });
+
+        // تفعيل الصلاة الأولى عند التحميل
+        window.addEventListener('load', () => {
+            document.querySelector('.prayer-btn.active').click();
+        });
+    </script>
+</body>
+</html>

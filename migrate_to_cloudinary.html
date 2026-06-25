@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔄 نقل الملفات إلى Cloudinary</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap');
+        
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        :root {
+            --bg: #0a0a0f;
+            --surface: #13131f;
+            --card: #1a1a2e;
+            --border: #2a2a4a;
+            --gold: #f5c842;
+            --gold-dim: rgba(245,200,66,0.15);
+            --green: #2ec4b6;
+            --red: #e71d36;
+            --orange: #ff9f1c;
+            --blue: #3b82f6;
+            --text: #e8e8f0;
+            --muted: #8888aa;
+        }
+        
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 40px 20px 30px;
+        }
+        
+        .header .icon-wrap {
+            width: 80px; height: 80px;
+            background: var(--gold-dim);
+            border: 2px solid var(--gold);
+            border-radius: 20px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 36px;
+            margin: 0 auto 16px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse { 0%,100% { box-shadow: 0 0 15px rgba(245,200,66,0.3); } 50% { box-shadow: 0 0 30px rgba(245,200,66,0.7); } }
+        
+        .header h1 { font-size: 28px; font-weight: 900; color: var(--gold); margin-bottom: 8px; }
+        .header p { color: var(--muted); font-size: 14px; }
+        
+        .container { max-width: 900px; margin: 0 auto; }
+        
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+        
+        .card h2 {
+            font-size: 16px; font-weight: 700;
+            color: var(--gold);
+            margin-bottom: 16px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        
+        .config-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        
+        label { font-size: 12px; color: var(--muted); display: block; margin-bottom: 4px; }
+        input {
+            width: 100%; padding: 10px 14px;
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 8px; color: var(--text);
+            font-family: 'Cairo', monospace; font-size: 13px;
+            transition: border-color 0.2s;
+        }
+        input:focus { outline: none; border-color: var(--gold); }
+        
+        .stats-row {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+        }
+        
+        .stat-card .val {
+            font-size: 28px; font-weight: 900;
+            color: var(--gold);
+        }
+        
+        .stat-card .lbl {
+            font-size: 11px; color: var(--muted);
+            margin-top: 4px;
+        }
+        
+        .stat-card.green .val { color: var(--green); }
+        .stat-card.red .val { color: var(--red); }
+        .stat-card.orange .val { color: var(--orange); }
+        
+        /* Progress */
+        .progress-wrap {
+            background: var(--surface);
+            border-radius: 100px;
+            height: 12px;
+            overflow: hidden;
+            margin: 12px 0;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold), #ffa500);
+            border-radius: 100px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+        
+        /* Buttons */
+        .btn {
+            padding: 14px 32px;
+            border: none; border-radius: 10px;
+            font-family: 'Cairo', sans-serif;
+            font-size: 15px; font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex; align-items: center; gap: 8px;
+        }
+        
+        .btn-gold {
+            background: linear-gradient(135deg, var(--gold), #e6a800);
+            color: #000;
+        }
+        
+        .btn-gold:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(245,200,66,0.4); }
+        .btn-gold:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+        
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--muted);
+        }
+        .btn-outline:hover { border-color: var(--gold); color: var(--gold); }
+        
+        .btn-row { display: flex; gap: 12px; flex-wrap: wrap; }
+        
+        /* Log */
+        .log-box {
+            background: #080810;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            height: 320px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.8;
+        }
+        
+        .log-box::-webkit-scrollbar { width: 6px; }
+        .log-box::-webkit-scrollbar-track { background: var(--surface); }
+        .log-box::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+        
+        .log-entry { display: flex; gap: 8px; padding: 2px 0; }
+        .log-time { color: var(--muted); flex-shrink: 0; }
+        .log-msg { flex: 1; }
+        .log-success { color: var(--green); }
+        .log-error { color: var(--red); }
+        .log-warning { color: var(--orange); }
+        .log-info { color: var(--blue); }
+        .log-skip { color: #666; }
+        
+        /* Item list */
+        .items-grid {
+            display: grid;
+            gap: 8px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .item-row {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 14px;
+            display: flex; align-items: center; gap: 10px;
+            font-size: 12px;
+        }
+        
+        .item-status {
+            width: 20px; height: 20px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 10px;
+            flex-shrink: 0;
+        }
+        
+        .status-pending { background: rgba(255,159,28,0.2); color: var(--orange); }
+        .status-done { background: rgba(46,196,182,0.2); color: var(--green); }
+        .status-error { background: rgba(231,29,54,0.2); color: var(--red); }
+        .status-skip { background: rgba(100,100,150,0.2); color: var(--muted); }
+        .status-running { background: rgba(245,200,66,0.2); color: var(--gold); animation: spin 1s linear infinite; }
+        
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .item-info { flex: 1; min-width: 0; }
+        .item-table { font-weight: 700; color: var(--gold); }
+        .item-url { color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 350px; }
+        .item-new-url { color: var(--green); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 350px; }
+        
+        .badge {
+            padding: 2px 8px;
+            border-radius: 100px;
+            font-size: 10px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        
+        .badge-audio { background: rgba(59,130,246,0.2); color: #60a5fa; }
+        .badge-video { background: rgba(168,85,247,0.2); color: #c084fc; }
+        .badge-image { background: rgba(236,72,153,0.2); color: #f472b6; }
+        .badge-other { background: rgba(100,100,100,0.2); color: #999; }
+        
+        .section-title {
+            font-size: 13px; font-weight: 700; color: var(--muted);
+            text-transform: uppercase; letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+        
+        .alert-box {
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            margin-bottom: 16px;
+            display: flex; align-items: flex-start; gap: 10px;
+        }
+        
+        .alert-warning { background: rgba(255,159,28,0.1); border: 1px solid rgba(255,159,28,0.3); color: var(--orange); }
+        .alert-info { background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.3); color: #60a5fa; }
+        
+        .check-row {
+            display: flex; align-items: center; gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 13px;
+        }
+        .check-row:last-child { border-bottom: none; }
+        input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--gold); }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="icon-wrap">🔄</div>
+        <h1>نقل الملفات القديمة إلى Cloudinary</h1>
+        <p>أداة ترحيل تلقائية — تسحب الملفات من Supabase وترفعها على Cloudinary وتحدّث قاعدة البيانات</p>
+    </div>
+
+    <!-- CONFIG -->
+    <div class="card">
+        <h2><i class="fas fa-cog"></i> إعدادات الاتصال</h2>
+        <div class="config-grid">
+            <div>
+                <label>Supabase URL</label>
+                <input type="text" id="cfgSupabaseUrl" value="https://dmfwaurbrcuzrcbvzolv.supabase.co" placeholder="https://xxx.supabase.co">
+            </div>
+            <div>
+                <label>Supabase Anon Key</label>
+                <input type="password" id="cfgSupabaseKey" placeholder="eyJh...">
+            </div>
+            <div>
+                <label>Cloudinary Cloud Name</label>
+                <input type="text" id="cfgCloudName" value="driqr3dec" placeholder="driqr3dec">
+            </div>
+            <div>
+                <label>Cloudinary Upload Preset (Unsigned)</label>
+                <input type="text" id="cfgPreset" value="church_preset" placeholder="church_preset">
+            </div>
+        </div>
+    </div>
+
+    <!-- WHAT TO MIGRATE -->
+    <div class="card">
+        <h2><i class="fas fa-filter"></i> اختر ما تريد نقله</h2>
+        <div class="alert-box alert-info">
+            <i class="fas fa-info-circle" style="margin-top:2px;flex-shrink:0;"></i>
+            <div>سيتم البحث في قاعدة البيانات عن كل URL يبدأ بـ Supabase Storage أو Base64 ويقوم بنقله إلى Cloudinary. الـ URLs التي تبدأ بـ cloudinary.com أو youtube.com ستُتخطى تلقائياً.</div>
+        </div>
+        <div class="check-row">
+            <input type="checkbox" id="chkLessonAudio" checked>
+            <label for="chkLessonAudio" style="margin:0;cursor:pointer;"><i class="fas fa-music" style="color:#60a5fa;margin-left:6px;"></i> ملفات الصوت في دروس الخدمة (service_lessons.audio_url)</label>
+        </div>
+        <div class="check-row">
+            <input type="checkbox" id="chkLessonVideo" checked>
+            <label for="chkLessonVideo" style="margin:0;cursor:pointer;"><i class="fas fa-video" style="color:#c084fc;margin-left:6px;"></i> ملفات الفيديو المباشرة في الدروس (service_lessons.video_url)</label>
+        </div>
+        <div class="check-row">
+            <input type="checkbox" id="chkAvatars" checked>
+            <label for="chkAvatars" style="margin:0;cursor:pointer;"><i class="fas fa-user-circle" style="color:#f472b6;margin-left:6px;"></i> صور بروفايل الطلاب (profiles.avatar_url)</label>
+        </div>
+        <div class="check-row">
+            <input type="checkbox" id="chkChurchNews" checked>
+            <label for="chkChurchNews" style="margin:0;cursor:pointer;"><i class="fas fa-newspaper" style="color:#34d399;margin-left:6px;"></i> صور أخبار الكنيسة (church_news.image_url)</label>
+        </div>
+        <div class="check-row">
+            <input type="checkbox" id="chkSlideshow" checked>
+            <label for="chkSlideshow" style="margin:0;cursor:pointer;"><i class="fas fa-images" style="color:#f59e0b;margin-left:6px;"></i> صور السلايدشو الرئيسية (slideshow_images.image_url)</label>
+        </div>
+    </div>
+
+    <!-- SCAN RESULTS -->
+    <div class="card" id="scanSection" style="display:none;">
+        <h2><i class="fas fa-search"></i> نتائج المسح <span id="scanCount" style="font-size:13px;color:var(--muted);font-weight:400;"></span></h2>
+        <div class="stats-row">
+            <div class="stat-card"><div class="val" id="statTotal">0</div><div class="lbl">إجمالي الملفات</div></div>
+            <div class="stat-card green"><div class="val" id="statDone">0</div><div class="lbl">تم النقل</div></div>
+            <div class="stat-card red"><div class="val" id="statError">0</div><div class="lbl">أخطاء</div></div>
+            <div class="stat-card orange"><div class="val" id="statSkip">0</div><div class="lbl">تخطي (Cloudinary/YT)</div></div>
+        </div>
+        <div class="progress-wrap">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <div id="progressText" style="text-align:center;font-size:12px;color:var(--muted);margin-bottom:16px;">0 / 0</div>
+        <div class="items-grid" id="itemsList"></div>
+    </div>
+
+    <!-- LOG -->
+    <div class="card" id="logSection" style="display:none;">
+        <h2><i class="fas fa-terminal"></i> سجل العمليات</h2>
+        <div class="log-box" id="logBox"></div>
+    </div>
+
+    <!-- ACTION BUTTONS -->
+    <div class="card">
+        <div class="btn-row">
+            <button class="btn btn-gold" id="btnScan" onclick="startScan()">
+                <i class="fas fa-search"></i> مسح قاعدة البيانات
+            </button>
+            <button class="btn btn-gold" id="btnMigrate" onclick="startMigration()" style="display:none;">
+                <i class="fas fa-rocket"></i> ابدأ النقل الآن
+            </button>
+            <button class="btn btn-outline" id="btnStop" onclick="stopMigration()" style="display:none;">
+                <i class="fas fa-stop"></i> إيقاف
+            </button>
+            <button class="btn btn-outline" onclick="clearLog()">
+                <i class="fas fa-trash"></i> مسح السجل
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- SUPABASE SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-config.js"></script>
+
+<script>
+// ──────────────────────────────────────────────
+// CONFIG helpers
+// ──────────────────────────────────────────────
+function getCfg() {
+    return {
+        supabaseUrl: document.getElementById('cfgSupabaseUrl').value.trim().replace(/\/$/, ''),
+        supabaseKey: document.getElementById('cfgSupabaseKey').value.trim() || (typeof SUPABASE_ANON_KEY !== 'undefined' ? SUPABASE_ANON_KEY : ''),
+        cloudName: document.getElementById('cfgCloudName').value.trim(),
+        preset: document.getElementById('cfgPreset').value.trim(),
+    };
+}
+
+function getClient() {
+    const cfg = getCfg();
+    if (!cfg.supabaseUrl || !cfg.supabaseKey) throw new Error('يرجى إدخال Supabase URL و Key');
+    return supabase.createClient(cfg.supabaseUrl, cfg.supabaseKey);
+}
+
+// Pre-fill key from config
+window.addEventListener('DOMContentLoaded', () => {
+    if (typeof SUPABASE_ANON_KEY !== 'undefined') {
+        document.getElementById('cfgSupabaseKey').value = SUPABASE_ANON_KEY;
+    }
+    if (typeof SUPABASE_URL !== 'undefined') {
+        document.getElementById('cfgSupabaseUrl').value = SUPABASE_URL.replace(/\/$/, '');
+    }
+});
+
+// ──────────────────────────────────────────────
+// LOGGING
+// ──────────────────────────────────────────────
+const logBox = document.getElementById('logBox');
+
+function log(msg, type = 'info') {
+    const entry = document.createElement('div');
+    entry.className = 'log-entry';
+    const now = new Date().toLocaleTimeString('ar-EG');
+    entry.innerHTML = `<span class="log-time">[${now}]</span><span class="log-msg log-${type}">${msg}</span>`;
+    logBox.appendChild(entry);
+    logBox.scrollTop = logBox.scrollHeight;
+}
+
+function clearLog() {
+    logBox.innerHTML = '';
+}
+
+// ──────────────────────────────────────────────
+// ITEM TRACKING
+// ──────────────────────────────────────────────
+let items = [];
+let stopFlag = false;
+let stats = { total: 0, done: 0, error: 0, skip: 0 };
+
+function addItem(table, column, rowId, url, extraId = null) {
+    const id = items.length;
+    const fileType = detectFileType(url);
+    items.push({ id, table, column, rowId, url, extraId, fileType, status: 'pending', newUrl: null, elId: `item-${id}` });
+    return id;
+}
+
+function detectFileType(url) {
+    if (!url) return 'other';
+    const u = url.toLowerCase();
+    if (u.match(/\.(mp3|wav|m4a|aac|ogg|wma|flac)/) || u.startsWith('data:audio')) return 'audio';
+    if (u.match(/\.(mp4|avi|mov|mkv|webm|flv|3gp)/) || u.startsWith('data:video')) return 'video';
+    if (u.match(/\.(jpg|jpeg|png|gif|webp|svg|bmp)/) || u.startsWith('data:image')) return 'image';
+    return 'other';
+}
+
+function getBadgeClass(fileType) {
+    return { audio: 'badge-audio', video: 'badge-video', image: 'badge-image', other: 'badge-other' }[fileType] || 'badge-other';
+}
+function getBadgeLabel(fileType) {
+    return { audio: '🎵 صوت', video: '🎬 فيديو', image: '🖼️ صورة', other: '📄 ملف' }[fileType] || '📄';
+}
+
+function renderItems() {
+    const list = document.getElementById('itemsList');
+    list.innerHTML = '';
+    for (const item of items) {
+        const div = document.createElement('div');
+        div.className = 'item-row';
+        div.id = item.elId;
+        div.innerHTML = `
+            <div class="item-status status-pending" id="status-${item.id}"><i class="fas fa-clock"></i></div>
+            <div class="item-info">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px;">
+                    <span class="item-table">${item.table}</span>
+                    <span style="color:var(--muted);font-size:10px;">.${item.column}</span>
+                </div>
+                <div class="item-url" id="url-${item.id}">${item.url.substring(0, 80)}${item.url.length > 80 ? '...' : ''}</div>
+            </div>
+            <span class="badge ${getBadgeClass(item.fileType)}">${getBadgeLabel(item.fileType)}</span>
+        `;
+        list.appendChild(div);
+    }
+}
+
+function updateItemStatus(itemId, status, newUrl = null) {
+    const el = document.getElementById(`status-${itemId}`);
+    const urlEl = document.getElementById(`url-${itemId}`);
+    if (!el) return;
+    el.className = `item-status status-${status}`;
+    const icons = { pending: 'fa-clock', done: 'fa-check', error: 'fa-times', skip: 'fa-forward', running: 'fa-spinner' };
+    el.innerHTML = `<i class="fas ${icons[status] || 'fa-circle'}"></i>`;
+    if (newUrl && urlEl) {
+        urlEl.className = 'item-new-url';
+        urlEl.textContent = newUrl.substring(0, 80) + (newUrl.length > 80 ? '...' : '');
+        urlEl.title = newUrl;
+    }
+}
+
+function updateStats() {
+    document.getElementById('statTotal').textContent = stats.total;
+    document.getElementById('statDone').textContent = stats.done;
+    document.getElementById('statError').textContent = stats.error;
+    document.getElementById('statSkip').textContent = stats.skip;
+    const done = stats.done + stats.error + stats.skip;
+    const pct = stats.total > 0 ? Math.round((done / stats.total) * 100) : 0;
+    document.getElementById('progressBar').style.width = pct + '%';
+    document.getElementById('progressText').textContent = `${done} / ${stats.total} (${pct}%)`;
+}
+
+// ──────────────────────────────────────────────
+// SHOULD MIGRATE URL?
+// ──────────────────────────────────────────────
+function shouldMigrate(url) {
+    if (!url || typeof url !== 'string') return false;
+    const u = url.toLowerCase();
+    // Skip already on Cloudinary
+    if (u.includes('cloudinary.com') || u.includes('res.cloudinary.com')) return false;
+    // Skip YouTube/external embeds
+    if (u.includes('youtube.com') || u.includes('youtu.be') || u.includes('vimeo.com')) return false;
+    // Migrate: Supabase Storage URLs, Base64 data URIs, or direct HTTP files
+    return true;
+}
+
+// ──────────────────────────────────────────────
+// SCAN DATABASE
+// ──────────────────────────────────────────────
+async function startScan() {
+    items = [];
+    stats = { total: 0, done: 0, error: 0, skip: 0 };
+    
+    document.getElementById('scanSection').style.display = 'block';
+    document.getElementById('logSection').style.display = 'block';
+    document.getElementById('btnMigrate').style.display = 'none';
+    document.getElementById('itemsList').innerHTML = '';
+    clearLog();
+    
+    log('🔍 بدأ مسح قاعدة البيانات...', 'info');
+    
+    let client;
+    try {
+        client = getClient();
+    } catch(e) {
+        log('❌ ' + e.message, 'error');
+        return;
+    }
+    
+    const chkAudio = document.getElementById('chkLessonAudio').checked;
+    const chkVideo = document.getElementById('chkLessonVideo').checked;
+    const chkAvatars = document.getElementById('chkAvatars').checked;
+    const chkChurchNews = document.getElementById('chkChurchNews').checked;
+    const chkSlideshow = document.getElementById('chkSlideshow').checked;
+    
+    // ── 1. service_lessons ──
+    if (chkAudio || chkVideo) {
+        log('📚 جاري فحص جدول service_lessons...', 'info');
+        const { data: lessons, error } = await client.from('service_lessons').select('id, audio_url, video_url');
+        if (error) { log('❌ خطأ في قراءة service_lessons: ' + error.message, 'error'); }
+        else {
+            let lessonCount = 0;
+            for (const lesson of lessons || []) {
+                if (chkAudio && lesson.audio_url && shouldMigrate(lesson.audio_url)) {
+                    addItem('service_lessons', 'audio_url', lesson.id, lesson.audio_url);
+                    lessonCount++;
+                }
+                if (chkVideo && lesson.video_url && shouldMigrate(lesson.video_url)) {
+                    addItem('service_lessons', 'video_url', lesson.id, lesson.video_url);
+                    lessonCount++;
+                }
+            }
+            log(`✅ service_lessons: وجدت ${lessons?.length || 0} درس — ${lessonCount} ملف يحتاج نقل`, 'success');
+        }
+    }
+    
+    // ── 2. profiles (avatars) ──
+    if (chkAvatars) {
+        log('👤 جاري فحص جدول profiles (صور البروفايل)...', 'info');
+        const { data: profiles, error } = await client.from('profiles').select('id, avatar_url').not('avatar_url', 'is', null);
+        if (error) { log('❌ خطأ في قراءة profiles: ' + error.message, 'error'); }
+        else {
+            let avatarCount = 0;
+            for (const profile of profiles || []) {
+                if (profile.avatar_url && shouldMigrate(profile.avatar_url)) {
+                    addItem('profiles', 'avatar_url', profile.id, profile.avatar_url);
+                    avatarCount++;
+                }
+            }
+            log(`✅ profiles: وجدت ${profiles?.length || 0} بروفايل — ${avatarCount} صورة تحتاج نقل`, 'success');
+        }
+    }
+
+    // ── 3. church_news (أخبار الكنيسة) ──
+    if (chkChurchNews) {
+        log('📰 جاري فحص جدول church_news (أخبار الكنيسة)...', 'info');
+        const { data: news, error } = await client.from('church_news').select('id, image_url').not('image_url', 'is', null);
+        if (error) { log('❌ خطأ في قراءة church_news: ' + error.message, 'error'); }
+        else {
+            let newsCount = 0;
+            for (const item of news || []) {
+                if (item.image_url && shouldMigrate(item.image_url)) {
+                    addItem('church_news', 'image_url', item.id, item.image_url);
+                    newsCount++;
+                }
+            }
+            log(`✅ church_news: وجدت ${news?.length || 0} خبر — ${newsCount} صورة تحتاج نقل`, 'success');
+        }
+    }
+
+    // ── 4. slideshow_images (السلايدشو) ──
+    if (chkSlideshow) {
+        log('🖼️ جاري فحص جدول slideshow_images (السلايدشو)...', 'info');
+        const { data: slides, error } = await client.from('slideshow_images').select('id, image_url').not('image_url', 'is', null);
+        if (error) { log('❌ خطأ في قراءة slideshow_images: ' + error.message, 'error'); }
+        else {
+            let slideCount = 0;
+            for (const slide of slides || []) {
+                if (slide.image_url && shouldMigrate(slide.image_url)) {
+                    addItem('slideshow_images', 'image_url', slide.id, slide.image_url);
+                    slideCount++;
+                }
+            }
+            log(`✅ slideshow_images: وجدت ${slides?.length || 0} صورة — ${slideCount} تحتاج نقل`, 'success');
+        }
+    }
+    
+    stats.total = items.length;
+    updateStats();
+    renderItems();
+    
+    document.getElementById('scanCount').textContent = `— ${items.length} ملف تحتاج نقل`;
+    log(`📊 المسح اكتمل! وجدت ${items.length} ملف يحتاج إلى نقل.`, items.length > 0 ? 'success' : 'warning');
+    
+    if (items.length > 0) {
+        document.getElementById('btnMigrate').style.display = 'inline-flex';
+    } else {
+        log('✅ لا توجد ملفات تحتاج إلى نقل — كل الملفات موجودة على Cloudinary أو لا توجد ملفات مرفوعة.', 'success');
+    }
+}
+
+// ──────────────────────────────────────────────
+// UPLOAD TO CLOUDINARY
+// ──────────────────────────────────────────────
+async function uploadToCloudinary(url, fileType) {
+    const cfg = getCfg();
+    
+    // Determine resource type
+    let resourceType = 'raw';
+    if (fileType === 'image') resourceType = 'image';
+    else if (fileType === 'audio' || fileType === 'video') resourceType = 'video';
+    
+    const uploadUrl = `https://api.cloudinary.com/v1_1/${cfg.cloudName}/${resourceType}/upload`;
+    
+    let blob;
+    
+    if (url.startsWith('data:')) {
+        // Base64 → Blob
+        const [header, base64Data] = url.split(',');
+        const mimeMatch = header.match(/data:([^;]+);/);
+        const mime = mimeMatch ? mimeMatch[1] : 'application/octet-stream';
+        const binary = atob(base64Data);
+        const bytes = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+        blob = new Blob([bytes], { type: mime });
+        
+        // Re-detect resource type from mime
+        if (mime.startsWith('image/')) resourceType = 'image';
+        else if (mime.startsWith('audio/') || mime.startsWith('video/')) resourceType = 'video';
+    } else {
+        // Download file via fetch (works for Supabase public URLs)
+        const resp = await fetch(url);
+        if (!resp.ok) throw new Error(`فشل تحميل الملف: ${resp.status}`);
+        blob = await resp.blob();
+        
+        // Re-detect from content-type
+        const ct = blob.type || '';
+        if (ct.startsWith('image/')) resourceType = 'image';
+        else if (ct.startsWith('audio/') || ct.startsWith('video/')) resourceType = 'video';
+    }
+    
+    const formData = new FormData();
+    formData.append('file', blob);
+    formData.append('upload_preset', cfg.preset);
+    
+    const finalUrl = `https://api.cloudinary.com/v1_1/${cfg.cloudName}/${resourceType}/upload`;
+    const response = await fetch(finalUrl, { method: 'POST', body: formData });
+    
+    if (!response.ok) {
+        const errText = await response.text();
+        throw new Error(`Cloudinary رفض الرفع: ${response.status} — ${errText.substring(0, 200)}`);
+    }
+    
+    const result = await response.json();
+    if (result && result.secure_url) return result.secure_url;
+    throw new Error('لم يتم استلام URL من Cloudinary');
+}
+
+// ──────────────────────────────────────────────
+// UPDATE DB
+// ──────────────────────────────────────────────
+async function updateDbUrl(client, item, newUrl) {
+    const update = {};
+    update[item.column] = newUrl;
+    
+    const { error } = await client.from(item.table).update(update).eq('id', item.rowId);
+    if (error) throw new Error(error.message);
+}
+
+// ──────────────────────────────────────────────
+// MIGRATION
+// ──────────────────────────────────────────────
+async function startMigration() {
+    stopFlag = false;
+    document.getElementById('btnMigrate').style.display = 'none';
+    document.getElementById('btnStop').style.display = 'inline-flex';
+    document.getElementById('btnScan').disabled = true;
+    
+    let client;
+    try { client = getClient(); }
+    catch(e) { log('❌ ' + e.message, 'error'); return; }
+    
+    log('🚀 بدأ عملية النقل...', 'info');
+    
+    for (const item of items) {
+        if (stopFlag) {
+            log('⛔ تم إيقاف العملية.', 'warning');
+            break;
+        }
+        
+        if (item.status === 'done' || item.status === 'skip') continue;
+        
+        updateItemStatus(item.id, 'running');
+        
+        try {
+            log(`📤 رفع: ${item.table}.${item.column} [${item.rowId}]`, 'info');
+            
+            const newUrl = await uploadToCloudinary(item.url, item.fileType);
+            await updateDbUrl(client, item, newUrl);
+            
+            item.status = 'done';
+            item.newUrl = newUrl;
+            stats.done++;
+            updateItemStatus(item.id, 'done', newUrl);
+            log(`✅ تم: ${newUrl.substring(0, 70)}...`, 'success');
+            
+        } catch (err) {
+            item.status = 'error';
+            stats.error++;
+            updateItemStatus(item.id, 'error');
+            log(`❌ خطأ في [${item.rowId}]: ${err.message}`, 'error');
+        }
+        
+        updateStats();
+        
+        // Small delay to avoid rate limiting
+        await new Promise(r => setTimeout(r, 300));
+    }
+    
+    document.getElementById('btnStop').style.display = 'none';
+    document.getElementById('btnScan').disabled = false;
+    
+    const remaining = items.filter(i => i.status === 'error').length;
+    if (remaining > 0) {
+        document.getElementById('btnMigrate').style.display = 'inline-flex';
+        document.getElementById('btnMigrate').innerHTML = '<i class="fas fa-redo"></i> إعادة المحاولة للملفات الفاشلة';
+        log(`⚠️ اكتملت العملية مع ${remaining} خطأ. يمكنك المحاولة مجدداً.`, 'warning');
+    } else {
+        log('🎉 تم نقل جميع الملفات بنجاح إلى Cloudinary!', 'success');
+    }
+}
+
+function stopMigration() {
+    stopFlag = true;
+    log('⛔ جاري إيقاف العملية...', 'warning');
+}
+</script>
+</body>
+</html>

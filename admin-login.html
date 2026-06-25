@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بوابة الإدارة - كنيسة القديسين بطرس وبولس</title>
+    
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #800000;
+            --secondary-color: #d4a017;
+            --light-color: #EDDDBD;
+            --dark-color: #013346;
+            --gradient-primary: linear-gradient(135deg, #800000, #a00000);
+            --gradient-secondary: linear-gradient(135deg, #d4a017, #f4c542);
+            --gradient-bg: linear-gradient(135deg, #013346, #024a63);
+            --gradient-card: linear-gradient(135deg, rgba(1, 51, 70, 0.95), rgba(0, 40, 56, 0.95));
+            --shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
+            --radius: 20px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: var(--gradient-bg);
+            color: var(--light-color);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Animated Background & Particles */
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            overflow: hidden;
+        }
+
+        .animated-bg::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: 
+                radial-gradient(circle at 10% 20%, rgba(128, 0, 0, 0.1) 0%, transparent 25%),
+                radial-gradient(circle at 90% 80%, rgba(212, 160, 23, 0.08) 0%, transparent 25%);
+            animation: float 20s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(-1%, 2%); }
+        }
+
+        /* Card container */
+        .admin-login-container {
+            width: 100%;
+            max-width: 460px;
+            margin: 20px;
+            z-index: 10;
+        }
+
+        .admin-login-card {
+            background: var(--gradient-card);
+            backdrop-filter: blur(15px);
+            border-radius: var(--radius);
+            padding: 40px 35px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(212, 160, 23, 0.25);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .admin-login-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: var(--gradient-primary);
+        }
+
+        .logo-container {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 75px;
+            height: 75px;
+            background: var(--gradient-primary);
+            border-radius: 50%;
+            margin-bottom: 15px;
+            box-shadow: 0 5px 20px rgba(128, 0, 0, 0.4);
+        }
+
+        .logo i {
+            font-size: 32px;
+            color: var(--light-color);
+        }
+
+        .title {
+            font-size: 24px;
+            font-weight: 900;
+            color: var(--light-color);
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            font-size: 15px;
+            color: rgba(237, 221, 189, 0.85);
+            font-weight: 300;
+        }
+
+        .form-group {
+            margin-bottom: 22px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .input-group {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-icon {
+            position: absolute;
+            right: 15px;
+            color: rgba(212, 160, 23, 0.7);
+            font-size: 17px;
+            z-index: 2;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px 45px 14px 15px;
+            background: rgba(237, 221, 189, 0.08);
+            border: 2px solid rgba(212, 160, 23, 0.25);
+            border-radius: 12px;
+            color: var(--light-color);
+            font-size: 15px;
+            font-family: 'Cairo', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            background: rgba(237, 221, 189, 0.12);
+            box-shadow: 0 0 0 3px rgba(212, 160, 23, 0.2);
+        }
+
+        .password-container {
+            position: relative;
+        }
+
+        .toggle-password {
+            position: absolute;
+            left: 15px;
+            background: none;
+            border: none;
+            color: rgba(212, 160, 23, 0.7);
+            cursor: pointer;
+            font-size: 17px;
+            z-index: 2;
+            padding: 5px;
+        }
+
+        .toggle-password:hover {
+            color: var(--secondary-color);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: var(--gradient-primary);
+            border: none;
+            border-radius: 12px;
+            color: var(--light-color);
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(128, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .submit-btn:hover {
+            background: linear-gradient(135deg, #a00000, #c00000);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(128, 0, 0, 0.4);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .submit-btn.loading .btn-text {
+            display: none;
+        }
+
+        .submit-btn.loading .spinner {
+            display: block;
+        }
+
+        .error-alert {
+            background: rgba(255, 107, 107, 0.15);
+            border: 1px solid #ff6b6b;
+            color: #ff6b6b;
+            padding: 12px 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: shake 0.4s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-6px); }
+            40%, 80% { transform: translateX(6px); }
+        }
+
+        .footer-link {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 13px;
+            color: rgba(237, 221, 189, 0.5);
+        }
+
+        .footer-link a {
+            color: var(--secondary-color);
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="animated-bg"></div>
+
+    <div class="admin-login-container">
+        <div class="admin-login-card">
+            <!-- Brand -->
+            <div class="logo-container">
+                <div class="logo">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+                <h1 class="title">لوحة تحكم النظام</h1>
+                <p class="subtitle">تسجيل الدخول للمسؤولين وأعضاء الخدمة</p>
+            </div>
+
+            <!-- Error Banner -->
+            <div class="error-alert" id="errorBanner" style="display: none;">
+                <i class="fas fa-exclamation-circle"></i>
+                <span id="errorMessage">أنت غير مخول بالدخول إلى لوحة التحكم.</span>
+            </div>
+
+            <!-- Login Form -->
+            <form id="adminLoginForm">
+                <div class="form-group">
+                    <label class="form-label" for="adminEmail">البريد الإلكتروني للإدارة</label>
+                    <div class="input-group">
+                        <input type="email" id="adminEmail" class="form-control" placeholder="admin@church.com" required autocomplete="email">
+                        <div class="input-icon"><i class="fas fa-envelope"></i></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="adminPassword">كلمة المرور</label>
+                    <div class="input-group password-container">
+                        <input type="password" id="adminPassword" class="form-control" placeholder="••••••••" required autocomplete="current-password">
+                        <button type="button" class="toggle-password" onclick="togglePassword()">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <div class="input-icon"><i class="fas fa-lock"></i></div>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn" id="submitBtn">
+                    <span class="btn-text"><i class="fas fa-sign-in-alt"></i> دخول آمن</span>
+                    <div class="spinner"></div>
+                </button>
+            </form>
+
+            <div class="footer-link">
+                كنيسة القديسين بطرس وبولس | <a href="index.html">العودة للموقع الرئيسي</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/supabase-service.js"></script>
+
+    <script>
+        // Check URL parameters for errors
+        window.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('error') === 'unauthorized') {
+                showError("عذراً، هذا الحساب غير مصرح له بالدخول للوحة التحكم.");
+            }
+        });
+
+        // Toggle Password
+        function togglePassword() {
+            const input = document.getElementById('adminPassword');
+            const icon = document.querySelector('.toggle-password i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        // Error display
+        function showError(msg) {
+            const banner = document.getElementById('errorBanner');
+            const message = document.getElementById('errorMessage');
+            message.textContent = msg;
+            banner.style.display = 'flex';
+            banner.style.animation = 'none';
+            banner.offsetHeight; // trigger reflow
+            banner.style.animation = 'shake 0.4s';
+        }
+
+        // Handle Admin Login Form Submission
+        document.getElementById('adminLoginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const email = document.getElementById('adminEmail').value.trim();
+            const password = document.getElementById('adminPassword').value;
+            const btn = document.getElementById('submitBtn');
+
+            // Set loading state
+            btn.classList.add('loading');
+            btn.disabled = true;
+            document.getElementById('errorBanner').style.display = 'none';
+
+            try {
+                // 1. Authenticate user in Supabase
+                const loginResult = await authService.login(email, password, false);
+                const role = loginResult.profile.role;
+
+                // 2. Validate administrator privileges (using new Arabic roles)
+                const allowedAdminRoles = ['اب كاهن', 'امين خدمه', 'خادم'];
+                if (!allowedAdminRoles.includes(role)) {
+                    // Log unauthorized breach attempt
+                    await authService.logActivity(
+                        loginResult.user.id, 
+                        'unauthorized_admin_attempt', 
+                        `محاولة دخول غير مصرحة للوحة التحكم بدور: ${role}`
+                    );
+                    
+                    // Force logout
+                    await authService.logout();
+                    throw new Error("عذراً، هذا الحساب (مخدوم) غير مصرح له بالوصول للوحة التحكم. يحتاج دور [خادم] أو أعلى.");
+                }
+
+                // 3. Log successful admin login
+                await authService.logActivity(
+                    loginResult.user.id, 
+                    'admin_login', 
+                    `دخول ناجح للوحة التحكم بدور: ${role}`
+                );
+
+                // Redirect to dashboard
+                window.location.href = "login-system/admin.html";
+
+            } catch (err) {
+                console.error("Admin Login Error:", err);
+                showError(err.message || "فشل تسجيل الدخول. تحقق من البريد وكلمة المرور.");
+                btn.classList.remove('loading');
+                btn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,3192 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم - كنيسة القديسين بطرس وبولس</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../js/supabase-config.js"></script>
+    <script src="../js/supabase-service.js"></script>
+
+    <!-- Immediate Authentication Route Guard -->
+    <script>
+        (async function () {
+            const localRole = localStorage.getItem('userRole');
+            const isLoggedIn = localStorage.getItem('isLoggedIn');
+            if (isLoggedIn !== 'true' || (localRole !== 'اب كاهن' && localRole !== 'امين خدمه' && localRole !== 'خادم')) {
+                window.location.replace("../admin-login.html?error=unauthorized");
+            }
+        })();
+    </script>
+
+    <style>
+        /* ============================================================
+           DESIGN TOKENS
+        ============================================================ */
+        :root {
+            --bg: #07111f;
+            --s1: #0b1929;
+            --s2: #0f1f33;
+            --s3: #142540;
+            --s4: #192b4a;
+            --border: rgba(212, 160, 23, .10);
+            --border-m: rgba(212, 160, 23, .20);
+            --border-h: rgba(212, 160, 23, .38);
+            --primary: #8b0000;
+            --primary-h: #a30000;
+            --gold: #d4a017;
+            --gold-bg: rgba(212, 160, 23, .08);
+            --gold-bg-h: rgba(212, 160, 23, .16);
+            --text: #f0e8d6;
+            --text-2: rgba(240, 232, 214, .72);
+            --text-3: rgba(240, 232, 214, .40);
+            --green: #3fc975;
+            --green-bg: rgba(63, 201, 117, .12);
+            --red: #e55050;
+            --red-bg: rgba(229, 80, 80, .12);
+            --purple: #c060e8;
+            --purple-bg: rgba(192, 96, 232, .12);
+            --blue: #3da0e8;
+            --blue-bg: rgba(61, 160, 232, .12);
+            --sidebar-w: 260px;
+            --nav-h: 60px;
+            --r: 10px;
+            --r-lg: 16px;
+            --t: .2s ease;
+            --shadow: 0 4px 24px rgba(0, 0, 0, .35);
+        }
+
+        /* ============================================================
+           RESET + BASE
+        ============================================================ */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            direction: rtl;
+            overflow-x: hidden;
+        }
+
+        /* ============================================================
+           NAVBAR
+        ============================================================ */
+        .admin-navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--nav-h);
+            background: var(--s1);
+            border-bottom: 1px solid var(--border-m);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            z-index: 1000;
+            gap: 12px;
+        }
+
+        .navbar-brand-custom {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text);
+            text-decoration: none;
+            flex-shrink: 0;
+        }
+
+        .navbar-logo {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-h));
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        .brand-title {
+            font-weight: 900;
+            font-size: 15px;
+            line-height: 1.2;
+            display: block;
+            color: var(--text);
+        }
+
+        .brand-sub {
+            font-size: 11px;
+            color: var(--gold);
+            display: block;
+            letter-spacing: .04em;
+        }
+
+        .nav-spacer {
+            flex: 1;
+        }
+
+        /* Avatar */
+        .initials-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-h));
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            flex-shrink: 0;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            transition: opacity var(--t);
+        }
+
+        .initials-avatar:hover {
+            opacity: .85;
+        }
+
+        .nav-user-text {
+            line-height: 1.3;
+            text-align: end;
+        }
+
+        .nav-greeting-line {
+            font-size: 11px;
+            color: var(--text-3);
+            display: block;
+        }
+
+        .nav-name-line {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text);
+            display: block;
+        }
+
+        /* Nav buttons */
+        .btn-nav {
+            height: 34px;
+            padding: 0 14px;
+            border-radius: var(--r);
+            border: 1px solid var(--border-m);
+            background: var(--gold-bg);
+            color: var(--gold);
+            font-family: 'Cairo', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background var(--t), border-color var(--t);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+            text-decoration: none;
+        }
+
+        .btn-nav:hover {
+            background: var(--gold-bg-h);
+            border-color: var(--border-h);
+            color: var(--gold);
+        }
+
+        .btn-nav-danger {
+            border-color: rgba(229, 80, 80, .3);
+            background: var(--red-bg);
+            color: var(--red);
+        }
+
+        .btn-nav-danger:hover {
+            background: rgba(229, 80, 80, .2);
+            border-color: var(--red);
+            color: var(--red);
+        }
+
+        /* Hamburger */
+        .nav-hamburger {
+            display: none;
+            width: 36px;
+            height: 36px;
+            border-radius: var(--r);
+            border: 1px solid var(--border-m);
+            background: var(--gold-bg);
+            color: var(--text);
+            font-size: 15px;
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        /* ============================================================
+           APP SHELL
+        ============================================================ */
+        .app-shell {
+            padding-top: var(--nav-h);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* ============================================================
+           SIDEBAR
+        ============================================================ */
+        .admin-sidebar {
+            position: fixed;
+            top: var(--nav-h);
+            right: 0;
+            width: var(--sidebar-w);
+            height: calc(100vh - var(--nav-h));
+            background: var(--s1);
+            border-left: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            padding: 18px 12px 24px;
+            z-index: 900;
+            overflow-y: auto;
+            transition: transform var(--t), box-shadow var(--t);
+        }
+
+        /* Thin scrollbar */
+        .admin-sidebar::-webkit-scrollbar {
+            width: 3px;
+        }
+
+        .admin-sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .admin-sidebar::-webkit-scrollbar-thumb {
+            background: var(--border-m);
+            border-radius: 2px;
+        }
+
+        .sidebar-label {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: .14em;
+            text-transform: uppercase;
+            color: var(--text-3);
+            padding: 0 8px;
+            margin: 16px 0 6px;
+        }
+
+        .sidebar-label:first-child {
+            margin-top: 0;
+        }
+
+        .sidebar-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 10px 0;
+        }
+
+        .admin-sidebar-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 10px;
+            border-radius: var(--r);
+            border: 1px solid transparent;
+            background: transparent;
+            color: var(--text-2);
+            font-family: 'Cairo', sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all var(--t);
+            text-decoration: none;
+            width: 100%;
+            text-align: right;
+            margin-bottom: 2px;
+        }
+
+        .admin-sidebar-btn .sb-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            background: var(--s3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            color: var(--text-3);
+            flex-shrink: 0;
+            transition: all var(--t);
+        }
+
+        .admin-sidebar-btn:hover {
+            background: var(--gold-bg);
+            border-color: var(--border);
+            color: var(--text);
+        }
+
+        .admin-sidebar-btn:hover .sb-icon {
+            background: var(--gold-bg-h);
+            color: var(--gold);
+        }
+
+        .admin-sidebar-btn.active {
+            background: linear-gradient(135deg, rgba(139, 0, 0, .22), rgba(163, 0, 0, .12));
+            border-color: rgba(139, 0, 0, .38);
+            color: #ffb870;
+        }
+
+        .admin-sidebar-btn.active .sb-icon {
+            background: rgba(139, 0, 0, .28);
+            color: #ffb870;
+        }
+
+        /* Close button (mobile only) */
+        .admin-sidebar-close {
+            display: none;
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 28px;
+            height: 28px;
+            border-radius: 7px;
+            border: 1px solid rgba(229, 80, 80, .35);
+            background: var(--red-bg);
+            color: var(--red);
+            font-size: 15px;
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+            transition: background var(--t);
+        }
+
+        .admin-sidebar-close:hover {
+            background: rgba(229, 80, 80, .22);
+        }
+
+        /* Overlay */
+        .admin-sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .68);
+            z-index: 899;
+            backdrop-filter: blur(3px);
+        }
+
+        .admin-sidebar-overlay.active {
+            display: block;
+        }
+
+        /* ============================================================
+           MAIN CONTENT AREA
+        ============================================================ */
+        .admin-content-wrapper {
+            flex: 1;
+            margin-right: var(--sidebar-w);
+            padding: 28px 24px 48px;
+            min-width: 0;
+        }
+
+        /* ============================================================
+           STATS GRID
+        ============================================================ */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card-custom {
+            background: var(--s2);
+            border: 1px solid var(--border);
+            border-radius: var(--r-lg);
+            padding: 18px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .stat-details h3 {
+            font-size: 30px;
+            font-weight: 900;
+            color: var(--gold);
+            margin: 0 0 2px 0;
+            line-height: 1;
+        }
+
+        .stat-details span {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-2);
+        }
+
+        .stat-icon-wrapper {
+            width: 46px;
+            height: 46px;
+            border-radius: var(--r);
+            background: var(--gold-bg);
+            border: 1px solid var(--border-m);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gold);
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        /* ============================================================
+           CONTROLS CARD (search + filters)
+        ============================================================ */
+        .controls-card {
+            background: var(--s2);
+            border: 1px solid var(--border);
+            border-radius: var(--r-lg);
+            padding: 14px 18px;
+            margin-bottom: 18px;
+        }
+
+        .search-box-custom {
+            position: relative;
+        }
+
+        .search-box-custom input {
+            width: 100%;
+            height: 40px;
+            padding: 0 42px 0 14px;
+            background: var(--s3);
+            border: 1px solid var(--border);
+            border-radius: var(--r);
+            color: var(--text);
+            font-family: 'Cairo', sans-serif;
+            font-size: 14px;
+            transition: border-color var(--t);
+        }
+
+        .search-box-custom input:focus {
+            outline: none;
+            border-color: var(--border-h);
+        }
+
+        .search-box-custom input::placeholder {
+            color: var(--text-3);
+        }
+
+        .search-box-custom i {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-3);
+            font-size: 13px;
+            pointer-events: none;
+        }
+
+        .select-filter-custom {
+            height: 40px;
+            width: 100%;
+            padding: 0 14px;
+            background: var(--s3);
+            border: 1px solid var(--border);
+            border-radius: var(--r);
+            color: var(--text);
+            font-family: 'Cairo', sans-serif;
+            font-size: 14px;
+            cursor: pointer;
+            transition: border-color var(--t);
+            appearance: none;
+            -webkit-appearance: none;
+        }
+
+        .select-filter-custom:focus {
+            outline: none;
+            border-color: var(--border-h);
+        }
+
+        .select-filter-custom option {
+            background: var(--s3);
+            color: var(--text);
+        }
+
+        /* Refresh btn in controls */
+        .btn-refresh {
+            height: 40px;
+            padding: 0 16px;
+            border-radius: var(--r);
+            border: 1px solid var(--border-m);
+            background: var(--gold-bg);
+            color: var(--gold);
+            font-family: 'Cairo', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background var(--t);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .btn-refresh:hover {
+            background: var(--gold-bg-h);
+        }
+
+        /* ============================================================
+           DATA PANELS  (tables, monitoring, etc.)
+        ============================================================ */
+        .table-responsive-custom {
+            background: var(--s2);
+            border: 1px solid var(--border);
+            border-radius: var(--r-lg);
+            padding: 20px;
+            overflow: auto;
+            box-shadow: var(--shadow);
+        }
+
+        /* Panel title inside a section */
+        .panel-title {
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0;
+        }
+
+        /* ============================================================
+           TABLE
+        ============================================================ */
+        .custom-table {
+            width: 100%;
+            border-collapse: collapse;
+            color: var(--text);
+            font-size: 13px;
+        }
+
+        .custom-table th {
+            padding: 10px 14px;
+            text-align: right;
+            border-bottom: 1px solid var(--border-m);
+            color: var(--gold);
+            font-weight: 700;
+            font-size: 11px;
+            letter-spacing: .03em;
+            background: var(--s3);
+            white-space: nowrap;
+        }
+
+        .custom-table td {
+            padding: 12px 14px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+            color: var(--text-2);
+        }
+
+        .custom-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .custom-table tbody tr:hover>td {
+            background: var(--gold-bg);
+        }
+
+        /* ============================================================
+           BADGES
+        ============================================================ */
+        .badge-role {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 6px;
+            white-space: nowrap;
+        }
+
+        .role-اب-كاهن {
+            background: rgba(232, 89, 12, .18);
+            color: #f08844;
+            border: 1px solid rgba(232, 89, 12, .4);
+        }
+
+        .role-امين-خدمه {
+            background: rgba(139, 0, 0, .2);
+            color: #e87878;
+            border: 1px solid rgba(139, 0, 0, .5);
+        }
+
+        .role-خادم {
+            background: var(--blue-bg);
+            color: var(--blue);
+            border: 1px solid rgba(61, 160, 232, .4);
+        }
+
+        .role-مخدوم {
+            background: var(--green-bg);
+            color: var(--green);
+            border: 1px solid rgba(63, 201, 117, .3);
+        }
+
+        .badge-status {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 6px;
+            white-space: nowrap;
+        }
+
+        .status-active {
+            background: var(--green-bg);
+            color: var(--green);
+            border: 1px solid rgba(63, 201, 117, .35);
+        }
+
+        .status-suspended {
+            background: var(--red-bg);
+            color: var(--red);
+            border: 1px solid rgba(229, 80, 80, .35);
+        }
+
+        .status-blocked {
+            background: var(--purple-bg);
+            color: var(--purple);
+            border: 1px solid rgba(192, 96, 232, .35);
+        }
+
+        /* Online dot */
+        .online-dot {
+            display: inline-block;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            margin-left: 5px;
+            vertical-align: middle;
+        }
+
+        .online-true {
+            background: var(--green);
+            box-shadow: 0 0 5px var(--green);
+        }
+
+        .online-false {
+            background: var(--text-3);
+        }
+
+        /* ============================================================
+           ACTION BUTTONS
+        ============================================================ */
+        .btn-action-custom {
+            width: 30px;
+            height: 30px;
+            border-radius: 7px;
+            border: 1px solid var(--border);
+            background: var(--s3);
+            color: var(--text-2);
+            cursor: pointer;
+            transition: all var(--t);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .btn-action-custom:hover {
+            background: var(--gold-bg-h);
+            border-color: var(--border-h);
+            color: var(--gold);
+        }
+
+        .btn-action-danger:hover {
+            background: var(--red-bg);
+            border-color: rgba(229, 80, 80, .4);
+            color: var(--red);
+        }
+
+        /* ============================================================
+           MODALS — Bootstrap dark overrides
+        ============================================================ */
+        .modal-content-custom {
+            background: var(--s2);
+            border: 1px solid var(--border-m);
+            border-radius: var(--r-lg);
+            color: var(--text);
+            box-shadow: 0 28px 70px rgba(0, 0, 0, .65);
+        }
+
+        .modal-header-custom {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .modal-body-custom {
+            padding: 20px;
+        }
+
+        .modal-footer-custom {
+            padding: 12px 20px;
+            border-top: 1px solid var(--border);
+            gap: 8px;
+        }
+
+        /* Form fields inside modals */
+        .modal-content-custom .form-control,
+        .modal-content-custom .form-select,
+        .modal-content-custom textarea.form-control {
+            background: var(--s3);
+            border: 1px solid var(--border-m);
+            border-radius: var(--r);
+            color: var(--text);
+            font-family: 'Cairo', sans-serif;
+            font-size: 14px;
+            transition: border-color var(--t), box-shadow var(--t);
+        }
+
+        .modal-content-custom .form-control:focus,
+        .modal-content-custom .form-select:focus,
+        .modal-content-custom textarea.form-control:focus {
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px rgba(212, 160, 23, .12);
+            background: var(--s3);
+            color: var(--text);
+            outline: none;
+        }
+
+        .modal-content-custom .form-control::placeholder {
+            color: var(--text-3);
+        }
+
+        .modal-content-custom textarea::placeholder {
+            color: var(--text-3);
+        }
+
+        .modal-content-custom .form-label {
+            font-weight: 700;
+            font-size: 13px;
+            color: var(--text-2);
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        /* Readonly form fields */
+        .modal-content-custom .form-control[readonly] {
+            opacity: .65;
+            cursor: not-allowed;
+        }
+
+        /* ============================================================
+           LOGS CONSOLE
+        ============================================================ */
+        .logs-console {
+            background: #020c17;
+            border: 1px solid var(--border-m);
+            border-radius: var(--r);
+            padding: 14px 16px;
+            font-family: 'Courier New', monospace;
+            max-height: 420px;
+            overflow-y: auto;
+            font-size: 12px;
+            line-height: 1.75;
+        }
+
+        .log-item {
+            padding: 2px 0;
+            border-bottom: 1px solid rgba(63, 201, 117, .06);
+            color: #4fe09a;
+        }
+
+        .log-item:last-child {
+            border-bottom: none;
+        }
+
+        .log-timestamp {
+            color: var(--gold);
+        }
+
+        .log-action {
+            color: #f0c060;
+            font-weight: bold;
+        }
+
+        /* ============================================================
+           TOAST NOTIFICATIONS
+        ============================================================ */
+        .toast-container {
+            position: fixed;
+            top: 70px;
+            left: 20px;
+            z-index: 99999;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .custom-toast {
+            background: var(--s2);
+            border: 1px solid var(--border-m);
+            border-radius: var(--r);
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text);
+            min-width: 280px;
+            max-width: 360px;
+            box-shadow: var(--shadow);
+            animation: toastIn .25s ease forwards;
+        }
+
+        @keyframes toastIn {
+            from {
+                transform: translateX(-16px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .toast-success {
+            border-right: 3px solid var(--green);
+        }
+
+        .toast-error {
+            border-right: 3px solid var(--red);
+        }
+
+        .toast-warning {
+            border-right: 3px solid var(--gold);
+        }
+
+        /* ============================================================
+           PIN LOCK SCREEN
+        ============================================================ */
+        .pin-lock-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(7, 17, 31, .97);
+            backdrop-filter: blur(20px);
+            z-index: 999999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .pin-lock-card {
+            background: var(--s2);
+            border: 1px solid var(--border-m);
+            border-radius: var(--r-lg);
+            padding: 32px 26px;
+            width: 90%;
+            max-width: 380px;
+            box-shadow: 0 28px 80px rgba(0, 0, 0, .65);
+            text-align: center;
+            position: relative;
+        }
+
+        .pin-lock-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-h));
+            color: #fff;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 20px rgba(139, 0, 0, .4);
+        }
+
+        .pin-indicators {
+            display: flex;
+            justify-content: center;
+            gap: 14px;
+            margin: 18px 0;
+        }
+
+        .pin-dot {
+            width: 13px;
+            height: 13px;
+            border: 2px solid var(--border-m);
+            border-radius: 50%;
+            transition: all .15s ease;
+        }
+
+        .pin-dot.active {
+            background: var(--gold);
+            border-color: var(--gold);
+            box-shadow: 0 0 8px rgba(212, 160, 23, .5);
+        }
+
+        .pin-lock-alert {
+            background: var(--red-bg);
+            border: 1px solid rgba(229, 80, 80, .4);
+            color: var(--red);
+            padding: 10px 14px;
+            border-radius: var(--r);
+            font-size: 13px;
+            margin-bottom: 14px;
+        }
+
+        .pin-keypad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 8px;
+            direction: ltr;
+        }
+
+        .pin-key-btn {
+            background: var(--s3);
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-radius: 50%;
+            width: 56px;
+            height: 56px;
+            margin: 0 auto;
+            font-size: 19px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all .15s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        .pin-key-btn:hover {
+            background: var(--gold-bg-h);
+            border-color: var(--border-h);
+            color: var(--gold);
+        }
+
+        .pin-key-btn:active {
+            transform: scale(.93);
+        }
+
+        .pin-key-btn.key-action-btn {
+            border-radius: var(--r);
+            width: 100%;
+            font-size: 13px;
+            height: 56px;
+        }
+
+        .pin-key-btn.btn-ok {
+            background: linear-gradient(135deg, var(--primary), var(--primary-h));
+            border-color: var(--primary);
+            color: #fff;
+        }
+
+        .pin-key-btn.btn-ok:hover {
+            background: linear-gradient(135deg, var(--primary-h), #c00000);
+            color: #fff;
+        }
+
+        /* ============================================================
+           SLIDES GRID
+        ============================================================ */
+        #slidesGridContainer {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+            gap: 10px;
+            max-height: 360px;
+            overflow-y: auto;
+            padding: 4px;
+        }
+
+        /* ============================================================
+           RESPONSIVE — TABLET (≤1200px)
+        ============================================================ */
+        @media (max-width: 1200px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* ============================================================
+           RESPONSIVE — MOBILE (≤991px) — sidebar becomes drawer
+        ============================================================ */
+        @media (max-width: 991px) {
+            .admin-sidebar {
+                top: 0;
+                height: 100vh;
+                transform: translateX(110%);
+                box-shadow: -10px 0 40px rgba(0, 0, 0, .55);
+                padding-top: 52px;
+            }
+
+            .admin-sidebar.open {
+                transform: translateX(0);
+            }
+
+            .admin-sidebar-close {
+                display: flex;
+            }
+
+            .admin-content-wrapper {
+                margin-right: 0;
+                padding: 20px 16px 40px;
+            }
+
+            .nav-hamburger {
+                display: flex;
+            }
+
+            .nav-user-text {
+                display: none;
+            }
+        }
+
+        /* ============================================================
+           RESPONSIVE — SMALL MOBILE (≤640px)
+        ============================================================ */
+        @media (max-width: 640px) {
+            .admin-content-wrapper {
+                padding: 14px 12px 36px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+
+            .stat-card-custom {
+                padding: 14px 14px;
+            }
+
+            .stat-details h3 {
+                font-size: 24px;
+            }
+
+            .controls-card {
+                padding: 12px 14px;
+            }
+
+            /* Table → Card layout */
+            .custom-table thead {
+                display: none;
+            }
+
+            .custom-table,
+            .custom-table tbody,
+            .custom-table tr,
+            .custom-table td {
+                display: block;
+                width: 100%;
+            }
+
+            .custom-table tbody tr {
+                background: var(--s3);
+                border: 1px solid var(--border);
+                border-radius: var(--r);
+                margin-bottom: 10px;
+                padding: 10px 12px;
+            }
+
+            .custom-table tbody tr td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                border-bottom: 1px solid var(--border);
+                padding: 7px 2px;
+                font-size: 13px;
+                gap: 8px;
+            }
+
+            .custom-table tbody tr td:last-child {
+                border-bottom: none;
+                justify-content: center;
+                padding-top: 10px;
+                gap: 8px;
+            }
+
+            .custom-table tbody tr td::before {
+                content: attr(data-label);
+                font-weight: 700;
+                font-size: 11px;
+                color: var(--gold);
+                white-space: nowrap;
+                flex-shrink: 0;
+            }
+
+            .custom-table tbody tr td:first-child {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .custom-table tbody tr td:first-child::before {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- =====================================================
+         PIN LOCK SCREEN OVERLAY
+    ===================================================== -->
+    <div id="pinLockOverlay" class="pin-lock-overlay" style="display:none;">
+        <div class="pin-lock-card">
+            <div>
+                <div class="pin-lock-icon"><i class="fas fa-shield-alt"></i></div>
+                <h3 id="pinLockTitle" style="font-weight:900; color:var(--text); margin-bottom:4px; font-size:16px;">
+                    تأكيد رمز الأمان</h3>
+                <p id="pinLockSubtitle" style="font-size:13px; color:var(--text-2); margin-bottom:10px;">الرجاء إدخال
+                    الرمز المكون من 4 أرقام للمتابعة</p>
+            </div>
+
+            <div class="pin-indicators">
+                <span class="pin-dot"></span>
+                <span class="pin-dot"></span>
+                <span class="pin-dot"></span>
+                <span class="pin-dot"></span>
+            </div>
+
+            <div id="pinLockAlert" class="pin-lock-alert" style="display:none;"></div>
+
+            <div class="pin-keypad">
+                <button type="button" class="pin-key-btn" onclick="pressPinNum('1')">1</button>
+                <button type="button" class="pin-key-btn" onclick="pressPinNum('2')">2</button>
+                <button type="button" class="pin-key-btn" onclick="pressPinNum('3')">3</button>
+                <button type="button" class="pin-key-btn" onclick="pressPinNum('4')">4</button>
+                <button type="button" class="pin-key-btn" onclick="pressPinNum('5')">5</button>
+                <button type="button" class="pin-key-btn" onclick="pressPinNum('6')">6</button>
+                <button type="button" class="pin-key-btn" onclick="pressPinNum('7')">7</button>
+                <button type="button" class="pin-key-btn" onclick="pressPinNum('8')">8</button>
+                <button type="button" class="pin-key-btn" onclick="pressPinNum('9')">9</button>
+                <button type="button" class="pin-key-btn key-action-btn" onclick="pressPinDelete()"><i
+                        class="fas fa-backspace"></i> حذف</button>
+                <button type="button" class="pin-key-btn" onclick="pressPinNum('0')">0</button>
+                <button type="button" class="pin-key-btn key-action-btn btn-ok" onclick="submitPinCheck()">OK</button>
+            </div>
+
+            <div id="pinLockSupport" style="display:none; margin-top:14px;">
+                <a id="whatsappSupportBtn" href="#" target="_blank"
+                    style="display:flex; align-items:center; justify-content:center; gap:8px; background:#25d366; border:none; border-radius:var(--r); height:42px; color:#fff; font-weight:700; font-family:'Cairo',sans-serif; font-size:14px; text-decoration:none;">
+                    <i class="fab fa-whatsapp" style="font-size:18px;"></i> تواصل عبر الواتساب
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar overlay (mobile) -->
+    <div class="admin-sidebar-overlay" id="adminSidebarOverlay" onclick="toggleAdminSidebar()"></div>
+
+    <!-- Toast notifications -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- =====================================================
+         NAVBAR
+    ===================================================== -->
+    <nav class="admin-navbar">
+        <!-- Hamburger (mobile) -->
+        <button class="nav-hamburger" id="adminSidebarToggleBtn" onclick="toggleAdminSidebar()">
+            <i class="fas fa-bars"></i>
+        </button>
+
+        <!-- Brand -->
+        <a class="navbar-brand-custom" href="../index.html">
+            <div class="navbar-logo">
+                <i class="fas fa-church"></i>
+            </div>
+            <div>
+                <span class="brand-title">كنيسة القديسين بطرس وبولس</span>
+                <span class="brand-sub">Site Control</span>
+            </div>
+        </a>
+
+        <div class="nav-spacer"></div>
+
+        <!-- User info + actions -->
+        <div style="display:flex; align-items:center; gap:10px;">
+            <div class="nav-user-text">
+                <span class="nav-greeting-line">أهلاً بك</span>
+                <span class="nav-name-line" id="adminHeaderName">المسؤول</span>
+            </div>
+            <div onclick="openAvatarModal()" title="تغيير الصورة الشخصية">
+                <div id="adminNavbarAvatar" class="initials-avatar"
+                    style="border: 2px solid var(--border-h); width:38px; height:38px; font-size:15px;">؟</div>
+            </div>
+            <button class="btn-nav btn-nav-danger" onclick="triggerLogout()">
+                <i class="fas fa-sign-out-alt"></i> خروج
+            </button>
+        </div>
+    </nav>
+
+    <!-- =====================================================
+         APP SHELL
+    ===================================================== -->
+    <div class="app-shell">
+
+        <!-- SIDEBAR -->
+        <aside class="admin-sidebar" id="adminSidebar">
+            <button class="admin-sidebar-close" onclick="toggleAdminSidebar()">&times;</button>
+
+            <div class="sidebar-label">التنقل الرئيسي</div>
+
+            <button class="admin-sidebar-btn active" id="tabUsersBtn"
+                onclick="switchTab('users'); closeAdminSidebarOnMobile();">
+                <span class="sb-icon"><i class="fas fa-users"></i></span>
+                <span>إدارة الأعضاء</span>
+            </button>
+
+            <button class="admin-sidebar-btn" id="tabSiteEditorBtn"
+                onclick="switchTab('site-editor'); closeAdminSidebarOnMobile();">
+                <span class="sb-icon"><i class="fas fa-edit"></i></span>
+                <span>تعديل الموقع</span>
+            </button>
+
+            <button class="admin-sidebar-btn" id="tabMonitoringBtn"
+                onclick="switchTab('monitoring'); closeAdminSidebarOnMobile();">
+                <span class="sb-icon"><i class="fas fa-shield-alt"></i></span>
+                <span>سجل الأنشطة</span>
+            </button>
+
+            <div class="sidebar-divider"></div>
+
+            <div class="sidebar-label">روابط خارجية</div>
+
+            <a href="../courses/courses.html" class="admin-sidebar-btn" target="_blank">
+                <span class="sb-icon"><i class="fas fa-graduation-cap"></i></span>
+                <span>الكورسات</span>
+            </a>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="admin-content-wrapper">
+
+            <!-- STATS GRID -->
+            <div class="stats-grid">
+                <div class="stat-card-custom">
+                    <div class="stat-details">
+                        <h3 id="statTotalUsers">0</h3>
+                        <span>إجمالي المستخدمين</span>
+                    </div>
+                    <div class="stat-icon-wrapper"><i class="fas fa-users"></i></div>
+                </div>
+
+                <div class="stat-card-custom">
+                    <div class="stat-details">
+                        <h3 id="statOnlineUsers">0</h3>
+                        <span>متصلين الآن</span>
+                    </div>
+                    <div class="stat-icon-wrapper">
+                        <i class="fas fa-circle" style="color:var(--green); font-size:14px;"></i>
+                    </div>
+                </div>
+
+                <div class="stat-card-custom">
+                    <div class="stat-details">
+                        <h3 id="statTodayUsers">0</h3>
+                        <span>مسجلين اليوم</span>
+                    </div>
+                    <div class="stat-icon-wrapper"><i class="fas fa-user-plus"></i></div>
+                </div>
+
+                <div class="stat-card-custom">
+                    <div class="stat-details">
+                        <h3 id="statActiveSessions">0</h3>
+                        <span>جلسات نشطة</span>
+                    </div>
+                    <div class="stat-icon-wrapper"><i class="fas fa-laptop-house"></i></div>
+                </div>
+            </div>
+
+            <!-- ─────────────────────────────────
+                 TAB: USERS DIRECTORY
+            ───────────────────────────────── -->
+            <div id="tabUsersSection">
+
+                <!-- Filters row -->
+                <div class="controls-card">
+                    <div class="row g-2 align-items-center">
+                        <div class="col-md-5 col-12">
+                            <div class="search-box-custom">
+                                <input type="text" id="userSearchInput"
+                                    placeholder="ابحث بالاسم، اسم المستخدم، البريد، الهاتف...">
+                                <i class="fas fa-search"></i>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-6">
+                            <select class="select-filter-custom" id="filterRole">
+                                <option value="">جميع الرتب</option>
+                                <option value="اب كاهن">اب كاهن</option>
+                                <option value="امين خدمه">امين خدمه</option>
+                                <option value="خادم">خادم</option>
+                                <option value="مخدوم">مخدوم</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 col-6">
+                            <select class="select-filter-custom" id="filterStatus">
+                                <option value="">جميع الحالات</option>
+                                <option value="Active">نشط</option>
+                                <option value="Suspended">موقوف</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 col-12">
+                            <button class="btn-refresh" onclick="loadDashboardData(true)">
+                                <i class="fas fa-sync-alt"></i> تحديث
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Users table -->
+                <div class="table-responsive-custom">
+                    <table class="custom-table" id="usersMainTable">
+                        <thead>
+                            <tr>
+                                <th>الاسم الكامل</th>
+                                <th>البريد الإلكتروني</th>
+                                <th>رقم الهاتف</th>
+                                <th>تاريخ الميلاد</th>
+                                <th>كلمة المرور</th>
+                                <th>الصلاحية</th>
+                                <th>تاريخ التسجيل</th>
+                                <th>آخر ظهور</th>
+                                <th>الحالة</th>
+                                <th style="text-align:center;">إجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody">
+                            <tr>
+                                <td colspan="10" class="text-center py-4">
+                                    <div class="spinner-border text-warning" role="status"
+                                        style="width:1.5rem; height:1.5rem;"></div>
+                                    <div class="mt-2" style="color:var(--gold); font-size:13px;">
+                                        جاري جلب بيانات الأعضاء...
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ─────────────────────────────────
+                 TAB: SITE EDITOR
+            ───────────────────────────────── -->
+            <div id="tabSiteEditorSection" style="display:none; margin-bottom:30px;">
+                <div class="row g-4">
+
+                    <!-- A. Mass Schedules -->
+                    <div class="col-lg-6">
+                        <div class="table-responsive-custom h-100">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <h4 class="panel-title">
+                                    <i class="fas fa-clock"></i> مواعيد القداسات
+                                </h4>
+                                <button class="btn btn-warning btn-sm fw-bold" onclick="openAddScheduleModal()">
+                                    <i class="fas fa-plus"></i> إضافة موعد
+                                </button>
+                            </div>
+                            <table class="custom-table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>اليوم</th>
+                                        <th>من</th>
+                                        <th>إلى</th>
+                                        <th style="text-align:center;">إجراء</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="schedulesTableBody">
+                                    <tr>
+                                        <td colspan="4" class="text-center py-4" style="color:var(--gold);">جاري جلب
+                                            مواعيد القداسات...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- B. Slideshow Images -->
+                    <div class="col-lg-6">
+                        <div class="table-responsive-custom h-100">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <h4 class="panel-title">
+                                    <i class="fas fa-images"></i> صور الخلفية المتحركة
+                                </h4>
+                                <button class="btn btn-warning btn-sm fw-bold" onclick="openAddSlideModal()">
+                                    <i class="fas fa-plus"></i> إضافة صورة
+                                </button>
+                            </div>
+                            <div id="slidesGridContainer">
+                                <div class="text-center py-4" style="color:var(--gold); grid-column:1/-1;">
+                                    جاري جلب صور الخلفية...
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- C. Church News -->
+                    <div class="col-12">
+                        <div class="table-responsive-custom">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <h4 class="panel-title">
+                                    <i class="fas fa-newspaper"></i> شريط أخبار الكنيسة
+                                </h4>
+                                <button class="btn btn-warning btn-sm fw-bold" onclick="openAddNewsModal()">
+                                    <i class="fas fa-plus"></i> إضافة خبر
+                                </button>
+                            </div>
+                            <table class="custom-table">
+                                <thead>
+                                    <tr>
+                                        <th>الصورة</th>
+                                        <th>العنوان</th>
+                                        <th>التاريخ</th>
+                                        <th>التصنيف</th>
+                                        <th>المحتوى</th>
+                                        <th style="text-align:center;">إجراء</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="newsTableBody">
+                                    <tr>
+                                        <td colspan="6" class="text-center py-4" style="color:var(--gold);">جاري جلب
+                                            الأخبار...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ─────────────────────────────────
+                 TAB: REALTIME MONITORING
+            ───────────────────────────────── -->
+            <div id="tabMonitoringSection" style="display:none;">
+                <div class="row g-4">
+
+                    <!-- Active sessions -->
+                    <div class="col-lg-6">
+                        <div class="table-responsive-custom h-100">
+                            <h4 class="panel-title mb-4">
+                                <i class="fas fa-laptop"></i> جلسات الأجهزة النشطة
+                            </h4>
+                            <table class="custom-table">
+                                <thead>
+                                    <tr>
+                                        <th>المستخدم</th>
+                                        <th>الجهاز</th>
+                                        <th>عنوان IP</th>
+                                        <th>دخول</th>
+                                        <th>آخر نشاط</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="sessionsTableBody">
+                                    <tr>
+                                        <td colspan="5" class="text-center py-4" style="color:var(--gold);">جاري جلب
+                                            الجلسات...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Audit logs -->
+                    <div class="col-lg-6">
+                        <div class="table-responsive-custom h-100">
+                            <h4 class="panel-title mb-4">
+                                <i class="fas fa-history"></i> سجل العمليات الحية
+                            </h4>
+                            <div class="logs-console" id="logsConsole">
+                                <div style="color:var(--gold);">جاري تحميل سجل الأنشطة...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div><!-- /.app-shell -->
+
+
+    <!-- ==================================================
+         MODALS
+    ================================================== -->
+
+    <!-- Edit User Modal -->
+    <div class="modal fade" id="editUserModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content modal-content-custom">
+                <div class="modal-header modal-header-custom">
+                    <h5 class="modal-title" style="font-weight:900;">
+                        <i class="fas fa-user-edit text-warning"></i> تعديل صلاحيات وحالة العضو
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body modal-body-custom">
+                    <form id="editUserForm">
+                        <input type="hidden" id="editUserId">
+                        <div class="mb-3">
+                            <label class="form-label">الاسم الكامل</label>
+                            <input type="text" id="editFullName" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">البريد الإلكتروني</label>
+                            <input type="email" id="editEmail" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">رقم الهاتف</label>
+                            <input type="text" id="editPhone" class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">تاريخ الميلاد</label>
+                            <input type="text" id="editDob" class="form-control" placeholder="YYYY-MM-DD">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">رتبة العضو</label>
+                            <select id="editRole" class="form-select select-filter-custom w-100">
+                                <option value="مخدوم">مخدوم (مستخدم عادي)</option>
+                                <option value="خادم">خادم (مشرف خدمة)</option>
+                                <option value="امين خدمه">امين خدمه (مدير نظام)</option>
+                                <option value="اب كاهن">اب كاهن (المدير العام)</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">حالة الحساب</label>
+                            <select id="editStatus" class="form-select select-filter-custom w-100">
+                                <option value="Active">Active (نشط)</option>
+                                <option value="Suspended">Suspended (موقوف)</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer modal-footer-custom">
+                    <button type="button" class="btn btn-secondary border-0" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="button" class="btn btn-warning" onclick="saveUserEdit()">حفظ التعديلات</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reset Password Modal -->
+    <div class="modal fade" id="resetPasswordModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content modal-content-custom">
+                <div class="modal-header modal-header-custom">
+                    <h5 class="modal-title" style="font-weight:900;">
+                        <i class="fas fa-key text-warning"></i> إعادة تعيين كلمة المرور
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body modal-body-custom">
+                    <p style="font-size:13px; color:var(--text-2); margin-bottom:16px;">
+                        سيتم تغيير كلمة المرور فوراً وبشكل مشفر في قاعدة البيانات.
+                        يرجى تزويد العضو بكلمة المرور الجديدة فور الحفظ.
+                    </p>
+                    <input type="hidden" id="resetPassUserId">
+                    <div class="mb-3">
+                        <label class="form-label">اسم العضو</label>
+                        <input type="text" id="resetPassUserName" class="form-control" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">كلمة المرور الجديدة</label>
+                        <input type="password" id="resetPassNewPassword" class="form-control"
+                            placeholder="أدخل 8 رموز كحد أدنى" required minlength="8">
+                    </div>
+                </div>
+                <div class="modal-footer modal-footer-custom">
+                    <button type="button" class="btn btn-secondary border-0" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="button" class="btn btn-danger" onclick="savePasswordReset()">تعيين كلمة
+                        المرور</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Unblock User Modal -->
+    <div class="modal fade" id="unblockUserModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content modal-content-custom" style="border-color:rgba(63,201,117,.4);">
+                <div class="modal-header modal-header-custom" style="border-bottom-color:rgba(63,201,117,.2);">
+                    <h5 class="modal-title" style="font-weight:900; color:var(--green);">
+                        <i class="fas fa-lock-open"></i> تأكيد رفع الحظر
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body modal-body-custom">
+                    <p style="font-size:15px; font-weight:700;">هل أنت متأكد من رغبتك في رفع الحظر عن هذا العضو؟</p>
+                    <p style="font-size:13px; color:var(--text-2); margin:0;">سيتمكن العضو من الدخول مرة أخرى بعد رفع
+                        الحظر.</p>
+                    <input type="hidden" id="unblockUserId">
+                    <div class="mt-3">
+                        <label class="form-label">الاسم المستهدف</label>
+                        <input type="text" id="unblockUserName" class="form-control" readonly>
+                    </div>
+                </div>
+                <div class="modal-footer modal-footer-custom" style="border-top-color:rgba(63,201,117,.2);">
+                    <button type="button" class="btn btn-secondary border-0" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="button" class="btn btn-success" onclick="confirmUnblockUser()">
+                        <i class="fas fa-lock-open me-1"></i>نعم، ارفع الحظر
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete User Modal -->
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content modal-content-custom" style="border-color:rgba(229,80,80,.4);">
+                <div class="modal-header modal-header-custom" style="border-bottom-color:rgba(229,80,80,.2);">
+                    <h5 class="modal-title" style="font-weight:900; color:var(--red);">
+                        <i class="fas fa-trash"></i> تأكيد الحذف النهائي
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body modal-body-custom">
+                    <p style="font-size:15px; font-weight:700;">هل أنت متأكد تماماً من رغبتك في حذف هذا العضو نهائياً؟
+                    </p>
+                    <p style="font-size:13px; color:var(--text-2); margin:0;">
+                        تحذير: سيؤدي هذا إلى حذف ملف العضو، حساب الدخول، الجلسات، وكافة البيانات المرتبطة.
+                        لا يمكن التراجع.
+                    </p>
+                    <input type="hidden" id="deleteUserId">
+                    <div class="mt-3">
+                        <label class="form-label">الاسم المستهدف للحذف</label>
+                        <input type="text" id="deleteUserName" class="form-control" readonly>
+                    </div>
+                </div>
+                <div class="modal-footer modal-footer-custom" style="border-top-color:rgba(229,80,80,.2);">
+                    <button type="button" class="btn btn-secondary border-0" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="button" class="btn btn-danger" onclick="confirmDeleteUser()">نعم، احذف
+                        نهائياً</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Block User Modal -->
+    <div class="modal fade" id="blockUserModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content modal-content-custom" style="border-color:rgba(192,96,232,.4);">
+                <div class="modal-header modal-header-custom" style="border-bottom-color:rgba(192,96,232,.2);">
+                    <h5 class="modal-title" style="font-weight:900; color:var(--purple);">
+                        <i class="fas fa-ban"></i> تأكيد الحظر النهائي
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body modal-body-custom">
+                    <p style="font-size:15px; font-weight:700;">هل أنت متأكد من رغبتك في حظر هذا العضو نهائياً؟</p>
+                    <p style="font-size:13px; color:var(--text-2); margin:0;">
+                        سيتم تسجيل خروج العضو فوراً ولن يتمكن من الدخول إلا بعد رفع الحظر.
+                    </p>
+                    <input type="hidden" id="blockUserId">
+                    <div class="mt-3">
+                        <label class="form-label">الاسم المستهدف للحظر</label>
+                        <input type="text" id="blockUserName" class="form-control" readonly>
+                    </div>
+                </div>
+                <div class="modal-footer modal-footer-custom" style="border-top-color:rgba(192,96,232,.2);">
+                    <button type="button" class="btn btn-secondary border-0" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="button" class="btn"
+                        style="background:var(--purple); border:none; color:#fff; font-weight:700;"
+                        onclick="confirmBlockUser()">حظر العضو نهائياً</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Avatar Modal -->
+    <div class="modal fade" id="editAvatarModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content modal-content-custom">
+                <div class="modal-header modal-header-custom">
+                    <h5 class="modal-title" style="font-weight:900;">
+                        <i class="fas fa-user-circle text-warning"></i> تغيير الصورة الشخصية
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body modal-body-custom">
+                    <div class="text-center mb-4">
+                        <div id="avatarModalPreview" class="initials-avatar mx-auto"
+                            style="width:90px; height:90px; font-size:32px; border:3px solid var(--border-h);">؟</div>
+                    </div>
+                    <form id="editAvatarForm">
+                        <div class="mb-3">
+                            <label class="form-label">رابط الصورة المباشر</label>
+                            <input type="url" id="avatarUrlInput" class="form-control"
+                                placeholder="مثال: https://example.com/avatar.jpg">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">أو رفع صورة من جهازك</label>
+                            <input type="file" id="avatarFileInput" class="form-control" accept="image/*">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer modal-footer-custom">
+                    <button type="button" class="btn btn-secondary border-0" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="button" class="btn btn-warning" onclick="saveAvatar()">حفظ الصورة</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Schedule Modal -->
+    <div class="modal fade" id="addScheduleModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content modal-content-custom">
+                <div class="modal-header modal-header-custom">
+                    <h5 class="modal-title" style="font-weight:900;">
+                        <i class="fas fa-calendar-plus text-warning"></i> إضافة موعد قداس جديد
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body modal-body-custom">
+                    <form id="addScheduleForm">
+                        <div class="mb-3">
+                            <label class="form-label">اليوم</label>
+                            <select id="schedDay" class="form-select select-filter-custom w-100" required>
+                                <option value="" disabled selected>اختر اليوم</option>
+                                <option value="الأحد">الأحد</option>
+                                <option value="الإثنين">الإثنين</option>
+                                <option value="الثلاثاء">الثلاثاء</option>
+                                <option value="الأربعاء">الأربعاء</option>
+                                <option value="الخميس">الخميس</option>
+                                <option value="الجمعة">الجمعة</option>
+                                <option value="السبت">السبت</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">وقت البدء (من)</label>
+                            <input type="time" id="schedFrom" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">وقت الانتهاء (إلى)</label>
+                            <input type="time" id="schedTo" class="form-control" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer modal-footer-custom">
+                    <button type="button" class="btn btn-secondary border-0" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="button" class="btn btn-warning" onclick="saveNewSchedule()">حفظ الموعد</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Slide Modal -->
+    <div class="modal fade" id="addSlideModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content modal-content-custom">
+                <div class="modal-header modal-header-custom">
+                    <h5 class="modal-title" style="font-weight:900;">
+                        <i class="fas fa-image text-warning"></i> إضافة صورة خلفية جديدة
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body modal-body-custom">
+                    <form id="addSlideForm">
+                        <div class="mb-3">
+                            <label class="form-label">اسم ملف الصورة أو رابطها</label>
+                            <input type="text" id="slideUrl" class="form-control"
+                                placeholder="مثال: 10.jpg أو https://..." required>
+                            <span style="font-size:11px; color:var(--text-3); display:block; margin-top:5px;">
+                                يمكنك كتابة اسم صورة موجودة في المجلد أو رابط كامل لصورة خارجية.
+                            </span>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">أو رفع صورة من جهازك</label>
+                            <input type="file" id="slideFileInput" class="form-control" accept="image/*">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer modal-footer-custom">
+                    <button type="button" class="btn btn-secondary border-0" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="button" class="btn btn-warning" onclick="saveNewSlide()">حفظ الصورة</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add News Modal -->
+    <div class="modal fade" id="addNewsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content modal-content-custom">
+                <div class="modal-header modal-header-custom">
+                    <h5 class="modal-title" style="font-weight:900;" id="newsModalTitle">
+                        <i class="fas fa-newspaper text-warning"></i> إضافة خبر جديد
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body modal-body-custom">
+                    <form id="addNewsForm">
+                        <input type="hidden" id="newsId">
+                        <div class="mb-3">
+                            <label class="form-label">عنوان الخبر</label>
+                            <input type="text" id="newsTitle" class="form-control" placeholder="أدخل العنوان الرئيسي"
+                                required>
+                        </div>
+                        <input type="hidden" id="newsDay">
+                        <input type="hidden" id="newsMonth">
+                        <div class="mb-3">
+                            <label class="form-label">تاريخ الخبر</label>
+                            <input type="date" id="newsDatePicker" class="form-control" required>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                <label class="form-label">التصنيف</label>
+                                <input type="text" id="newsCategory" class="form-control"
+                                    placeholder="مثال: رسامة، كرازة" required>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="form-label">رابط / اسم الصورة</label>
+                                <input type="text" id="newsImageUrl" class="form-control"
+                                    placeholder="مثال: 16.jpg أو رابط خارجي" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">أو رفع صورة من جهازك</label>
+                            <input type="file" id="newsFileInput" class="form-control" accept="image/*">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">محتوى الخبر</label>
+                            <textarea id="newsContent" class="form-control" rows="4" placeholder="أدخل تفاصيل الخبر..."
+                                required></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer modal-footer-custom">
+                    <button type="button" class="btn btn-secondary border-0" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="button" class="btn btn-warning" id="newsSubmitBtn" onclick="saveNewNews()">حفظ
+                        الخبر</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Delete Modal (schedules / slides / news) -->
+    <div class="modal fade" id="quickDeleteModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content modal-content-custom" style="border-color:rgba(229,80,80,.4);">
+                <div class="modal-header modal-header-custom"
+                    style="border-bottom-color:rgba(229,80,80,.2); padding:14px 18px;">
+                    <h6 class="modal-title" style="font-weight:900; color:var(--red);">
+                        <i class="fas fa-trash-alt"></i> تأكيد الحذف
+                    </h6>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body modal-body-custom" style="padding:18px;">
+                    <p id="quickDeleteMessage" style="font-size:14px; font-weight:600; margin:0;"></p>
+                </div>
+                <div class="modal-footer modal-footer-custom"
+                    style="border-top-color:rgba(229,80,80,.2); padding:10px 18px;">
+                    <button type="button" class="btn btn-secondary btn-sm border-0"
+                        data-bs-dismiss="modal">إلغاء</button>
+                    <button type="button" id="quickDeleteConfirmBtn" class="btn btn-danger btn-sm">
+                        <i class="fas fa-trash-alt me-1"></i>حذف
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Password Reset Success Copy Modal -->
+    <div class="modal fade" id="passwordResetSuccessModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content modal-content-custom" style="border-color:rgba(63,201,117,.4);">
+                <div class="modal-header modal-header-custom" style="border-bottom-color:rgba(63,201,117,.2);">
+                    <h5 class="modal-title" style="font-weight:900; color:var(--green);">
+                        <i class="fas fa-check-circle"></i> تم تغيير كلمة المرور بنجاح
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body modal-body-custom">
+                    <p style="font-size:13px; color:var(--text-2); margin-bottom:12px;">
+                        تم تغيير كلمة المرور بنجاح. يمكنك نسخ الرسالة التالية لإرسالها للعضو:
+                    </p>
+                    <div class="mb-3">
+                        <textarea id="successMessageTextarea" class="form-control" rows="4" readonly
+                            style="background:var(--s3); border-color:var(--border-m); color:var(--text); font-size:13px; resize:none;"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer modal-footer-custom" style="border-top-color:rgba(63,201,117,.2);">
+                    <button type="button" class="btn btn-secondary border-0" data-bs-dismiss="modal">إغلاق</button>
+                    <button type="button" class="btn btn-success" onclick="copyResetMessage()">
+                        <i class="fas fa-copy me-1"></i> نسخ الرسالة
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Logout Confirm Modal -->
+    <div class="modal fade" id="logoutConfirmModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content modal-content-custom" style="border-color:rgba(212,160,23,.4);">
+                <div class="modal-header modal-header-custom"
+                    style="border-bottom-color:rgba(212,160,23,.2); padding:14px 18px;">
+                    <h6 class="modal-title" style="font-weight:900; color:var(--gold);">
+                        <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
+                    </h6>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body modal-body-custom" style="padding:18px;">
+                    <p style="font-size:14px; font-weight:600; margin:0;">هل ترغب في تسجيل الخروج من لوحة الإدارة؟</p>
+                </div>
+                <div class="modal-footer modal-footer-custom"
+                    style="border-top-color:rgba(212,160,23,.2); padding:10px 18px;">
+                    <button type="button" class="btn btn-secondary btn-sm border-0"
+                        data-bs-dismiss="modal">إلغاء</button>
+                    <button type="button" class="btn btn-warning btn-sm" onclick="confirmLogout()">
+                        <i class="fas fa-sign-out-alt me-1"></i>خروج
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Bootstrap & jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Dashboard Core Code -->
+    <script>
+        let cachedProfiles = [];
+
+        // PIN Lock State Variables
+        let currentPin = '';
+        let correctPin = '';
+        let isSetupMode = false;  // Step 1: verify default PIN 8888
+        let isNewPinMode = false; // Step 2: set brand-new custom PIN
+        let loggedInUser = null;
+
+
+        // Apply visual headers
+        document.getElementById('adminHeaderName').textContent = localStorage.getItem('userFullName') || localStorage.getItem('userFirstName') || "مدير النظام";
+
+        // Toast Messages Helper
+        function showToast(message, type = 'error') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `custom-toast toast-${type}`;
+            const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle';
+            toast.innerHTML = `
+                <i class="fas ${icon}" style="font-size:18px;"></i>
+                <span style="font-size:14px; font-weight:600;">${message}</span>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.animation = 'toastIn 0.3s ease reverse forwards';
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        // Tab Switching
+        function switchTab(tab) {
+            const usersBtn = document.getElementById('tabUsersBtn');
+            const monitoringBtn = document.getElementById('tabMonitoringBtn');
+            const siteEditorBtn = document.getElementById('tabSiteEditorBtn');
+            const usersSection = document.getElementById('tabUsersSection');
+            const monitoringSection = document.getElementById('tabMonitoringSection');
+            const siteEditorSection = document.getElementById('tabSiteEditorSection');
+
+            // Reset active states
+            usersBtn.classList.remove('active');
+            monitoringBtn.classList.remove('active');
+            siteEditorBtn.classList.remove('active');
+            usersSection.style.display = 'none';
+            monitoringSection.style.display = 'none';
+            siteEditorSection.style.display = 'none';
+
+            if (tab === 'users') {
+                usersBtn.classList.add('active');
+                usersSection.style.display = 'block';
+            } else if (tab === 'monitoring') {
+                monitoringBtn.classList.add('active');
+                monitoringSection.style.display = 'block';
+                loadMonitoringData();
+            } else if (tab === 'site-editor') {
+                siteEditorBtn.classList.add('active');
+                siteEditorSection.style.display = 'block';
+                loadSiteEditorData();
+            }
+        }
+
+        // --- FETCH DASHBOARD CORE DATA ---
+        async function loadDashboardData(showToastConfirm = false) {
+            if (!supabaseClient) return;
+
+            try {
+                // 1. Fetch Users Profiles
+                const { data: profiles, error } = await supabaseClient
+                    .from("profiles")
+                    .select("*")
+                    .order("created_at", { ascending: false });
+
+                if (error) throw error;
+                cachedProfiles = profiles || [];
+
+                // 2. Fetch Sessions stats (quick counts)
+                const { count: activeSessionsCount, error: sessionErr } = await supabaseClient
+                    .from("user_sessions")
+                    .select("*", { count: 'exact', head: true })
+                    .eq("is_active", true);
+
+                // Update Widgets
+                calculateWidgets(cachedProfiles, activeSessionsCount || 0);
+
+                // Render Table
+                renderUsersTable(cachedProfiles);
+
+                if (showToastConfirm) {
+                    showToast("تم تحديث بيانات لوحة التحكم بنجاح.", "success");
+                }
+            } catch (err) {
+                console.error("Dashboard fetch error:", err);
+                showToast("حدث خطأ أثناء تحميل البيانات: " + err.message);
+            }
+        }
+
+        // Calculate widget stats
+        function calculateWidgets(profiles, activeSessions) {
+            const total = profiles.length;
+            const online = profiles.filter(p => p.online_status).length;
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const todayCount = profiles.filter(p => {
+                const regDate = new Date(p.created_at);
+                regDate.setHours(0, 0, 0, 0);
+                return regDate.getTime() === today.getTime();
+            }).length;
+            document.getElementById('statTotalUsers').textContent = total;
+            document.getElementById('statOnlineUsers').textContent = online;
+            document.getElementById('statTodayUsers').textContent = todayCount;
+            document.getElementById('statActiveSessions').textContent = activeSessions;
+        }
+
+        // Render Profiles Table
+        function renderUsersTable(profiles) {
+            const body = document.getElementById('usersTableBody');
+            body.innerHTML = '';
+
+            if (profiles.length === 0) {
+                body.innerHTML = '<tr><td colspan="10" class="text-center text-muted">لا يوجد مستخدمين مسجلين في النظام حالياً.</td></tr>';
+                return;
+            }
+
+            profiles.forEach(p => {
+                const fullName = p.full_name || '';
+                const emailVal = p.email || '';
+                const roleVal = p.role || 'مخدوم';
+                const statusVal = p.status || 'Active';
+                const initials = (fullName.charAt(0) || "?").toUpperCase();
+                const regDate = new Date(p.created_at).toLocaleDateString('ar-EG', {
+                    year: 'numeric', month: 'short', day: 'numeric'
+                });
+                const lastSeen = p.online_status ? 'متصل الآن' : getTimeAgo(new Date(p.last_seen));
+                const statusBadge = p.is_blocked
+                    ? '<span class="badge-status status-blocked"><i class="fas fa-ban me-1"></i>محظور</span>'
+                    : `<span class="badge-status status-${statusVal.toLowerCase()}">${statusVal === 'Active' ? 'نشط' : 'موقوف'}</span>`;
+
+                const avatarStyle = p.avatar_url
+                    ? `background-image: url('${p.avatar_url}'); text-indent: -9999px; background-size: cover; background-position: center;`
+                    : '';
+
+                body.innerHTML += `
+                    <tr>
+                        <td data-label="الاسم الكامل">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="initials-avatar" style="${avatarStyle}">${initials}</div>
+                                <div>
+                                    <strong style="font-size:14px; display:block;">${fullName}</strong>
+                                    <span style="font-size:12px; color:var(--text-3);">@${p.username || ''}</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td data-label="البريد الإلكتروني" style="font-size:13px;">
+                            <i class="fas fa-envelope text-warning me-1"></i> ${emailVal}
+                        </td>
+                        <td data-label="رقم الهاتف" style="font-size:13px;">
+                            <i class="fas fa-phone text-warning me-1"></i> ${p.phone || 'غير محدد'}
+                        </td>
+                        <td data-label="تاريخ الميلاد" style="font-size:13px;">${p.dob || 'غير محدد'}</td>
+                        <td data-label="كلمة المرور" style="font-size:13px;">
+                            <code style="background:var(--s3); padding:2px 7px; border-radius:5px; color:var(--text);">${p.plain_password || 'غير محدد'}</code>
+                        </td>
+                        <td data-label="الصلاحية">
+                            <span class="badge-role role-${roleVal.toLowerCase().replace(/\s+/g, '-')}">${roleVal}</span>
+                        </td>
+                        <td data-label="تاريخ التسجيل" style="font-size:13px;">${regDate}</td>
+                        <td data-label="آخر ظهور" style="font-size:13px;">
+                            <span class="online-dot online-${p.online_status}"></span>
+                            <span>${lastSeen}</span>
+                        </td>
+                        <td data-label="الحالة">
+                            ${statusBadge}
+                        </td>
+                        <td data-label="إجراءات">
+                            <div class="d-flex justify-content-center gap-2">
+                                <button class="btn-action-custom" title="تعديل الحساب والصلاحية" onclick="openEditModal('${p.id}', '${fullName.replace(/'/g, "\\'")}', '${emailVal.replace(/'/g, "\\'")}', '${(p.phone || '').replace(/'/g, "\\'")}', '${(p.dob || '').replace(/'/g, "\\'")}', '${roleVal}', '${statusVal}')">
+                                    <i class="fas fa-user-edit"></i>
+                                </button>
+                                <button class="btn-action-custom" title="تغيير كلمة المرور" onclick="openResetPasswordModal('${p.id}', '${fullName.replace(/'/g, "\\'")}')">
+                                    <i class="fas fa-key"></i>
+                                </button>
+                                 <button class="btn-action-custom" title="${p.is_blocked ? 'رفع الحظر عن هذا العضو' : 'حظر نهائي - منع الوصول للموقع'}" onclick="toggleBlockUser('${p.id}', '${fullName.replace(/'/g, "\\'")}', ${p.is_blocked})" style="background:${p.is_blocked ? 'rgba(192,96,232,.25)' : 'rgba(192,96,232,.1)'};">
+                                     <i class="fas ${p.is_blocked ? 'fa-lock-open' : 'fa-ban'}" style="color:var(--purple);"></i>
+                                 </button>
+                                <button class="btn-action-custom btn-action-danger" title="حذف العضو نهائياً" onclick="openDeleteModal('${p.id}', '${fullName.replace(/'/g, "\\'")}')">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // Relative time helper
+        function getTimeAgo(date) {
+            const diff = new Date() - date;
+            const minutes = Math.floor(diff / 60000);
+            const hours = Math.floor(diff / 3600000);
+            const days = Math.floor(diff / 86400000);
+            if (days > 0) return `منذ ${days} يوم`;
+            if (hours > 0) return `منذ ${hours} ساعة`;
+            if (minutes > 0) return `منذ ${minutes} دقيقة`;
+            return 'الآن';
+        }
+
+        // Search & Filters Listener
+        function applyFilters() {
+            const query = document.getElementById('userSearchInput').value.toLowerCase();
+            const role = document.getElementById('filterRole').value;
+            const status = document.getElementById('filterStatus').value;
+
+            let filtered = cachedProfiles.filter(p => {
+                const matchQuery = p.full_name.toLowerCase().includes(query) ||
+                    p.email.toLowerCase().includes(query) ||
+                    p.username.toLowerCase().includes(query) ||
+                    (p.phone && p.phone.includes(query));
+
+                const matchRole = role === "" || p.role === role;
+                const matchStatus = status === "" || p.status === status;
+
+                return matchQuery && matchRole && matchStatus;
+            });
+
+            renderUsersTable(filtered);
+        }
+
+        document.getElementById('userSearchInput').addEventListener('input', applyFilters);
+        document.getElementById('filterRole').addEventListener('change', applyFilters);
+        document.getElementById('filterStatus').addEventListener('change', applyFilters);
+
+        // --- FETCH REAL-TIME MONITORING DETAILS ---
+        async function loadMonitoringData() {
+            if (!supabaseClient) return;
+
+            try {
+                // 1. Fetch Active Sessions
+                const { data: sessions, error: sessionErr } = await supabaseClient
+                    .from("user_sessions")
+                    .select("*, profiles(full_name)")
+                    .eq("is_active", true)
+                    .order("last_activity", { ascending: false });
+
+                if (sessionErr) throw sessionErr;
+
+                // 2. Fetch Activity Audit Logs
+                const { data: logs, error: logsErr } = await supabaseClient
+                    .from("activity_logs")
+                    .select("*, profiles(full_name)")
+                    .order("created_at", { ascending: false })
+                    .limit(50);
+
+                if (logsErr) throw logsErr;
+
+                // Render Sessions
+                const sessBody = document.getElementById('sessionsTableBody');
+                sessBody.innerHTML = '';
+                if (!sessions || sessions.length === 0) {
+                    sessBody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">لا يوجد أجهزة نشطة متصلة حالياً.</td></tr>';
+                } else {
+                    sessions.forEach(s => {
+                        const userName = s.profiles ? s.profiles.full_name : 'غير معروف';
+                        const loginT = new Date(s.login_time).toLocaleTimeString('ar-EG');
+                        const lastAct = new Date(s.last_activity).toLocaleTimeString('ar-EG');
+                        sessBody.innerHTML += `
+                            <tr>
+                                <td data-label="المستخدم"><strong>${userName}</strong></td>
+                                <td data-label="الجهاز المتصل" style="font-size:12px;">${s.device_info}</td>
+                                <td data-label="عنوان IP"><code>${s.ip_address}</code></td>
+                                <td data-label="تاريخ الدخول" style="font-size:12px;">${loginT}</td>
+                                <td data-label="آخر نشاط" style="font-size:12px; color:var(--green);">${lastAct}</td>
+                            </tr>
+                        `;
+                    });
+                }
+
+                // Render Console logs
+                const logsConsole = document.getElementById('logsConsole');
+                logsConsole.innerHTML = '';
+                if (!logs || logs.length === 0) {
+                    logsConsole.innerHTML = '<div class="text-muted">لا توجد عمليات مسجلة حتى الآن.</div>';
+                } else {
+                    logs.forEach(l => {
+                        const executor = l.profiles ? l.profiles.full_name : 'النظام';
+                        const timestamp = new Date(l.created_at).toLocaleString('ar-EG');
+                        logsConsole.innerHTML += `
+                            <div class="log-item">
+                                <span class="log-timestamp">[${timestamp}]</span> 
+                                <span style="color:var(--gold);">[${l.ip_address || '0.0.0.0'}]</span> 
+                                <strong>${executor}</strong> قام بـ 
+                                <span class="log-action">${l.action}</span>: 
+                                <span>${l.details}</span>
+                            </div>
+                        `;
+                    });
+                }
+
+            } catch (err) {
+                console.error("Monitoring logs error:", err);
+                showToast("خطأ في جلب بيانات المراقبة: " + err.message);
+            }
+        }
+
+        // --- SECURITY PIN LOCK SCREEN CODES ---
+        function checkSecurityPin(profile) {
+            loggedInUser = profile;
+
+            // Check if there is an active lock in localStorage
+            const lockExpiration = localStorage.getItem('pin_lock_expiration');
+            const failedAttempts = parseInt(localStorage.getItem('pin_failed_attempts') || '0');
+            const blockStage = parseInt(localStorage.getItem('pin_block_stage') || '0');
+
+            if (lockExpiration && Date.now() < parseInt(lockExpiration)) {
+                startPinLockCountdown(parseInt(lockExpiration), blockStage);
+                document.getElementById('pinLockOverlay').style.display = 'flex';
+                return;
+            }
+
+            if (blockStage === 3) {
+                showPermanentPinBlock();
+                document.getElementById('pinLockOverlay').style.display = 'flex';
+                return;
+            }
+
+            // Check setup mode
+            if (!profile.security_pin) {
+                isSetupMode = true;
+                correctPin = '8888';
+                document.getElementById('pinLockTitle').textContent = 'إعداد رمز الأمان المبدئي';
+                document.getElementById('pinLockSubtitle').textContent = 'الرجاء إدخال الرمز المبدئي.';
+                document.getElementById('pinLockOverlay').style.display = 'flex';
+            } else {
+                isSetupMode = false;
+                correctPin = profile.security_pin;
+                document.getElementById('pinLockTitle').textContent = 'تأكيد رمز الأمان لدخول النظام';
+                document.getElementById('pinLockSubtitle').textContent = 'الرجاء إدخال الرمز المكون من 4 أرقام للمتابعة';
+                document.getElementById('pinLockOverlay').style.display = 'flex';
+            }
+        }
+
+        function pressPinNum(num) {
+            if (currentPin.length < 4) {
+                currentPin += num;
+                updatePinDots();
+            }
+        }
+
+        function pressPinDelete() {
+            currentPin = currentPin.slice(0, -1);
+            updatePinDots();
+        }
+
+        function updatePinDots() {
+            const dots = document.querySelectorAll('.pin-dot');
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('active', i < currentPin.length);
+            });
+        }
+
+        async function submitPinCheck() {
+            if (currentPin.length < 4) {
+                showPinAlert('الرجاء إدخال 4 أرقام كاملة');
+                return;
+            }
+
+            if (isNewPinMode) {
+                // Step 2: Save new PIN
+                try {
+                    const { error } = await supabaseClient
+                        .from('profiles')
+                        .update({ security_pin: currentPin })
+                        .eq('id', loggedInUser.id);
+
+                    if (error) throw error;
+
+                    document.getElementById('pinLockOverlay').style.display = 'none';
+                    showToast('تم حفظ رمز الأمان الجديد بنجاح.', 'success');
+                    localStorage.removeItem('pin_failed_attempts');
+                    localStorage.removeItem('pin_block_stage');
+                    localStorage.removeItem('pin_lock_expiration');
+                } catch (err) {
+                    let hint = "";
+                    if (err.message && (err.message.includes('fetch') || err.message.includes('network'))) {
+                        hint = " (تلميح: أضف ?reset_config=true لرابط الصفحة لإعادة ضبط الاتصال)";
+                    }
+                    showPinAlert('فشل في حفظ الرمز: ' + err.message + hint);
+                }
+                currentPin = '';
+                updatePinDots();
+                return;
+            }
+
+            if (currentPin === correctPin) {
+                // Correct PIN
+                localStorage.removeItem('pin_failed_attempts');
+                localStorage.removeItem('pin_block_stage');
+                localStorage.removeItem('pin_lock_expiration');
+
+                if (isSetupMode) {
+                    // Correct default PIN → ask for new custom PIN
+                    isSetupMode = false;
+                    isNewPinMode = true;
+                    currentPin = '';
+                    updatePinDots();
+                    document.getElementById('pinLockTitle').textContent = 'أنشئ رمز الأمان الخاص بك';
+                    document.getElementById('pinLockSubtitle').textContent = 'أدخل رمزاً جديداً مكوناً من 4 أرقام سيُستخدم في كل مرة تدخل فيها.';
+                    hidePinAlert();
+                } else {
+                    // Normal login: correct PIN → open dashboard
+                    document.getElementById('pinLockOverlay').style.display = 'none';
+                }
+            } else {
+                // Wrong PIN
+                let failedAttempts = parseInt(localStorage.getItem('pin_failed_attempts') || '0') + 1;
+                localStorage.setItem('pin_failed_attempts', failedAttempts);
+
+                if (failedAttempts >= 10) {
+                    let blockStage = parseInt(localStorage.getItem('pin_block_stage') || '0') + 1;
+                    localStorage.setItem('pin_block_stage', blockStage);
+                    localStorage.setItem('pin_failed_attempts', '0');
+
+                    if (blockStage >= 3) {
+                        showPermanentPinBlock();
+                    } else {
+                        const lockDurations = [5 * 60 * 1000, 30 * 60 * 1000];
+                        const lockDuration = lockDurations[blockStage - 1] || 30 * 60 * 1000;
+                        const expiration = Date.now() + lockDuration;
+                        localStorage.setItem('pin_lock_expiration', expiration);
+                        startPinLockCountdown(expiration, blockStage);
+                    }
+                } else {
+                    const remaining = 10 - failedAttempts;
+                    showPinAlert(`رمز خاطئ! تبقى لك ${remaining} محاولة${remaining === 1 ? '' : 'ات'}.`);
+                }
+
+                currentPin = '';
+                updatePinDots();
+            }
+        }
+
+        function showPinAlert(msg) {
+            const alert = document.getElementById('pinLockAlert');
+            alert.textContent = msg;
+            alert.style.display = 'block';
+        }
+
+        function hidePinAlert() {
+            document.getElementById('pinLockAlert').style.display = 'none';
+        }
+
+        function startPinLockCountdown(expiration, blockStage) {
+            const durations = ['5 دقائق', '30 دقيقة'];
+            const stageText = durations[blockStage - 1] || '30 دقيقة';
+
+            const updateCountdown = () => {
+                const remaining = Math.max(0, expiration - Date.now());
+                const minutes = Math.floor(remaining / 60000);
+                const seconds = Math.floor((remaining % 60000) / 1000);
+
+                showPinAlert(`تم تجاوز عدد المحاولات. يرجى الانتظار ${minutes}:${String(seconds).padStart(2, '0')} دقيقة.`);
+
+                if (remaining <= 0) {
+                    localStorage.removeItem('pin_lock_expiration');
+                    localStorage.removeItem('pin_failed_attempts');
+                    hidePinAlert();
+                    return;
+                }
+
+                setTimeout(updateCountdown, 1000);
+            };
+
+            updateCountdown();
+        }
+
+        function showPermanentPinBlock() {
+            document.getElementById('pinLockTitle').textContent = 'تم تعليق الحساب نهائياً';
+            document.getElementById('pinLockSubtitle').textContent = 'تم تجاوز الحد المسموح من المحاولات الفاشلة. يرجى التواصل مع المسؤول.';
+            showPinAlert('هذا الحساب مُعلَّق. لا يمكن المتابعة.');
+            document.getElementById('pinLockSupport').style.display = 'block';
+            const whatsappLink = 'https://wa.me/20XXXXXXXXXX';
+            document.getElementById('whatsappSupportBtn').href = whatsappLink;
+        }
+
+        // --- USER ACTIONS (MODAL OPENERS) ---
+        function openEditModal(id, fullName, email, phone, dob, role, status) {
+            document.getElementById('editUserId').value = id;
+            document.getElementById('editFullName').value = fullName;
+            document.getElementById('editEmail').value = email;
+            document.getElementById('editPhone').value = phone;
+            document.getElementById('editDob').value = dob;
+            document.getElementById('editRole').value = role;
+            document.getElementById('editStatus').value = status;
+            new bootstrap.Modal(document.getElementById('editUserModal')).show();
+        }
+
+        function openResetPasswordModal(id, name) {
+            document.getElementById('resetPassUserId').value = id;
+            document.getElementById('resetPassUserName').value = name;
+            document.getElementById('resetPassNewPassword').value = '';
+            new bootstrap.Modal(document.getElementById('resetPasswordModal')).show();
+        }
+
+        function unblockUser(id, name) {
+            document.getElementById('unblockUserId').value = id;
+            document.getElementById('unblockUserName').value = name;
+            new bootstrap.Modal(document.getElementById('unblockUserModal')).show();
+        }
+
+        function openBlockModal(id, name) {
+            document.getElementById('blockUserId').value = id;
+            document.getElementById('blockUserName').value = name;
+            new bootstrap.Modal(document.getElementById('blockUserModal')).show();
+        }
+
+        function openDeleteModal(id, name) {
+            document.getElementById('deleteUserId').value = id;
+            document.getElementById('deleteUserName').value = name;
+            new bootstrap.Modal(document.getElementById('deleteConfirmModal')).show();
+        }
+
+        function openAvatarModal() {
+            new bootstrap.Modal(document.getElementById('editAvatarModal')).show();
+        }
+
+        // --- SAVE ACTIONS ---
+        async function saveUserEdit() {
+            const id = document.getElementById('editUserId').value;
+            const fullName = document.getElementById('editFullName').value.trim();
+            const email = document.getElementById('editEmail').value.trim();
+            const phone = document.getElementById('editPhone').value.trim();
+            const dob = document.getElementById('editDob').value.trim();
+            const role = document.getElementById('editRole').value;
+            const status = document.getElementById('editStatus').value;
+
+            try {
+                await authService.updateUserProfile(id, { full_name: fullName, email, phone, dob, role, status });
+                const currentAdminId = (await supabaseClient.auth.getUser()).data.user.id;
+                await authService.logActivity(currentAdminId, 'edit_user', `تعديل بيانات المستخدم: ${fullName}`);
+                bootstrap.Modal.getInstance(document.getElementById('editUserModal')).hide();
+                showToast("تم تحديث بيانات العضو بنجاح.", "success");
+                loadDashboardData();
+            } catch (err) {
+                console.error("Save edit error:", err);
+                showToast("فشل في حفظ التعديلات: " + err.message);
+            }
+        }
+
+        async function savePasswordReset() {
+            const id = document.getElementById('resetPassUserId').value;
+            const newPass = document.getElementById('resetPassNewPassword').value;
+
+            if (newPass.length < 8) {
+                showToast("كلمة المرور يجب أن تكون 8 رموز على الأقل.");
+                return;
+            }
+
+            try {
+                await authService.resetUserPassword(id, newPass);
+                const currentAdminId = (await supabaseClient.auth.getUser()).data.user.id;
+                await authService.logActivity(currentAdminId, 'reset_password', `إعادة تعيين كلمة مرور المستخدم ${id}`);
+
+                // Hide reset password modal
+                bootstrap.Modal.getInstance(document.getElementById('resetPasswordModal')).hide();
+
+                // Setup copy text and show success modal
+                const msg = `تم تغيير كلمة المرور الخاصة بك. إذا تريد معرفتها عليك التواصل مع الخادم الخاص بك أو التواصل مع المطور\nhttps://wa.me/201275916745`;
+                document.getElementById('successMessageTextarea').value = msg;
+                new bootstrap.Modal(document.getElementById('passwordResetSuccessModal')).show();
+
+                loadDashboardData();
+            } catch (err) {
+                console.error("Reset pass error:", err);
+                showToast("فشل في تغيير كلمة المرور: " + err.message);
+            }
+        }
+
+        function copyResetMessage() {
+            const textarea = document.getElementById('successMessageTextarea');
+            textarea.select();
+            textarea.setSelectionRange(0, 99999);
+            navigator.clipboard.writeText(textarea.value);
+            showToast("تم نسخ رسالة تغيير كلمة المرور بنجاح.", "success");
+        }
+
+        async function confirmUnblockUser() {
+            const id = document.getElementById('unblockUserId').value;
+            try {
+                await authService.unblockUser(id);
+                const currentAdminId = (await supabaseClient.auth.getUser()).data.user.id;
+                await authService.logActivity(currentAdminId, 'unblock_user', `رفع الحظر عن المستخدم ${id}`);
+                bootstrap.Modal.getInstance(document.getElementById('unblockUserModal')).hide();
+                showToast("تم رفع الحظر عن العضو بنجاح.", "success");
+                loadDashboardData();
+            } catch (err) {
+                showToast("فشل في رفع الحظر: " + err.message);
+            }
+        }
+
+        async function confirmBlockUser() {
+            const id = document.getElementById('blockUserId').value;
+            try {
+                await authService.blockUser(id);
+                const currentAdminId = (await supabaseClient.auth.getUser()).data.user.id;
+                await authService.logActivity(currentAdminId, 'block_user', `حظر المستخدم ${id}`);
+                bootstrap.Modal.getInstance(document.getElementById('blockUserModal')).hide();
+                showToast("تم حظر العضو بنجاح.", "success");
+                loadDashboardData();
+            } catch (err) {
+                showToast("فشل في الحظر: " + err.message);
+            }
+        }
+
+        async function toggleBlockUser(id, name, isBlocked) {
+            const actionText = isBlocked ? "إلغاء حظر" : "حظر";
+            if (confirm(`هل أنت متأكد من رغبتك في ${actionText} العضو (${name})؟`)) {
+                try {
+                    if (isBlocked) {
+                        await authService.unblockUser(id);
+                        const currentAdminId = (await supabaseClient.auth.getUser()).data.user.id;
+                        await authService.logActivity(currentAdminId, 'unblock_user', `رفع الحظر عن المستخدم ${id}`);
+                        showToast(`تم رفع الحظر عن العضو (${name}) بنجاح.`, "success");
+                    } else {
+                        await authService.blockUser(id);
+                        const currentAdminId = (await supabaseClient.auth.getUser()).data.user.id;
+                        await authService.logActivity(currentAdminId, 'block_user', `حظر المستخدم ${id}`);
+                        showToast(`تم حظر العضو (${name}) بنجاح.`, "success");
+                    }
+                    loadDashboardData();
+                } catch (err) {
+                    showToast(`فشل في ${actionText} العضو: ` + err.message);
+                }
+            }
+        }
+
+        async function confirmDeleteUser() {
+            const id = document.getElementById('deleteUserId').value;
+            try {
+                await authService.deleteUser(id);
+                const currentAdminId = (await supabaseClient.auth.getUser()).data.user.id;
+                await authService.logActivity(currentAdminId, 'delete_user', `حذف المستخدم ${id}`);
+                bootstrap.Modal.getInstance(document.getElementById('deleteConfirmModal')).hide();
+                showToast("تم حذف العضو نهائياً.", "success");
+                loadDashboardData();
+            } catch (err) {
+                showToast("فشل في الحذف: " + err.message);
+            }
+        }
+
+        async function saveAvatar() {
+            const avatarPreview = document.getElementById('avatarModalPreview');
+            const bgImage = avatarPreview.style.backgroundImage;
+            let avatarUrl = '';
+
+            if (bgImage && bgImage !== 'none') {
+                const match = bgImage.match(/url\(['"]?(.+?)['"]?\)/);
+                if (match) avatarUrl = match[1];
+            }
+
+            if (!avatarUrl) {
+                showToast("الرجاء اختيار صورة أو إدخال رابط.");
+                return;
+            }
+
+            try {
+                const { data: { user } } = await supabaseClient.auth.getUser();
+                await authService.updateUserProfile(user.id, { avatar_url: avatarUrl });
+
+                const navAvatar = document.getElementById('adminNavbarAvatar');
+                navAvatar.style.backgroundImage = `url('${avatarUrl}')`;
+                navAvatar.textContent = '';
+
+                bootstrap.Modal.getInstance(document.getElementById('editAvatarModal')).hide();
+                showToast("تم حفظ الصورة الشخصية بنجاح.", "success");
+            } catch (err) {
+                showToast("فشل في حفظ الصورة: " + err.message);
+            }
+        }
+
+        // --- PROFILE GREETING ---
+        function applyProfileGreetings(profile) {
+            const navAvatar = document.getElementById('adminNavbarAvatar');
+            if (profile.avatar_url) {
+                navAvatar.style.backgroundImage = `url('${profile.avatar_url}')`;
+                navAvatar.textContent = '';
+            } else {
+                navAvatar.textContent = (profile.full_name || '؟').charAt(0).toUpperCase();
+            }
+            document.getElementById('adminHeaderName').textContent = profile.full_name || profile.username || 'مدير النظام';
+        }
+
+        // --- LOGOUT ---
+        function triggerLogout() {
+            new bootstrap.Modal(document.getElementById('logoutConfirmModal')).show();
+        }
+
+        async function confirmLogout() {
+            try {
+                const { data: { user } } = await supabaseClient.auth.getUser();
+                if (user) {
+                    await authService.logActivity(user.id, 'logout', 'تسجيل خروج من لوحة التحكم');
+                    await authService.endUserSession(user.id);
+                }
+            } catch (e) { /* silent */ }
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('userRole');
+            localStorage.removeItem('userFullName');
+            localStorage.removeItem('userFirstName');
+            await supabaseClient.auth.signOut();
+            window.location.replace("../admin-login.html");
+        }
+
+        // --- QUICK DELETE MODAL (shared) ---
+        function openQuickDeleteModal(message, onConfirm) {
+            document.getElementById('quickDeleteMessage').textContent = message;
+            const modal = new bootstrap.Modal(document.getElementById('quickDeleteModal'));
+            modal.show();
+            const btn = document.getElementById('quickDeleteConfirmBtn');
+            const newBtn = btn.cloneNode(true);
+            btn.parentNode.replaceChild(newBtn, btn);
+            newBtn.addEventListener('click', async () => {
+                await onConfirm();
+                bootstrap.Modal.getInstance(document.getElementById('quickDeleteModal')).hide();
+            });
+        }
+
+        // --- SITE EDITOR ---
+        async function loadSiteEditorData() {
+            await Promise.all([loadSchedules(), loadSlideshowImages(), loadNews()]);
+        }
+
+        async function loadSchedules() {
+            if (!supabaseClient) return;
+            try {
+                const { data, error } = await supabaseClient
+                    .from('mass_schedules')
+                    .select('*')
+                    .order('id', { ascending: true });
+                if (error) throw error;
+                renderSchedulesTable(data || []);
+            } catch (err) {
+                showToast("خطأ في جلب مواعيد القداسات: " + err.message);
+            }
+        }
+
+        function renderSchedulesTable(schedules) {
+            const body = document.getElementById('schedulesTableBody');
+            if (!schedules.length) {
+                body.innerHTML = '<tr><td colspan="4" class="text-center py-3" style="color:var(--text-3);">لا يوجد مواعيد مضافة حتى الآن.</td></tr>';
+                return;
+            }
+
+            const dayOrder = {
+                'الأحد': 0, 'الاحد': 0,
+                'الإثنين': 1, 'الاثنين': 1,
+                'الثلاثاء': 2,
+                'الأربعاء': 3, 'الاربعاء': 3,
+                'الخميس': 4,
+                'الجمعة': 5, 'الجمعه': 5,
+                'السبت': 6
+            };
+
+            schedules.sort((a, b) => {
+                const orderA = dayOrder[a.day_name] !== undefined ? dayOrder[a.day_name] : 99;
+                const orderB = dayOrder[b.day_name] !== undefined ? dayOrder[b.day_name] : 99;
+                return orderA - orderB;
+            });
+
+            body.innerHTML = schedules.map(s => `
+                <tr>
+                    <td data-label="اليوم"><strong>${s.day_name}</strong></td>
+                    <td data-label="من">${s.time_from}</td>
+                    <td data-label="إلى">${s.time_to}</td>
+                    <td data-label="إجراء" style="text-align:center;">
+                        <button class="btn-action-custom btn-action-danger" onclick="deleteSchedule('${s.id}')">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function convert24hToArabicTime(time24) {
+            if (!time24) return '';
+            const [hoursStr, minutesStr] = time24.split(':');
+            let hours = parseInt(hoursStr, 10);
+            const amampm = hours >= 12 ? 'م' : 'ص';
+            hours = hours % 12;
+            hours = hours ? hours : 12;
+            const hourFormatted = String(hours).padStart(2, '0');
+            return `${hourFormatted}:${minutesStr} ${amampm}`;
+        }
+
+        function openAddScheduleModal() {
+            document.getElementById('schedDay').value = '';
+            document.getElementById('schedFrom').value = '';
+            document.getElementById('schedTo').value = '';
+            new bootstrap.Modal(document.getElementById('addScheduleModal')).show();
+        }
+
+        async function saveNewSchedule() {
+            const day = document.getElementById('schedDay').value;
+            const from24 = document.getElementById('schedFrom').value;
+            const to24 = document.getElementById('schedTo').value;
+            if (!day || !from24 || !to24) { showToast("جميع الحقول مطلوبة."); return; }
+
+            const from = convert24hToArabicTime(from24);
+            const to = convert24hToArabicTime(to24);
+
+            try {
+                await authService.addSchedule(day, from, to);
+                const currentAdminId = (await supabaseClient.auth.getUser()).data.user.id;
+                await authService.logActivity(currentAdminId, 'add_schedule', `إضافة موعد قداس: ${day}`);
+                bootstrap.Modal.getInstance(document.getElementById('addScheduleModal')).hide();
+                showToast("تم إضافة موعد القداس بنجاح.", "success");
+                loadSchedules();
+            } catch (err) {
+                showToast("فشل في إضافة الموعد: " + err.message);
+            }
+        }
+
+        async function deleteSchedule(id) {
+            openQuickDeleteModal('هل أنت متأكد من حذف موعد القداس هذا؟', async () => {
+                try {
+                    await authService.deleteSchedule(id);
+                    const currentAdminId = (await supabaseClient.auth.getUser()).data.user.id;
+                    await authService.logActivity(currentAdminId, 'delete_schedule', `حذف موعد القداس ${id}`);
+                    showToast("تم حذف الموعد بنجاح.", "success");
+                    loadSchedules();
+                } catch (err) {
+                    showToast("فشل في حذف الموعد: " + err.message);
+                }
+            });
+        }
+
+        async function loadSlideshowImages() {
+            if (!supabaseClient) return;
+            try {
+                const { data, error } = await supabaseClient
+                    .from('slideshow_images')
+                    .select('*')
+                    .order('id', { ascending: true });
+                if (error) throw error;
+                renderSlidesGrid(data || []);
+            } catch (err) {
+                showToast("خطأ في جلب صور الخلفية: " + err.message);
+            }
+        }
+
+        function renderSlidesGrid(slides) {
+            const container = document.getElementById('slidesGridContainer');
+            if (!slides.length) {
+                container.innerHTML = '<div style="color:var(--text-3); font-size:13px; grid-column:1/-1; padding:12px 0;">لا يوجد صور مضافة حتى الآن.</div>';
+                return;
+            }
+            container.innerHTML = slides.map(s => {
+                const src = (s.image_url.startsWith('http') || s.image_url.startsWith('data:')) ? s.image_url : `../${s.image_url}`;
+                return `
+                    <div style="position:relative; border-radius:8px; overflow:hidden; border:1px solid var(--border); background:var(--s3);">
+                        <img src="${src}" alt="slide" style="width:100%; aspect-ratio:16/9; object-fit:cover; display:block;">
+                        <button onclick="deleteSlide('${s.id}')" title="حذف الصورة"
+                                style="position:absolute; top:4px; left:4px; width:24px; height:24px; border-radius:5px;
+                                       background:rgba(229,80,80,.85); border:none; color:#fff; font-size:11px;
+                                       cursor:pointer; display:flex; align-items:center; justify-content:center;">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function openAddSlideModal() {
+            document.getElementById('slideUrl').value = '';
+            document.getElementById('slideFileInput').value = '';
+            new bootstrap.Modal(document.getElementById('addSlideModal')).show();
+        }
+
+        async function saveNewSlide() {
+            const url = document.getElementById('slideUrl').value.trim();
+            if (!url) { showToast("الرجاء إدخال رابط أو اسم ملف الصورة."); return; }
+            try {
+                await authService.addSlide(url);
+                const currentAdminId = (await supabaseClient.auth.getUser()).data.user.id;
+                await authService.logActivity(currentAdminId, 'add_slide', `إضافة صورة خلفية: ${url}`);
+                bootstrap.Modal.getInstance(document.getElementById('addSlideModal')).hide();
+                showToast("تمت إضافة الصورة بنجاح.", "success");
+                loadSlideshowImages();
+            } catch (err) {
+                showToast("فشل في إضافة الصورة: " + err.message);
+            }
+        }
+
+        async function deleteSlide(id) {
+            openQuickDeleteModal('هل أنت متأكد من حذف هذه الصورة من الخلفية المتحركة؟', async () => {
+                try {
+                    await authService.deleteSlide(id);
+                    const currentAdminId = (await supabaseClient.auth.getUser()).data.user.id;
+                    await authService.logActivity(currentAdminId, 'delete_slide', `حذف صورة الخلفية ${id}`);
+                    showToast("تم حذف الصورة بنجاح.", "success");
+                    loadSlideshowImages();
+                } catch (err) {
+                    showToast("فشل في حذف الصورة: " + err.message);
+                }
+            });
+        }
+
+        async function loadNews() {
+            if (!supabaseClient) return;
+            try {
+                const { data, error } = await supabaseClient
+                    .from('church_news')
+                    .select('*')
+                    .order('id', { ascending: false });
+                if (error) throw error;
+                renderNewsTable(data || []);
+            } catch (err) {
+                showToast("خطأ في جلب الأخبار: " + err.message);
+            }
+        }
+
+        function renderNewsTable(news) {
+            const body = document.getElementById('newsTableBody');
+            if (!news.length) {
+                body.innerHTML = '<tr><td colspan="6" class="text-center py-3" style="color:var(--text-3);">لا يوجد أخبار مضافة حتى الآن.</td></tr>';
+                return;
+            }
+            body.innerHTML = news.map(n => {
+                const src = n.image_url && (n.image_url.startsWith('http') || n.image_url.startsWith('data:')) ? n.image_url : `../${n.image_url || ''}`;
+                return `
+                    <tr>
+                        <td data-label="الصورة">
+                            <img src="${src}" alt="news" style="width:50px; height:36px; object-fit:cover; border-radius:6px; border:1px solid var(--border);"
+                                 onerror="this.style.display='none'">
+                        </td>
+                        <td data-label="العنوان"><strong>${n.title}</strong></td>
+                        <td data-label="التاريخ" style="font-size:12px; white-space:nowrap;">${n.date_day || ''} ${n.date_month || ''}</td>
+                        <td data-label="التصنيف">
+                            <span class="badge-role" style="background:var(--blue-bg); color:var(--blue); border:1px solid rgba(61,160,232,.35);">${n.category || ''}</span>
+                        </td>
+                        <td data-label="المحتوى" style="font-size:12px; max-width:220px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${n.content || ''}</td>
+                        <td data-label="إجراء" style="text-align:center;">
+                            <div class="d-flex justify-content-center gap-2">
+                                <button class="btn-action-custom" title="تعديل الخبر" onclick="openEditNewsModal(${JSON.stringify(n).replace(/'/g, "\\'").replace(/"/g, '&quot;')})">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn-action-custom btn-action-danger" title="حذف الخبر" onclick="deleteNewsItem('${n.id}')">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function openAddNewsModal() {
+            document.getElementById('newsId').value = '';
+            document.getElementById('newsTitle').value = '';
+            document.getElementById('newsDay').value = '';
+            document.getElementById('newsMonth').value = '';
+            document.getElementById('newsDatePicker').value = '';
+            document.getElementById('newsCategory').value = '';
+            document.getElementById('newsImageUrl').value = '';
+            document.getElementById('newsContent').value = '';
+            document.getElementById('newsModalTitle').innerHTML = '<i class="fas fa-newspaper text-warning"></i> إضافة خبر جديد';
+            document.getElementById('newsSubmitBtn').textContent = 'حفظ الخبر';
+            new bootstrap.Modal(document.getElementById('addNewsModal')).show();
+        }
+
+        function openEditNewsModal(n) {
+            document.getElementById('newsId').value = n.id;
+            document.getElementById('newsTitle').value = n.title || '';
+            document.getElementById('newsDay').value = n.date_day || '';
+            document.getElementById('newsMonth').value = n.date_month || '';
+
+            // Set date picker value if dates are present
+            const arabicMonths = [
+                "يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو",
+                "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"
+            ];
+            const year = new Date().getFullYear();
+            const monthIdx = arabicMonths.indexOf(n.date_month);
+            if (monthIdx !== -1 && n.date_day) {
+                const formattedMonth = String(monthIdx + 1).padStart(2, '0');
+                const formattedDay = String(n.date_day).padStart(2, '0');
+                document.getElementById('newsDatePicker').value = `${year}-${formattedMonth}-${formattedDay}`;
+            } else {
+                document.getElementById('newsDatePicker').value = '';
+            }
+
+            document.getElementById('newsCategory').value = n.category || '';
+            document.getElementById('newsImageUrl').value = n.image_url || '';
+            document.getElementById('newsContent').value = n.content || '';
+            document.getElementById('newsModalTitle').innerHTML = '<i class="fas fa-edit text-warning"></i> تعديل الخبر';
+            document.getElementById('newsSubmitBtn').textContent = 'حفظ التعديل';
+            new bootstrap.Modal(document.getElementById('addNewsModal')).show();
+        }
+
+        async function saveNewNews() {
+            const id = document.getElementById('newsId').value;
+            const title = document.getElementById('newsTitle').value.trim();
+            const day = document.getElementById('newsDay').value.trim();
+            const month = document.getElementById('newsMonth').value.trim();
+            const category = document.getElementById('newsCategory').value.trim();
+            const imageUrl = document.getElementById('newsImageUrl').value.trim();
+            const content = document.getElementById('newsContent').value.trim();
+
+            if (!title || !day || !month || !category || !imageUrl || !content) {
+                showToast("جميع الحقول مطلوبة.");
+                return;
+            }
+
+            try {
+                if (id) {
+                    await authService.updateNews(id, title, content, day, month, category, imageUrl);
+                    const currentAdminId = (await supabaseClient.auth.getUser()).data.user.id;
+                    await authService.logActivity(currentAdminId, 'edit_news', `تعديل خبر: ${title}`);
+                    bootstrap.Modal.getInstance(document.getElementById('addNewsModal')).hide();
+                    showToast("تم تعديل الخبر بنجاح.", "success");
+                } else {
+                    await authService.addNews(title, content, day, month, category, imageUrl);
+                    const currentAdminId = (await supabaseClient.auth.getUser()).data.user.id;
+                    await authService.logActivity(currentAdminId, 'add_news', `إضافة خبر جديد بعنوان: ${title}`);
+                    bootstrap.Modal.getInstance(document.getElementById('addNewsModal')).hide();
+                    showToast("تمت إضافة خبر الكنيسة بنجاح.", "success");
+                }
+                loadNews();
+            } catch (err) {
+                console.error("Save news error:", err);
+                showToast("فشل في حفظ الخبر: " + err.message);
+            }
+        }
+
+        async function deleteNewsItem(id) {
+            openQuickDeleteModal('هل أنت متأكد من رغبتك في حذف هذا الخبر نهائياً؟', async () => {
+                try {
+                    await authService.deleteNews(id);
+                    const currentAdminId = (await supabaseClient.auth.getUser()).data.user.id;
+                    await authService.logActivity(currentAdminId, 'delete_news', `حذف خبر الكنيسة بالمعرف ${id}`);
+                    showToast("تم حذف الخبر بنجاح.", "success");
+                    loadNews();
+                } catch (err) {
+                    console.error("Delete news error:", err);
+                    showToast("فشل في حذف الخبر: " + err.message);
+                }
+            });
+        }
+
+        // Initialize Realtime subscriptions
+        function initRealtimeSubscriptions() {
+            if (!supabaseClient) return;
+
+            const channel = supabaseClient.channel('db-realtime-dashboard')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, (payload) => {
+                    console.log('Realtime change detected in profiles:', payload);
+                    loadDashboardData();
+                })
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'user_sessions' }, (payload) => {
+                    console.log('Realtime change detected in sessions:', payload);
+                    loadDashboardData();
+                    if (document.getElementById('tabMonitoringSection').style.display !== 'none') {
+                        loadMonitoringData();
+                    }
+                })
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'mass_schedules' }, (payload) => {
+                    console.log('Realtime change in schedules:', payload);
+                    if (document.getElementById('tabSiteEditorSection').style.display !== 'none') {
+                        loadSchedules();
+                    }
+                })
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'church_news' }, (payload) => {
+                    console.log('Realtime change in news:', payload);
+                    if (document.getElementById('tabSiteEditorSection').style.display !== 'none') {
+                        loadNews();
+                    }
+                })
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'slideshow_images' }, (payload) => {
+                    console.log('Realtime change in slideshow:', payload);
+                    if (document.getElementById('tabSiteEditorSection').style.display !== 'none') {
+                        loadSlideshowImages();
+                    }
+                })
+                .subscribe();
+        }
+
+        // Page loaded trigger
+        window.addEventListener('DOMContentLoaded', async () => {
+            const isAuthorized = await authService.checkAdminGuard();
+            if (isAuthorized) {
+                const { data: { user } } = await supabaseClient.auth.getUser();
+                if (user) {
+                    const { data: profile } = await supabaseClient
+                        .from("profiles")
+                        .select("*")
+                        .eq("id", user.id)
+                        .single();
+
+                    if (profile) {
+                        checkSecurityPin(profile);
+                        applyProfileGreetings(profile);
+                    }
+                }
+
+                // File input: Avatar
+                document.getElementById('avatarFileInput').addEventListener('change', function (e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        if (file.size > 1000000) {
+                            showToast("حجم الصورة كبير جداً! الحد الأقصى هو 1 ميجابايت.", "warning");
+                            this.value = '';
+                            return;
+                        }
+                        const reader = new FileReader();
+                        reader.onload = function (evt) {
+                            const avatarPreview = document.getElementById('avatarModalPreview');
+                            avatarPreview.textContent = '';
+                            avatarPreview.style.backgroundImage = `url('${evt.target.result}')`;
+                            document.getElementById('avatarUrlInput').value = '';
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+
+                // File input: Slide background image
+                document.getElementById('slideFileInput').addEventListener('change', function (e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        if (file.size > 3000000) {
+                            showToast("حجم الصورة كبير جداً! الحد الأقصى هو 3 ميجابايت.", "warning");
+                            this.value = '';
+                            return;
+                        }
+                        const reader = new FileReader();
+                        reader.onload = function (evt) {
+                            document.getElementById('slideUrl').value = evt.target.result;
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+
+                // File input: News image
+                document.getElementById('newsFileInput').addEventListener('change', function (e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        if (file.size > 2000000) {
+                            showToast("حجم الصورة كبير جداً! الحد الأقصى هو 2 ميجابايت.", "warning");
+                            this.value = '';
+                            return;
+                        }
+                        const reader = new FileReader();
+                        reader.onload = function (evt) {
+                            document.getElementById('newsImageUrl').value = evt.target.result;
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+
+                // News Date Picker change listener
+                document.getElementById('newsDatePicker').addEventListener('change', function () {
+                    const dateVal = this.value;
+                    if (dateVal) {
+                        const dateObj = new Date(dateVal);
+                        const dayNum = String(dateObj.getDate()).padStart(2, '0');
+                        const arabicMonths = [
+                            "يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو",
+                            "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"
+                        ];
+                        const monthName = arabicMonths[dateObj.getMonth()];
+                        document.getElementById('newsDay').value = dayNum;
+                        document.getElementById('newsMonth').value = monthName;
+                    }
+                });
+
+                // Avatar URL input
+                document.getElementById('avatarUrlInput').addEventListener('input', function () {
+                    if (this.value) {
+                        document.getElementById('avatarFileInput').value = '';
+                        const avatarPreview = document.getElementById('avatarModalPreview');
+                        avatarPreview.textContent = '';
+                        avatarPreview.style.backgroundImage = `url('${this.value}')`;
+                    }
+                });
+
+                await loadDashboardData();
+                initRealtimeSubscriptions();
+            }
+        });
+
+        // ============================================
+        //  ADMIN SIDEBAR TOGGLE (MOBILE DRAWER)
+        // ============================================
+        function toggleAdminSidebar() {
+            const sidebar = document.getElementById('adminSidebar');
+            const overlay = document.getElementById('adminSidebarOverlay');
+            const isOpen = sidebar.classList.contains('open');
+            if (isOpen) {
+                sidebar.classList.remove('open');
+                overlay.classList.remove('active');
+            } else {
+                sidebar.classList.add('open');
+                overlay.classList.add('active');
+            }
+        }
+
+        function closeAdminSidebarOnMobile() {
+            if (window.innerWidth < 992) {
+                const sidebar = document.getElementById('adminSidebar');
+                const overlay = document.getElementById('adminSidebarOverlay');
+                sidebar.classList.remove('open');
+                overlay.classList.remove('active');
+            }
+        }
+    </script>
+</body>
+
+</html>

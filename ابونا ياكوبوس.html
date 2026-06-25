@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- استيراد خط Cairo من Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <!-- مكتبة أيقونات -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* ===== تأسيسات عامة مستوحاة من style.css ===== */
+        :root {
+            --primary-red: #800000;
+            --primary-gold: #d4a017;
+            --dark-navy: #013346;
+            --light-cream: #efdfbf;
+            --white: #ffffff;
+            --shadow-light: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --shadow-gold: 0 0 20px rgba(212, 160, 23, 0.4);
+            --transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: var(--light-cream);
+            color: var(--dark-navy);
+            line-height: 1.6;
+            overflow-x: hidden;
+            transition: var(--transition);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ===== الخلفية المتحركة ===== */
+        .bg-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.1;
+            background-image: radial-gradient(var(--primary-red) 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+
+        /* ===== الوضع المظلم ===== */
+        body.dark-mode {
+            background: #0f172a;
+            color: var(--light-cream);
+        }
+
+        body.dark-mode .bg-pattern {
+            opacity: 0.05;
+            background-image: radial-gradient(var(--primary-gold) 1px, transparent 1px);
+        }
+
+        /* ===== الشريط العلوي ===== */
+        .top-bar {
+            padding: 15px 20px;
+            background: linear-gradient(90deg, #002334, #820303);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .back-btn {
+            color: var(--white);
+            text-decoration: none;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 20px;
+            border-radius: 50px;
+            background: rgba(255,255,255,0.1);
+            transition: var(--transition);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .back-btn:hover {
+            background: var(--primary-gold);
+            color: var(--dark-navy);
+            transform: translateX(5px);
+        }
+
+        /* ===== زر تبديل الوضع (Theme Toggle) ===== */
+        .theme-switch-wrapper {
+            display: flex;
+            align-items: center;
+        }
+        
+        .theme-switch {
+            display: none;
+        }
+        
+        .theme-switch-label {
+            background: rgba(0,0,0,0.3);
+            border: 2px solid var(--primary-gold);
+            border-radius: 50px;
+            cursor: pointer;
+            height: 36px;
+            width: 70px;
+            position: relative;
+            transition: var(--transition);
+        }
+        
+        .theme-switch-label:before {
+            content: '\f185'; /* Sun icon */
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            background: var(--primary-gold);
+            border-radius: 50%;
+            height: 28px;
+            width: 28px;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 14px;
+            transition: var(--transition);
+        }
+
+        .theme-switch:checked + .theme-switch-label:before {
+            transform: translateX(34px);
+            content: '\f186'; /* Moon icon */
+            background: var(--white);
+            color: var(--dark-navy);
+        }
+
+        /* ===== حاوية المحتوى الرئيسي ===== */
+        .main-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+            perspective: 1000px;
+        }
+
+        /* ===== بطاقة الكاهن (The Priest Card) ===== */
+        .priest-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 30px;
+            padding: 50px;
+            max-width: 900px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.4);
+            display: flex;
+            align-items: center;
+            gap: 50px;
+            position: relative;
+            overflow: hidden;
+            animation: cardEntrance 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        body.dark-mode .priest-card {
+            background: rgba(30, 41, 59, 0.6);
+            border-color: rgba(255,255,255,0.05);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        /* تأثير زخرفي ذهبي */
+        .priest-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary-red), var(--primary-gold), var(--primary-red));
+        }
+
+        /* ===== صورة الكاهن ===== */
+        .image-wrapper {
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .priest-img {
+            width: 320px;
+            height: 320px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 6px solid var(--primary-gold);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            transition: var(--transition);
+            position: relative;
+            z-index: 2;
+        }
+
+        /* هالة حول الصورة */
+        .image-wrapper::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 340px;
+            height: 340px;
+            border-radius: 50%;
+            border: 2px dashed var(--primary-red);
+            animation: spin 30s linear infinite;
+            z-index: 1;
+        }
+
+        .priest-card:hover .priest-img {
+            transform: scale(1.05) rotate(2deg);
+            border-color: var(--primary-red);
+        }
+
+        /* ===== تفاصيل النصوص ===== */
+        .info-content {
+            flex: 1;
+            text-align: right;
+            z-index: 2;
+        }
+
+        .priest-title {
+            font-size: 1.2rem;
+            color: var(--primary-gold);
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            display: block;
+        }
+
+        .priest-name {
+            font-size: 3.5rem;
+            font-weight: 900;
+            color: var(--primary-red);
+            margin-bottom: 25px;
+            line-height: 1.1;
+            text-shadow: 2px 2px 0px rgba(0,0,0,0.05);
+            background: linear-gradient(45deg, var(--primary-red), #c0392b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        body.dark-mode .priest-name {
+            background: linear-gradient(45deg, var(--primary-gold), #f1c40f);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* ===== تواريخ السيامة ===== */
+        .timeline-box {
+            background: rgba(128, 0, 0, 0.05);
+            border-right: 4px solid var(--primary-red);
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            border-radius: 8px 0 0 8px;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        body.dark-mode .timeline-box {
+            background: rgba(255, 255, 255, 0.05);
+            border-right-color: var(--primary-gold);
+        }
+
+        .timeline-box:hover {
+            transform: translateX(-10px);
+            background: rgba(128, 0, 0, 0.1);
+        }
+
+        .date-icon {
+            font-size: 1.5rem;
+            color: var(--primary-red);
+        }
+
+        body.dark-mode .date-icon {
+            color: var(--primary-gold);
+        }
+
+        .date-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #666;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        body.dark-mode .date-label {
+            color: #aaa;
+        }
+
+        .date-value {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--dark-navy);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* For better numbers */
+        }
+
+        body.dark-mode .date-value {
+            color: var(--white);
+        }
+
+        /* ===== زر التواصل (الخرافي) ===== */
+        .action-wrapper {
+            margin-top: 40px;
+            text-align: center; /* توسيط الزر في الموبايل */
+        }
+
+        .contact-btn {
+            position: relative;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            padding: 18px 50px;
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--primary-gold);
+            background: linear-gradient(135deg, #410000 0%, #002f44 100%);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            text-decoration: none;
+            overflow: hidden;
+            transition: var(--transition);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .contact-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: 0.5s;
+        }
+
+        .contact-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(128, 0, 0, 0.4);
+            color: #fff;
+        }
+
+        .contact-btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-icon {
+            font-size: 1.4rem;
+        }
+
+        /* ===== الفوتر ===== */
+        .footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        /* ===== الرسوم المتحركة (Animations) ===== */
+        @keyframes cardEntrance {
+            from {
+                opacity: 0;
+                transform: translateY(50px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes spin {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        /* ===== التجاوب (Mobile Responsive) ===== */
+        @media (max-width: 992px) {
+            .priest-card {
+                flex-direction: column;
+                padding: 40px 20px;
+                text-align: center;
+                gap: 30px;
+            }
+
+            .image-wrapper::after {
+                width: 270px;
+                height: 270px;
+            }
+
+            .priest-img {
+                width: 250px;
+                height: 250px;
+            }
+
+            .info-content {
+                text-align: center;
+                width: 100%;
+            }
+
+            .timeline-box {
+                justify-content: center;
+                border-right: none;
+                border-bottom: 4px solid var(--primary-red);
+                border-radius: 8px;
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            body.dark-mode .timeline-box {
+                border-bottom-color: var(--primary-gold);
+            }
+
+            .priest-name {
+                font-size: 2.5rem;
+            }
+            
+            .back-btn span {
+                display: none; /* إخفاء نص الرجوع في الموبايل والاكتفاء بالأيقونة */
+            }
+        }
+    </style>
+</head>
+<body class="light-mode">
+
+    <!-- خلفية زخرفية -->
+    <div class="bg-pattern"></div>
+
+    <!-- الشريط العلوي -->
+    <div class="top-bar">
+        <div class="theme-switch-wrapper">
+            <input type="checkbox" class="theme-switch" id="checkbox">
+            <label class="theme-switch-label" for="checkbox"></label>
+        </div>
+        
+        <a href="index.html" class="back-btn">
+            <i class="fas fa-arrow-left"></i>
+            <span>العودة للرئيسية</span>
+        </a>
+    </div>
+
+    <!-- المحتوى الرئيسي -->
+    <div class="main-container">
+        <div class="priest-card">
+            
+            <!-- قسم الصورة -->
+            <div class="image-wrapper">
+                <!-- تم استخدام صورة افتراضية في حالة عدم وجود الصورة الأصلية، استبدل src بـ "2.jpg" -->
+                <img src="6.png" alt="الْقَسّ بَيْتِروس دَاوُدُ" class="priest-img" onerror="this.src='https://via.placeholder.com/370x370/800000/d4a017?text=القمص+بولس'">
+            </div>
+
+            <!-- قسم المعلومات -->
+            <div class="info-content">
+                <h1 class="priest-name">الْقَسّ ياكوبوس صبري</h1>
+
+                <div class="action-wrapper">
+                    <button class="contact-btn" onclick="location.href='رقم ابونا ياكوبوس.html'">
+                        <i class="fas fa-heart btn-icon"></i>
+                        <span>للتبرع والتواصل</span>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="footer">
+        &copy; كنيسة القديسين - جميع الحقوق محفوظة
+    </div>
+
+    <script>
+        // كود تبديل الوضع الليلي والنهاري
+        // تم تحديث المحدد (Selector) ليكون أكثر دقة ويشير إلى العنصر صاحب الكلاس theme-switch مباشرة
+        const toggleSwitch = document.querySelector('.theme-switch');
+        const currentTheme = localStorage.getItem('theme');
+
+        if (currentTheme) {
+            document.body.classList.remove('light-mode', 'dark-mode');
+            document.body.classList.add(currentTheme);
+            if (currentTheme === 'dark-mode' && toggleSwitch) {
+                toggleSwitch.checked = true;
+            }
+        }
+
+        function switchTheme(e) {
+            if (e.target.checked) {
+                document.body.classList.remove('light-mode');
+                document.body.classList.add('dark-mode');
+                localStorage.setItem('theme', 'dark-mode');
+            } else {
+                document.body.classList.remove('dark-mode');
+                document.body.classList.add('light-mode');
+                localStorage.setItem('theme', 'light-mode');
+            }
+        }
+
+        // إضافة شرط للتأكد من وجود العنصر قبل إضافة المستمع لتجنب الخطأ
+        if (toggleSwitch) {
+            toggleSwitch.addEventListener('change', switchTheme);
+        }
+    </script>
+</body>
+</html>

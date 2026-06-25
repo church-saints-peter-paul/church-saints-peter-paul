@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام الخدمة - كنيسة القديسين بطرس وبولس</title>
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- CSS Theme -->
+    <link rel="stylesheet" href="css/style.css">
+
+    <!-- Cropper.js -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
+
+    <style>
+        /* CSS variables fallback just in case */
+        :root {
+            --gold-primary: #d4a017;
+            --bg-card: rgba(10, 25, 47, 0.85);
+            --border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Top Progress Bar */
+        .top-progress-bar {
+            position: fixed;
+            top: 0; left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--gold-primary), #f4c542, #10b981);
+            z-index: 999999;
+            width: 0%;
+            transition: width 0.4s ease, opacity 0.3s ease;
+            opacity: 0;
+            box-shadow: 0 0 8px rgba(212,160,23,0.6);
+        }
+        .top-progress-bar.active { opacity: 1; }
+
+        /* Upload Progress Overlay */
+        .upload-progress-overlay {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            max-width: 380px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, rgba(10,25,47,0.98), rgba(5,15,30,0.98));
+            border: 1px solid rgba(212,160,23,0.4);
+            border-radius: 16px;
+            padding: 16px 20px;
+            z-index: 99998;
+            opacity: 0;
+            transform: translateY(20px);
+            pointer-events: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+            font-family: 'Cairo', sans-serif;
+        }
+        .upload-progress-overlay.show {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: all;
+        }
+        .upload-progress-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--gold-primary);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .upload-progress-bar-wrap {
+            height: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 100px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+        .upload-progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold-primary), #f4c542);
+            border-radius: 100px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+        .upload-progress-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: rgba(255,255,255,0.6);
+        }
+
+        /* Edit Profile Modal adjustments */
+        #editProfileForm .form-group {
+            margin-bottom: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            text-align: right;
+        }
+        #editProfileForm .form-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #e2e8f0;
+        }
+        #editProfileForm .form-control {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 10px 14px;
+            color: #fff;
+            font-family: 'Cairo', sans-serif;
+            font-size: 14px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        #editProfileForm .form-control:focus {
+            outline: none;
+            border-color: var(--gold-primary);
+            box-shadow: 0 0 0 3px rgba(212,160,23,0.15);
+        }
+        #editProfileForm .form-control.is-invalid {
+            border-color: #ff6b6b;
+            box-shadow: 0 0 0 3px rgba(255,107,107,0.15);
+        }
+        #editProfileForm .error-message {
+            font-size: 12px;
+            color: #ff6b6b;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Top Progress Bar -->
+    <div class="top-progress-bar" id="topProgressBar"></div>
+    <!-- Background overlay for design depth -->
+    <div class="glass-bg"></div>
+
+    <!-- Main App Container -->
+    <div class="app-container">
+
+        <!-- Header Section -->
+        <header class="main-header glass-card">
+            <div class="header-top">
+                <div class="student-profile">
+                    <div class="avatar-container">
+                        <div class="avatar" id="studentAvatarContainer">
+                            <i class="fas fa-user-graduate" id="studentDefaultAvatarIcon"></i>
+                        </div>
+                        <input type="file" id="studentAvatarFile" accept="image/*" style="display: none;">
+                        <button class="edit-avatar-btn" id="btnEditAvatar" title="تغيير الصورة الشخصية" onclick="document.getElementById('studentAvatarFile').click()">
+                            <i class="fas fa-camera"></i>
+                        </button>
+                    </div>
+                    <div class="student-meta">
+                        <h1 id="studentName">جاري التحميل...</h1>
+                        <span id="studentGrade" class="badge-grade">صف ...</span>
+                    </div>
+                </div>
+                <div class="points-tracker" id="pointsTrackerBtn">
+                    <span class="points-label">النقاط الكلية</span>
+                    <span class="points-value"><span id="totalPoints">0</span> <i class="fas fa-coins"></i></span>
+                </div>
+            </div>
+
+            <div class="header-actions">
+                <div class="student-code-box">
+                    <span class="code-title">كود المخدوم:</span>
+                    <span id="studentCode" class="code-number">------</span>
+                    <button class="action-icon-btn" onclick="copyStudentCode()" title="نسخ الكود">
+                        <i class="far fa-copy"></i>
+                    </button>
+                    <button class="action-btn qr-btn" id="openQrBtn">
+                        <i class="fas fa-qrcode"></i> QR
+                    </button>
+                </div>
+
+                <div class="navigation-buttons">
+                    <button class="action-btn edit-profile-btn" id="openEditProfileBtn" style="background: rgba(212,160,23,0.15); color: var(--gold-primary); border: 1px solid rgba(212,160,23,0.3);">
+                        <i class="fas fa-user-edit"></i> تعديل حسابي
+                    </button>
+                    <button class="action-btn calendar-btn" id="openCalendarBtn">
+                        <i class="far fa-calendar-alt"></i> سجل الحضور
+                    </button>
+                    <a href="../index.html" class="action-btn home-btn-nav">
+                        <i class="fas fa-home"></i> الرئيسية
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <!-- ==========================================
+             VIRTUAL VIEWS AREA (SPA NAVIGATION)
+             ========================================== -->
+        <main class="content-workspace">
+            
+            <!-- 1. DASHBOARD VIEW (Default) -->
+            <div class="virtual-view active" id="dashboardView">
+                <!-- Global Progress Card -->
+                <section class="progress-section glass-card">
+                    <h2 class="section-title"><i class="fas fa-chart-line"></i> مؤشر إكمال المنهج الدراسي</h2>
+                    <div class="progress-wrapper">
+                        <div class="progress-track">
+                            <div class="progress-fill" id="completionProgressBar" style="width: 0%"></div>
+                        </div>
+                        <span class="progress-percent" id="completionProgressText">0%</span>
+                    </div>
+                    <div class="progress-sub-stats">
+                        <div class="stat-bubble">
+                            <i class="fas fa-headphones text-gold"></i>
+                            <span id="stat_audio_count">0 فويسات</span>
+                        </div>
+                        <div class="stat-bubble">
+                            <i class="fas fa-video text-gold"></i>
+                            <span id="stat_video_count">0 فيديوهات</span>
+                        </div>
+                        <div class="stat-bubble">
+                            <i class="fas fa-edit text-gold"></i>
+                            <span id="stat_quiz_count">0 امتحانات</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Category Large Square Buttons Grid -->
+                <section class="categories-panel">
+                    <h2 class="panel-section-title"><i class="fas fa-graduation-cap"></i> أقسام المنهج التعليمي</h2>
+                    <div class="square-categories-grid">
+                        <!-- Bible Study -->
+                        <div class="category-square-card bible-study-card" onclick="openCategoryView('bible_study')">
+                            <div class="card-glow-layer"></div>
+                            <div class="card-content-box">
+                                <div class="card-icon-circle">
+                                    <i class="fas fa-book-open"></i>
+                                </div>
+                                <h3>درس الكتاب</h3>
+                                <p class="card-desc-arabic">تأملات، قراءات ممتعة، وتفسيرات روحية لآيات الإنجيل.</p>
+                                <div class="category-mini-progress">
+                                    <span class="mini-progress-label">نسبة الإنجاز</span>
+                                    <div class="mini-progress-track">
+                                        <div class="mini-progress-fill" id="miniProg_bible_study" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Coptic Language -->
+                        <div class="category-square-card coptic-card" onclick="openCategoryView('coptic')">
+                            <div class="card-glow-layer"></div>
+                            <div class="card-content-box">
+                                <div class="card-icon-circle">
+                                    <svg class="svg-icon-coptic" viewBox="0 0 100 100" style="fill: none; stroke: currentColor; stroke-width: 8; stroke-linecap: round; stroke-linejoin: round;">
+                                        <circle cx="45" cy="55" r="25" />
+                                        <path d="M70 25 L70 80 C70 88, 82 85, 85 80" />
+                                        <path d="M70 25 C70 20, 55 18, 45 22" />
+                                    </svg>
+                                </div>
+                                <h3>اللغة القبطية</h3>
+                                <p class="card-desc-arabic">دروس تعليم الحروف القبطية، القواعد ونصوص الصلوات.</p>
+                                <div class="category-mini-progress">
+                                    <span class="mini-progress-label">نسبة الإنجاز</span>
+                                    <div class="mini-progress-track">
+                                        <div class="mini-progress-fill" id="miniProg_coptic" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Hymns School -->
+                        <div class="category-square-card hymns-card" onclick="openCategoryView('hymns')">
+                            <div class="card-glow-layer"></div>
+                            <div class="card-content-box">
+                                <div class="card-icon-circle">
+                                    <svg class="svg-icon-hymns" viewBox="0 0 100 100" style="fill: none; stroke: currentColor; stroke-width: 6; stroke-linecap: round; stroke-linejoin: round;">
+                                        <path d="M 70 15 L 92 55 L 52 55 L 68 17" />
+                                        <path d="M 86 18 L 74 38" />
+                                        <circle cx="38" cy="62" r="20" style="fill: #0d1b2f; stroke-width: 6;" />
+                                        <circle cx="18" cy="62" r="3.5" style="fill: var(--gold-primary); stroke: none;" />
+                                        <circle cx="38" cy="82" r="3.5" style="fill: var(--gold-primary); stroke: none;" />
+                                        <circle cx="24" cy="48" r="3.5" style="fill: var(--gold-primary); stroke: none;" />
+                                        <circle cx="52" cy="76" r="3.5" style="fill: var(--gold-primary); stroke: none;" />
+                                    </svg>
+                                </div>
+                                <h3>مدرسة الألحان</h3>
+                                <p class="card-desc-arabic">حفظ الهزات، الألحان الكنسية التراثية والتسبحة الروحية.</p>
+                                <div class="category-mini-progress">
+                                    <span class="mini-progress-label">نسبة الإنجاز</span>
+                                    <div class="mini-progress-track">
+                                        <div class="mini-progress-fill" id="miniProg_hymns" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- 2. CATEGORY DETAIL VIEW -->
+            <div class="virtual-view" id="categoryView">
+                <div class="view-header-row">
+                    <button class="back-nav-btn" onclick="navigateToDashboard()">
+                        <i class="fas fa-arrow-right"></i> العودة للرئيسية
+                    </button>
+                    <div class="category-view-title-box">
+                        <i class="fas fa-folder-open text-gold" id="categoryHeaderIcon"></i>
+                        <h2 class="category-header-title" id="categoryHeaderTitle">اسم القسم</h2>
+                    </div>
+                </div>
+
+                <!-- Category Specific Progress Indicator -->
+                <section class="progress-section glass-card category-progress-section">
+                    <div class="category-prog-info-row">
+                        <span class="prog-section-label"><i class="fas fa-award text-gold"></i> مدى التقدم في هذا القسم:</span>
+                        <span class="category-prog-percent" id="categoryProgressText">0%</span>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-fill" id="categoryProgressBar" style="width: 0%"></div>
+                    </div>
+                </section>
+
+                <!-- Partition Pills Filter Menu -->
+                <div class="partitions-menu" id="categoryPartitionsMenu">
+                    <!-- Dynamic Partitions Pills -->
+                </div>
+
+                <!-- Lessons Grid -->
+                <div class="lessons-grid" id="categoryLessonsGrid">
+                    <div class="loading-state"><i class="fas fa-circle-notch fa-spin"></i> جاري تحميل الدروس...</div>
+                </div>
+            </div>
+
+            <!-- 3. LESSON DETAIL VIEW -->
+            <div class="virtual-view" id="lessonView">
+                <div class="view-header-row">
+                    <button class="back-nav-btn" onclick="navigateToCategory()">
+                        <i class="fas fa-arrow-right"></i> العودة لقائمة الدروس
+                    </button>
+                    <div class="lesson-breadcrumb-box">
+                        <span class="breadcrumb-cat" id="lessonBreadcrumbCat">القسم</span>
+                        <i class="fas fa-chevron-left breadcrumb-arrow"></i>
+                        <span class="breadcrumb-lesson" id="lessonBreadcrumbTitle">اسم الدرس</span>
+                    </div>
+                </div>
+
+                <div class="lesson-detail-card glass-card">
+                    <div class="lesson-card-header">
+                        <div class="lesson-tag-row">
+                            <span class="partition-tag" id="lessonDetailPartition"><i class="fas fa-folder"></i> عام</span>
+                            <span id="lessonDetailStatusBadge"></span>
+                        </div>
+                        <h2 class="lesson-detail-title" id="lessonDetailTitle">عنوان الدرس</h2>
+                        <p class="points-info-desc" id="lessonDetailPointsDesc">النقاط المكتسبة</p>
+                    </div>
+
+                    <!-- Main Dynamic Content Workspace -->
+                    <div class="lesson-content-workspace" id="lessonDetailWorkspace">
+                        <!-- Dynamic HTML based on Category (Audio player, video player, reading text frame, etc.) -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. FULL-PAGE QUIZ VIEW -->
+            <div class="virtual-view" id="quizFullView">
+                <div class="view-header-row">
+                    <button class="back-nav-btn" id="exitQuizBtn" onclick="exitQuizToLesson()">
+                        <i class="fas fa-arrow-right"></i> إلغاء الامتحان والعودة للدرس
+                    </button>
+                    <div class="lesson-breadcrumb-box">
+                        <span class="breadcrumb-cat" id="quizBreadcrumbCat">القسم</span>
+                        <i class="fas fa-chevron-left breadcrumb-arrow"></i>
+                        <span class="breadcrumb-lesson" id="quizBreadcrumbTitle">امتحان الدرس</span>
+                    </div>
+                </div>
+
+                <div class="quiz-fullpage-card glass-card">
+                    <!-- Progress Section -->
+                    <div class="quiz-progress-section">
+                        <div class="quiz-progress-info">
+                            <span class="quiz-progress-text" id="quizProgressText">السؤال 1 من 5</span>
+                            <span class="quiz-progress-percent" id="quizProgressPercent">0%</span>
+                        </div>
+                        <div class="quiz-progress-bar-container">
+                            <div class="quiz-progress-fill-bar" id="quizProgressFillBar" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Question Container -->
+                    <div class="quiz-workspace" id="quizFullWorkspace">
+                        <!-- Populated dynamically by JS -->
+                    </div>
+
+                    <!-- Footer / Actions -->
+                    <div class="quiz-actions-row">
+                        <button class="action-btn next-question-btn" id="quizNextBtn" disabled>
+                            السؤال التالي <i class="fas fa-chevron-left"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+        <footer class="app-footer">
+            <p>جميع الحقوق محفوظة &copy; كنيسة القديسين بطرس وبولس</p>
+        </footer>
+    </div>
+
+    <!-- ==========================================
+         MODALS & DIALOGS
+         ========================================== -->
+
+    <!-- QR Code Modal -->
+    <div class="modal-overlay" id="qrModal">
+        <div class="modal-box glass-card scale-in">
+            <button class="modal-close-btn">&times;</button>
+            <div class="modal-header">
+                <h2>رمز الحضور الشخصي (QR Code)</h2>
+            </div>
+            <div class="modal-body text-center">
+                <p class="modal-desc">قم بعرض هذا الرمز للخادم لتسجيل حضورك في الخدمة تلقائياً وكسب النقاط.</p>
+                <div class="qr-container-box">
+                    <div id="qrcode"></div>
+                </div>
+                <div class="qr-code-footer" id="qrCodeValue">------</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Points Detail Modal -->
+    <div class="modal-overlay" id="pointsModal">
+        <div class="modal-box glass-card scale-in size-large">
+            <button class="modal-close-btn">&times;</button>
+            <div class="modal-header">
+                <h2><i class="fas fa-star text-gold"></i> تفاصيل النقاط المكتسبة</h2>
+            </div>
+            <div class="modal-body">
+                <div class="stats-summary-grid">
+                    <div class="summary-card">
+                        <span class="summary-label">نقاط الفويسات</span>
+                        <span class="summary-val" id="points_audio_sum">0</span>
+                    </div>
+                    <div class="summary-card">
+                        <span class="summary-label">نقاط الفيديوهات</span>
+                        <span class="summary-val" id="points_video_sum">0</span>
+                    </div>
+                    <div class="summary-card">
+                        <span class="summary-label">نقاط الامتحانات</span>
+                        <span class="summary-val" id="points_quiz_sum">0</span>
+                    </div>
+                    <div class="summary-card">
+                        <span class="summary-label">نقاط الحضور</span>
+                        <span class="summary-val" id="points_attendance_sum">0</span>
+                    </div>
+                </div>
+
+                <h3 class="table-title">سجل العمليات التفصيلي</h3>
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>النوع</th>
+                                <th>التفاصيل</th>
+                                <th>النقاط المكتسبة</th>
+                                <th>التاريخ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pointsLogsTableBody">
+                            <tr>
+                                <td colspan="4" class="text-center">لا توجد سجلات نقاط بعد.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Calendar Modal -->
+    <div class="modal-overlay" id="calendarModal">
+        <div class="modal-box glass-card scale-in size-large">
+            <button class="modal-close-btn">&times;</button>
+            <div class="modal-header">
+                <h2><i class="far fa-calendar-alt text-gold"></i> سجل حضور الخدمة</h2>
+            </div>
+            <div class="modal-body">
+                <div class="calendar-workspace">
+                    <div class="calendar-wrapper">
+                        <div class="calendar-header-controls">
+                            <button class="cal-nav-btn" id="prevMonthBtn"><i class="fas fa-chevron-right"></i></button>
+                            <span class="calendar-month-title" id="calendarMonthTitle">يونيو 2026</span>
+                            <button class="cal-nav-btn" id="nextMonthBtn"><i class="fas fa-chevron-left"></i></button>
+                        </div>
+                        <div class="calendar-grid-weekdays">
+                            <div>السبت</div>
+                            <div>الأحد</div>
+                            <div>الاثنين</div>
+                            <div>الثلاثاء</div>
+                            <div>الأربعاء</div>
+                            <div>الخميس</div>
+                            <div>الجمعة</div>
+                        </div>
+                        <div class="calendar-grid-days" id="calendarGridDays">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+
+                    <div class="attendance-summary-info">
+                        <h3>ملخص أيام حضورك</h3>
+                        <div class="attendance-table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>اليوم</th>
+                                        <th>التاريخ</th>
+                                        <th>النقاط</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="attendanceTableBody">
+                                    <tr>
+                                        <td colspan="3" class="text-center">لا توجد سجلات حضور مسجلة.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quiz Modal -->
+    <div class="modal-overlay" id="quizModal">
+        <div class="modal-box glass-card scale-in modal-quiz">
+            <button class="modal-close-btn" id="closeQuizBtn">&times;</button>
+            <div class="modal-header">
+                <h2 id="quizModalTitle">امتحان الدرس</h2>
+            </div>
+            <div class="modal-body">
+                <div class="quiz-progress-bar">
+                    <div class="quiz-progress-fill" id="quizProgressFill" style="width: 0%"></div>
+                </div>
+                <div class="quiz-question-container" id="quizQuestionBox">
+                    <!-- Question populated by JS -->
+                </div>
+                <div class="quiz-footer">
+                    <button class="action-btn next-question-btn" id="nextQuestionBtn" disabled>
+                        السؤال التالي <i class="fas fa-chevron-left"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Success Points Overlay -->
+    <div class="points-earned-alert" id="pointsEarnedAlert">
+        <div class="points-earned-content">
+            <div class="star-icon"><i class="fas fa-star fa-spin"></i></div>
+            <div class="earned-title">أحسنت صنعاً!</div>
+            <div class="earned-points-number" id="earnedPointsValue">+0 نقطة</div>
+            <div class="earned-desc" id="earnedPointsDesc">حصلت على نقاط جديدة بنجاح!</div>
+        </div>
+    </div>
+
+    <!-- Edit Profile Modal -->
+    <div class="modal-overlay" id="editProfileModal">
+        <div class="modal-box glass-card scale-in size-medium" style="max-width: 500px; width: 95%;">
+            <button class="modal-close-btn" id="closeEditProfileBtn">&times;</button>
+            <div class="modal-header">
+                <h2><i class="fas fa-user-edit text-gold"></i> تعديل بيانات حسابي</h2>
+            </div>
+            <div class="modal-body">
+                <form id="editProfileForm" style="display: flex; flex-direction: column; gap: 16px;">
+                    <!-- Photo Selection -->
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; margin-bottom: 12px;">
+                        <div class="avatar-container" style="position: relative;">
+                            <div class="avatar" id="editProfileAvatarContainer" style="width: 100px; height: 100px; border-radius: 50%; overflow: hidden; border: 3px solid var(--gold-primary); display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.05);">
+                                <i class="fas fa-user-graduate" id="editProfileDefaultAvatarIcon" style="font-size: 2.5rem; color: rgba(255,255,255,0.3);"></i>
+                            </div>
+                            <input type="file" id="editProfileAvatarFile" accept="image/*" style="display: none;">
+                            <button type="button" class="edit-avatar-btn" id="btnTriggerAvatarFile" title="تغيير الصورة الشخصية" style="position: absolute; bottom: 0; right: 0; background: var(--gold-primary); border: none; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #000; cursor: pointer; transition: transform 0.2s;">
+                                <i class="fas fa-camera"></i>
+                            </button>
+                        </div>
+                        <span style="font-size: 11px; color: rgba(255,255,255,0.5);">اضغط على الكاميرا لتغيير صورتك الشخصية</span>
+                    </div>
+
+                    <!-- Full Name (Read-Only) -->
+                    <div class="form-group">
+                        <label class="form-label">الاسم الكامل (لا يمكن تعديله)</label>
+                        <input type="text" id="editProfileFullName" class="form-control" readonly disabled style="opacity: 0.7; cursor: not-allowed; background: rgba(255,255,255,0.02);">
+                    </div>
+
+                    <!-- Personal Phone -->
+                    <div class="form-group">
+                        <label class="form-label" for="editProfilePhone">رقم هاتفك الشخصي <span style="color:#ff6b6b;">*</span></label>
+                        <input type="tel" id="editProfilePhone" class="form-control" required placeholder="+201XXXXXXXXX">
+                        <span class="error-message" id="editProfilePhoneError" style="color: #ff6b6b; font-size: 0.85rem; display: none;"></span>
+                    </div>
+
+                    <!-- Parent Phone -->
+                    <div class="form-group">
+                        <label class="form-label" for="editProfileParentPhone">رقم تليفون ولي الأمر <span style="color:#ff6b6b;">*</span></label>
+                        <input type="tel" id="editProfileParentPhone" class="form-control" required placeholder="+201XXXXXXXXX">
+                        <span class="error-message" id="editProfileParentPhoneError" style="color: #ff6b6b; font-size: 0.85rem; display: none;"></span>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="form-group">
+                        <label class="form-label" for="editProfileEmail">البريد الإلكتروني <span style="color:#ff6b6b;">*</span></label>
+                        <input type="email" id="editProfileEmail" class="form-control" required placeholder="example@domain.com">
+                        <span class="error-message" id="editProfileEmailError" style="color: #ff6b6b; font-size: 0.85rem; display: none;"></span>
+                    </div>
+
+                    <!-- Home Address -->
+                    <div class="form-group">
+                        <label class="form-label" for="editProfileAddress">عنوان المنزل <span style="color:#ff6b6b;">*</span></label>
+                        <input type="text" id="editProfileAddress" class="form-control" required placeholder="مثال: شارع الجمهورية، شبين الكوم">
+                        <span class="error-message" id="editProfileAddressError" style="color: #ff6b6b; font-size: 0.85rem; display: none;"></span>
+                    </div>
+
+                    <!-- Password -->
+                    <div class="form-group">
+                        <label class="form-label" for="editProfilePassword">كلمة المرور الجديدة (اتركها فارغة إذا لم ترد التغيير)</label>
+                        <div style="position: relative;">
+                            <input type="password" id="editProfilePassword" class="form-control" placeholder="أدخل كلمة مرور جديدة (8 رموز على الأقل)">
+                            <button type="button" id="btnToggleEditPass" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: rgba(255,255,255,0.4); cursor: pointer; padding: 4px;">
+                                <i class="fas fa-eye" id="toggleEditPassIcon"></i>
+                            </button>
+                        </div>
+                        <span class="error-message" id="editProfilePasswordError" style="color: #ff6b6b; font-size: 0.85rem; display: none;"></span>
+                    </div>
+
+                    <!-- Modal Actions -->
+                    <div class="modal-footer" style="margin-top: 12px; display: flex; gap: 12px; justify-content: flex-end;">
+                        <button type="button" class="action-btn" id="btnCancelEditProfile" style="background: rgba(255,255,255,0.05); color: #fff;">إلغاء</button>
+                        <button type="submit" class="action-btn" id="btnSaveEditProfile" style="background: var(--gold-primary); color: #000; font-weight: 600;">حفظ التغييرات</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cropper Modal Overlay -->
+    <div class="cropper-modal-overlay" id="cropperModalOverlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; z-index: 12000; align-items: center; justify-content: center;">
+        <div class="cropper-modal-box" style="background: #0d1b2f; border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 24px; max-width: 90%; width: 480px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+            <div class="cropper-modal-title" style="font-size: 1.25rem; font-weight: 700; color: #fff; margin-bottom: 16px; text-align: center; font-family: 'Cairo', sans-serif;">قص الصورة الشخصية</div>
+            <div class="cropper-container-wrap" style="max-height: 350px; overflow: hidden; border-radius: 8px; margin-bottom: 20px; background: #000; display: flex; align-items: center; justify-content: center;">
+                <img id="cropperImage" src="" alt="image to crop" style="max-width: 100%; max-height: 350px; display: block;">
+            </div>
+            <div class="cropper-actions" style="display: flex; gap: 12px; justify-content: flex-end; font-family: 'Cairo', sans-serif;">
+                <button type="button" class="action-btn" id="btnCropCancel" style="background: rgba(255,255,255,0.05); color: #fff;">إلغاء</button>
+                <button type="button" class="action-btn" id="btnCropSave" style="background: var(--gold-primary); color: #000; font-weight: 600;">حفظ وقص</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upload Progress Overlay -->
+    <div class="upload-progress-overlay" id="uploadProgressOverlay">
+        <div class="upload-progress-title">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <span id="uploadProgressLabel">جاري رفع الملف...</span>
+        </div>
+        <div class="upload-progress-bar-wrap">
+            <div class="upload-progress-bar-fill" id="uploadProgressFill"></div>
+        </div>
+        <div class="upload-progress-info">
+            <span id="uploadProgressPct">0%</span>
+            <span id="uploadProgressSpeed">جاري الحساب...</span>
+        </div>
+    </div>
+
+    <!-- Cropper JS Dependency -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
+
+    <!-- Scripts -->
+    <!-- Supabase SDK Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../js/supabase-config.js"></script>
+    <script src="../js/supabase-service.js"></script>
+
+    <!-- QRCode JS Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <!-- App Logic Script -->
+    <script src="js/script.js"></script>
+</body>
+
+</html>
